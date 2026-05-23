@@ -1,0 +1,6 @@
+{
+  "name": "Hello World",
+  "description": "A minimalist, beautifully styled Hello World website.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
