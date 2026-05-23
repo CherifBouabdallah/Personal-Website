@@ -4,40 +4,62 @@
  */
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
+import Home from "./pages/Home";
+import About from "./pages/About";
 
 export default function App() {
-  const text = "Hello, World!";
   const [isReady, setIsReady] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     document.fonts.ready.then(() => setIsReady(true));
   }, []);
 
+  const isAbout = location.pathname === "/about";
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F6F0DF] overflow-hidden">
-      <h1 className="font-maghfirea text-[clamp(2rem,12vw,200px)] text-[#6A994E] whitespace-nowrap flex justify-center selection:bg-[#6A994E] selection:text-[#F6F0DF]">
-        {text.split("").map((char, index) => (
+    <div className="relative flex min-h-screen items-center justify-center bg-[#F6F0DF] overflow-hidden">
+      {/* Navigation */}
+      <motion.nav 
+        initial={{ opacity: 0, y: -10 }}
+        animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
+        transition={{ duration: 0.8, delay: 0.5 }}
+        className="absolute top-8 right-8 flex gap-8 z-10"
+      >
+        <Link
+          to="/"
+          className={`font-maghfirea text-xl tracking-wider transition-all duration-300 relative group ${
+            !isAbout ? "text-[#6A994E]" : "text-[#6A994E]/50 hover:text-[#6A994E]"
+          }`}
+        >
+          Hello
           <span
-            key={index}
-            className="inline-block overflow-hidden"
-            style={{ paddingBottom: "0.12em", marginBottom: "-0.12em" }}
-          >
-            <motion.span
-              className="inline-block"
-              // Ported from (1): Starts invisible and shifted down by 40px
-              initial={{ opacity: 0, y: 40 }}
-              animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-              transition={{
-                duration: 0.9, // animation-duration: 0.9s
-                ease: [0.21, 1, 0.36, 1], // cubic-bezier(0.21, 1, 0.36, 1)
-                delay: index * 0.05, // animation-delay steps of 0.08s per letter
-              }}
-            >
-              {char === " " ? "\u00A0" : char}
-            </motion.span>
-          </span>
-        ))}
-      </h1>
+            className={`absolute -bottom-1 left-0 w-full h-[2px] bg-[#6A994E] origin-left transition-transform duration-300 ${
+              !isAbout ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+            }`}
+          />
+        </Link>
+        <Link
+          to="/about"
+          className={`font-maghfirea text-xl tracking-wider transition-all duration-300 relative group ${
+            isAbout ? "text-[#6A994E]" : "text-[#6A994E]/50 hover:text-[#6A994E]"
+          }`}
+        >
+          About
+          <span
+            className={`absolute -bottom-1 left-0 w-full h-[2px] bg-[#6A994E] origin-left transition-transform duration-300 ${
+              isAbout ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+            }`}
+          />
+        </Link>
+      </motion.nav>
+
+      {/* Main Content */}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
     </div>
   );
 }
