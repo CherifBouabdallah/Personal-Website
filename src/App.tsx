@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
+import LiquidNavbar from "./components/LiquidNavbar";
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
@@ -20,6 +21,16 @@ export default function App() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-[#F6F0DF] overflow-hidden">
+      {/* Liquid Navbar at top middle */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
+        transition={{ duration: 0.8, delay: 0.5 }}
+        className="z-50"
+      >
+        <LiquidNavbar />
+      </motion.div>
+
       {/* Navigation */}
       <motion.nav
         initial={{ opacity: 0, y: -10 }}
