@@ -34,21 +34,22 @@
 
 .liquid-toggle {
   --unchecked: hsl(218, 8%, 81%);
-  --hue: 98; /* Custom matched to site green #6A994E */
+  --hue: 98;
+  /* Custom matched to site green #6A994E */
   --complete: 0;
   --delta: 0;
-  --checked: hsl(
-    var(--hue),
-    calc((8 + (var(--complete) / 100 * 92)) * 1%),
-    calc((81 - (var(--complete) / 100 * (81 - 43))) * 1%)
-  );
+  --checked: hsl(var(--hue),
+      calc((8 + (var(--complete) / 100 * 92)) * 1%),
+      calc((81 - (var(--complete) / 100 * (81 - 43))) * 1%));
   --control: hsl(300, 100%, 100%);
   --border: 4px;
   --width: 280;
-  --height: 28;          /* Thinner track bar (28px) */
+  --height: 28;
+  /* Thinner track bar (28px) */
   --bubble-width: 120;
-  --bubble-height: 52;   /* Taller bubble selector (52px) to stand out */
-  
+  --bubble-height: 52;
+  /* Taller bubble selector (52px) to stand out */
+
   height: calc(var(--height) * 1px);
   width: calc(var(--width) * 1px);
   border-radius: 100px;
@@ -72,55 +73,19 @@
   outline: none;
 }
 
-.indicator {
-  border-radius: 100px;
-  pointer-events: none;
-  height: 100%;
-  width: 100%;
-  background: #E2DCD0;
+/* Continuous Grey Track Background passing under the bubble */
+.indicator-track {
   position: absolute;
+  left: 0;
   top: 50%;
-  scale: 1;
-  left: 50%;
-  translate: -50% -50%;
-}
-
-.knockout {
+  translate: 0 -50%;
   height: calc(var(--height) * 1px);
   width: calc(var(--width) * 1px);
+  background: #E2DCD0;
   border-radius: 100px;
-  filter: url(#remove-black);
-  position: absolute;
-  inset: 0;
-  will-change: filter, scale;
-  transform: translate3d(0, 0, 0);
-}
-
-.indicator--masked {
-  background: #E2DCD0; /* Inset track background color */
-  z-index: 12;
-  height: 100%;
-  width: 100%;
-  translate: -50% -50%;
-  container-type: inline-size;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05); /* Inset shadow for depth */
-}
-
-.indicator--masked .mask {
-  position: absolute;
-  height: calc(var(--bubble-height) * 1px); /* Taller bubble height */
-  width: calc((var(--bubble-width) * 1px) - (2 * var(--border)));
-  top: 50%;
-  background: #000;
-  left: var(--border);
-  border-radius: 100px;
-  translate: calc(
-      (var(--complete) / 100) * (100cqi - calc(var(--bubble-width) * 1px) - (0 * var(--border)))
-    ) -50%;
-  transition-property: height, width, margin, scale, translate;
-  transition-duration: var(--transition);
-  transition-timing-function: var(--ease);
-  will-change: height, width, margin, translate;
+  z-index: 10;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  /* Inset shadow for depth */
 }
 
 .wrapper {
@@ -139,21 +104,27 @@
   border-radius: 100px;
   overflow: hidden;
   filter: url(#goo);
+  opacity: 0.5;
+  /* Opacity of the gooey blend */
 }
 
 .liquids .liquid__shadow {
   position: absolute;
   inset: 0;
-  box-shadow: inset 0px 0px 3px 4px #F6F0DF,
-    inset calc(((var(--complete) / 100) * 8px) + -4px) 0px 3px 4px #F6F0DF;
+  background: #ffffff;
+  /* Solid white bubble base for goo blending */
+  box-shadow: inset 0px 0px 3px 4px #ffffff,
+    inset calc(((var(--complete) / 100) * 8px) + -4px) 0px 3px 4px #ffffff;
   border-radius: 100px;
 }
 
 .liquids .liquid__track {
   content: '';
-  height: calc(var(--bubble-height) * 1px); /* Match bubble height */
+  height: calc(var(--height) * 1px);
+  /* Match track height (28px) so it distorts/bulges under the bubble */
   width: calc((var(--width) * 1px) - (0 * var(--border)));
-  background: #F6F0DF; /* Match app background color to look transparent */
+  background: #E2DCD0;
+  /* Match track color to blend with external track */
   border-radius: 100px;
   position: absolute;
   top: 50%;
@@ -161,26 +132,25 @@
   transition-property: height, width, filter, left, translate;
   transition-duration: var(--transition);
   transition-timing-function: var(--ease);
-  translate: calc(
-      (var(--complete) / 100) * (100cqi - 100% - (6 * var(--border)))
-    ) -50%;
+  translate: calc((var(--complete) / 100) * (100cqi - 100% - (6 * var(--border)))) -50%;
 }
 
 .indicator__liquid {
   position: absolute;
-  height: calc(var(--bubble-height) * 1px); /* Taller bubble height */
+  height: calc(var(--bubble-height) * 1px);
+  /* Taller bubble height */
   width: calc((var(--bubble-width) * 1px) - (2 * var(--border)));
   container-type: inline-size;
   top: 50%;
   background: transparent;
   left: var(--border);
   border-radius: 100px;
-  translate: calc(
-      (var(--complete) / 100) * (100cqi - 100% - (2 * var(--border)))
-    ) -50%;
+  translate: calc((var(--complete) / 100) * (100cqi - 100% - (2 * var(--border)))) -50%;
   transition-property: scale, translate;
   transition-duration: var(--transition);
   transition-timing-function: var(--ease);
+  z-index: 20;
+  /* Layered on top of the track */
 }
 
 .indicator__liquid .shadow {
@@ -203,23 +173,7 @@
   transition: opacity var(--transition) var(--ease);
 }
 
-.indicator__liquid .cover {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: #F6F0DF; /* Match app background color */
-  border-radius: 100px;
-  opacity: 0;
-  transition: opacity var(--transition) var(--ease);
-}
-
 /* Drag Delta Squeeze and Active States */
-.liquid-toggle[data-active='true'] .indicator--masked .mask {
-  height: calc((var(--bubble-height) * 1px) * (1.25 - (var(--delta, 0) * 0.025)));
-  width: calc((calc(var(--bubble-width) * 1px) - (2 * var(--border))) * (1.25 + (var(--delta, 0) * 0.025)));
-  margin-left: calc((calc(var(--bubble-width) * 1px) - (2 * var(--border))) * ((.25 + (var(--delta, 0) * 0.025)) * -0.5));
-}
-
 .liquid-toggle[data-active='true'] .indicator__liquid {
   scale: calc(1.25 + (var(--delta, 0) * 0.025)) calc(1.25 - (var(--delta, 0) * 0.025));
 }
@@ -232,13 +186,10 @@
   opacity: 1;
 }
 
-.liquid-toggle[data-active='true'] .indicator__liquid .cover {
-  opacity: 0;
-}
-
 .liquid-toggle[data-active='true'] .indicator__liquid .liquid__track {
   left: calc(var(--border) * 3);
-  height: calc((var(--bubble-height) * 1px) - (6 * var(--border))); /* Adjusted to bubble-height */
+  height: calc((var(--height) * 1px) - (6 * var(--border)));
+  /* Squeeze the track height */
 }
 
 /* Nav labels style inside the track */
@@ -246,12 +197,14 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: calc(var(--bubble-height) * 1px); /* Match bubble height for alignment & hover target */
+  height: calc(var(--bubble-height) * 1px);
+  /* Match bubble height for alignment & hover target */
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
   z-index: 25;
+  /* Sits above the bubble (z-index: 20) */
   pointer-events: auto;
 }
 
@@ -262,7 +215,8 @@
   letter-spacing: 0.02em;
   text-decoration: none;
   color: #6A994E;
-  opacity: 0.45; /* Semi-transparent for inactive state */
+  opacity: 0.45;
+  /* Semi-transparent for inactive state */
   transition: color var(--transition), opacity var(--transition), transform var(--transition);
   width: calc(var(--bubble-width) * 1px);
   height: 100%;
@@ -285,7 +239,19 @@
 }
 
 .nav-link-item.active {
-  color: #6A994E; /* Keep active text green for high contrast with transparent glass */
+  color: #6A994E;
+  /* Keep active text green for high contrast with transparent glass */
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.nav-link-item:last-child {
+  right: 0;
+}
+
+.nav-link-item.active {
+  color: #9FD382;
+  /* Bright pastel green for strong contrast against transparent glass bubble */
   opacity: 1;
   transform: scale(1.05);
 }

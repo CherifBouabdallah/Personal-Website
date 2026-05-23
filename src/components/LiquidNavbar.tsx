@@ -176,13 +176,10 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
           </a>
         </div>
 
-        {/* Liquid Indicator & Knockout Structure */}
-        <div className="knockout">
-          <div className="indicator indicator--masked">
-            <div className="mask"></div>
-          </div>
-        </div>
+        {/* Continuous Track Background */}
+        <div className="indicator-track"></div>
 
+        {/* Glass Bubble Selector */}
         <div className="indicator__liquid">
           <div className="shadow"></div>
           <div className="wrapper">
@@ -191,7 +188,6 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
               <div className="liquid__track"></div>
             </div>
           </div>
-          <div className="cover"></div>
         </div>
       </button>
 
