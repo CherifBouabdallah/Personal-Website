@@ -4,14 +4,24 @@
  */
 
 export default function App() {
+  const text = "Hello, World!";
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-stone-50 p-6 text-stone-900 transition-colors duration-300">
-      <main className="max-w-md text-center animate-fade-in">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#F6F0DF] p-6 text-[#6A994E] transition-colors duration-300 overflow-hidden">
+      <main className="text-center">
         <h1
           id="hello-world-title"
-          className="text-5xl font-extrabold tracking-tight sm:text-6xl text-stone-900 selection:bg-amber-100 mb-4"
+          className="font-maghfirea text-[200px] text-[#6A994E] selection:bg-[#6A994E] selection:text-[#F6F0DF] mb-4 flex justify-center"
         >
-          Hello, World!
+          {text.split("").map((char, index) => (
+            <span
+              key={index}
+              className="animate-slide-up-fade inline-block"
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              {char === " " ? "\u00A0" : char}
+            </span>
+          ))}
         </h1>
       </main>
     </div>
