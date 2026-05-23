@@ -21,7 +21,7 @@ export default function App() {
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-[#F6F0DF] overflow-hidden">
       {/* Navigation */}
-      <motion.nav 
+      <motion.nav
         initial={{ opacity: 0, y: -10 }}
         animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
         transition={{ duration: 0.8, delay: 0.5 }}
@@ -29,28 +29,24 @@ export default function App() {
       >
         <Link
           to="/"
-          className={`font-maghfirea text-xl tracking-wider transition-all duration-300 relative group ${
-            !isAbout ? "text-[#6A994E]" : "text-[#6A994E]/50 hover:text-[#6A994E]"
-          }`}
+          className={`font-maghfirea text-xl tracking-wider transition-all duration-300 relative group ${!isAbout ? "text-[#6A994E]" : "text-[#6A994E]/50 hover:text-[#6A994E]"
+            }`}
         >
           Hello
           <span
-            className={`absolute -bottom-1 left-0 w-full h-[2px] bg-[#6A994E] origin-left transition-transform duration-300 ${
-              !isAbout ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-            }`}
+            className={`absolute -bottom-1 left-0 w-full h-[2px] bg-[#6A994E] origin-left transition-transform duration-300 ${!isAbout ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+              }`}
           />
         </Link>
         <Link
           to="/about"
-          className={`font-maghfirea text-xl tracking-wider transition-all duration-300 relative group ${
-            isAbout ? "text-[#6A994E]" : "text-[#6A994E]/50 hover:text-[#6A994E]"
-          }`}
+          className={`font-maghfirea text-xl tracking-wider transition-all duration-300 relative group ${isAbout ? "text-[#6A994E]" : "text-[#6A994E]/50 hover:text-[#6A994E]"
+            }`}
         >
           About
           <span
-            className={`absolute -bottom-1 left-0 w-full h-[2px] bg-[#6A994E] origin-left transition-transform duration-300 ${
-              isAbout ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-            }`}
+            className={`absolute -bottom-1 left-0 w-full h-[2px] bg-[#6A994E] origin-left transition-transform duration-300 ${isAbout ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+              }`}
           />
         </Link>
       </motion.nav>
