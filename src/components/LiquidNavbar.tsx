@@ -185,7 +185,6 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
           <div className="wrapper">
             <div className="liquids">
               <div className="liquid__shadow"></div>
-              <div className="liquid__track"></div>
             </div>
           </div>
         </div>
