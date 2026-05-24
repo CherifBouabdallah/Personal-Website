@@ -35,6 +35,32 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
     bubble: true,
   };
 
+  // Interpolate tab styles (color, scale, opacity) dynamically along with the bubble movement
+  const updateLinkColors = (complete: number) => {
+    const toggle = toggleRef.current;
+    if (!toggle) return;
+
+    const links = toggle.querySelectorAll(".nav-link-item");
+    const numPages = PATHS.length;
+    const interval = 100 / (numPages - 1);
+
+    links.forEach((link: any, i: number) => {
+      const targetVal = i * interval;
+      const distance = Math.abs(complete - targetVal);
+      const factor = Math.max(0, 1 - distance / interval);
+
+      // Active color: #6A994E (rgb(106, 153, 78))
+      // Inactive color: #F6F0DF (rgb(246, 240, 223))
+      const r = Math.round(246 + (106 - 246) * factor);
+      const g = Math.round(240 + (153 - 240) * factor);
+      const b = Math.round(223 + (78 - 223) * factor);
+
+      link.style.color = `rgb(${r}, ${g}, ${b})`;
+      link.style.transform = `scale(${1 + 0.05 * factor})`;
+      link.style.opacity = String(0.7 + 0.3 * factor);
+    });
+  };
+
   // Sync state with HTML dataset attributes & CSS custom properties
   const updateVisuals = (complete: number, active: boolean, delta = 0) => {
     const toggle = toggleRef.current;
@@ -54,7 +80,10 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
     const currentIndex = PATHS.indexOf(location.pathname);
     const activeIndex = currentIndex === -1 ? 0 : currentIndex;
     const targetComplete = (activeIndex / (PATHS.length - 1)) * 100;
-    
+
+    // Apply color styling immediately to prevent layout flash before animation begins
+    updateLinkColors(targetComplete);
+
     // Set active to trigger the bubble scaling animation
     toggle.dataset.active = "true";
     toggle.dataset.pressed = "true";
@@ -65,9 +94,14 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
       ease: config.bounce
         ? "elastic.out(1, 0.6)"
         : "power2.out",
+      onUpdate: function () {
+        const currentComplete = parseFloat(toggle.style.getPropertyValue("--complete")) || 0;
+        updateLinkColors(currentComplete);
+      },
       onComplete: () => {
         toggle.dataset.active = "false";
         toggle.dataset.pressed = "false";
+        updateLinkColors(targetComplete);
       },
     });
   }, [location.pathname]);
@@ -97,16 +131,16 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
         const computedStyle = window.getComputedStyle(toggle);
         const bubbleWidth = parseFloat(computedStyle.getPropertyValue("--bubble-width")) || 120;
         const travelDistance = toggleBounds.width - bubbleWidth;
-        
+
         const currentIndex = PATHS.indexOf(location.pathname);
         const activeIndex = currentIndex === -1 ? 0 : currentIndex;
         const startComplete = (activeIndex / (PATHS.length - 1)) * 100;
-        
+
         this.travelDistance = travelDistance;
         this.startComplete = startComplete;
         this.leftLimit = - (startComplete / 100) * travelDistance;
         this.rightLimit = (1 - startComplete / 100) * travelDistance;
-        
+
         toggle.dataset.active = "true";
       },
       onDrag: function () {
@@ -117,10 +151,11 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
           gsap.utils.mapRange(this.leftLimit, this.rightLimit, 0, 100, dragged)
         );
         this.complete = complete;
-        
+
         // Calculate delta for the bubble squeeze stretch effect
         const delta = Math.min(Math.abs(this.deltaX), 12);
         updateVisuals(complete, true, delta);
+        updateLinkColors(complete);
       },
       onDragEnd: function () {
         const numPages = PATHS.length;
@@ -128,7 +163,7 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
         const nearestIndex = Math.round(this.complete / snapInterval);
         const targetComplete = nearestIndex * snapInterval;
         const targetPath = PATHS[nearestIndex];
-        
+
         gsap.fromTo(
           toggle,
           {
@@ -138,8 +173,13 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
             "--complete": targetComplete,
             duration: 0.25,
             ease: "power2.out",
+            onUpdate: function () {
+              const currentComplete = parseFloat(toggle.style.getPropertyValue("--complete")) || 0;
+              updateLinkColors(currentComplete);
+            },
             onComplete: () => {
               toggle.dataset.active = "false";
+              updateLinkColors(targetComplete);
               if (location.pathname !== targetPath) {
                 navigate(targetPath);
               }
@@ -178,7 +218,7 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
             if (path === "/portfolio") label = "Portfolio";
             if (path === "/contact") label = "Contact";
             if (path === "/about") label = "About";
-            
+
             const active = location.pathname === path;
             return (
               <a
