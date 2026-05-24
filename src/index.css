@@ -10,7 +10,7 @@
 
 /* 2. Add it to Tailwind's theme */
 @theme {
-  --font-maghfirea: "Maghfirea", sans-serif;
+  --font-maghfirea: "Maghfirea", serif;
 }
 
 /* Liquid Toggle Styles */
@@ -39,7 +39,7 @@
       calc((81 - (var(--complete) / 100 * (81 - 43))) * 1%));
   --control: hsl(300, 100%, 100%);
   --border: 4px;
-  --width: 280;
+  --width: 560;
   --height: 28;
   /* Thinner track bar (28px) */
   --bubble-width: 120;
@@ -178,6 +178,7 @@
   transform: translateY(-50%);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   z-index: 25;
   /* Sits above the bubble (z-index: 20) */
   pointer-events: auto;
@@ -201,16 +202,8 @@
   cursor: pointer;
   z-index: 30;
   user-select: none;
-  position: absolute;
+  position: relative;
   top: 0;
-}
-
-.nav-link-item:first-child {
-  left: 0;
-}
-
-.nav-link-item:last-child {
-  right: 0;
 }
 
 .nav-link-item.active {

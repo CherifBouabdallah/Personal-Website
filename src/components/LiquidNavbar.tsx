@@ -6,6 +6,8 @@ import { Draggable } from "gsap/Draggable";
 // Register Draggable plugin
 gsap.registerPlugin(Draggable);
 
+const PATHS = ["/", "/portfolio", "/contact", "/about"];
+
 interface LiquidNavbarProps {
   className?: string;
 }
@@ -18,11 +20,13 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
   const proxyRef = useRef<HTMLDivElement>(null);
   const draggableInstance = useRef<any>(null);
 
-  const isAbout = location.pathname === "/about";
+  const currentIndex = PATHS.indexOf(location.pathname);
+  const activeIndex = currentIndex === -1 ? 0 : currentIndex;
+  const initialComplete = (activeIndex / (PATHS.length - 1)) * 100;
 
   // Initial config matching the Jhey toggle
   const config = {
-    complete: isAbout ? 100 : 0,
+    complete: initialComplete,
     active: false,
     deviation: 2,
     alpha: 16,
@@ -47,7 +51,9 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
     const toggle = toggleRef.current;
     if (!toggle) return;
 
-    const targetComplete = isAbout ? 100 : 0;
+    const currentIndex = PATHS.indexOf(location.pathname);
+    const activeIndex = currentIndex === -1 ? 0 : currentIndex;
+    const targetComplete = (activeIndex / (PATHS.length - 1)) * 100;
     
     // Set active to trigger the bubble scaling animation
     toggle.dataset.active = "true";
@@ -64,7 +70,7 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
         toggle.dataset.pressed = "false";
       },
     });
-  }, [isAbout]);
+  }, [location.pathname]);
 
   // Click handler for menu items
   const handleNavClick = (path: string, e: React.MouseEvent) => {
@@ -88,23 +94,26 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
       handle: toggle,
       onDragStart: function () {
         const toggleBounds = toggle.getBoundingClientRect();
-        const pressed = location.pathname === "/about";
-        // Calculate the drag bounds relative to the current position
-        const bounds = pressed
-          ? toggleBounds.left - this.pointerX
-          : toggleBounds.left + toggleBounds.width - this.pointerX;
-        this.dragBounds = bounds;
+        const bubbleWidth = 120;
+        const travelDistance = toggleBounds.width - bubbleWidth;
+        
+        const currentIndex = PATHS.indexOf(location.pathname);
+        const activeIndex = currentIndex === -1 ? 0 : currentIndex;
+        const startComplete = (activeIndex / (PATHS.length - 1)) * 100;
+        
+        this.travelDistance = travelDistance;
+        this.startComplete = startComplete;
+        this.leftLimit = - (startComplete / 100) * travelDistance;
+        this.rightLimit = (1 - startComplete / 100) * travelDistance;
+        
         toggle.dataset.active = "true";
       },
       onDrag: function () {
-        const pressed = location.pathname === "/about";
         const dragged = this.x - this.startX;
         const complete = gsap.utils.clamp(
           0,
           100,
-          pressed
-            ? gsap.utils.mapRange(this.dragBounds, 0, 0, 100, dragged)
-            : gsap.utils.mapRange(0, this.dragBounds, 0, 100, dragged)
+          gsap.utils.mapRange(this.leftLimit, this.rightLimit, 0, 100, dragged)
         );
         this.complete = complete;
         
@@ -113,7 +122,11 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
         updateVisuals(complete, true, delta);
       },
       onDragEnd: function () {
-        const targetComplete = this.complete >= 50 ? 100 : 0;
+        const numPages = PATHS.length;
+        const snapInterval = 100 / (numPages - 1);
+        const nearestIndex = Math.round(this.complete / snapInterval);
+        const targetComplete = nearestIndex * snapInterval;
+        const targetPath = PATHS[nearestIndex];
         
         gsap.fromTo(
           toggle,
@@ -126,7 +139,6 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
             ease: "power2.out",
             onComplete: () => {
               toggle.dataset.active = "false";
-              const targetPath = targetComplete === 100 ? "/about" : "/";
               if (location.pathname !== targetPath) {
                 navigate(targetPath);
               }
@@ -151,29 +163,33 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
       <button
         ref={toggleRef}
         aria-label="toggle"
-        aria-pressed={isAbout ? "true" : "false"}
+        aria-pressed={activeIndex > 0 ? "true" : "false"}
         className="liquid-toggle"
         style={{
           // Set initial complete state
-          "--complete": isAbout ? 100 : 0,
+          "--complete": initialComplete,
         } as React.CSSProperties}
       >
         {/* Navigation Labels Layer (Rendered below/inside the track bubble) */}
         <div className="nav-links-overlay">
-          <a
-            href="/"
-            onClick={(e) => handleNavClick("/", e)}
-            className={`nav-link-item ${!isAbout ? "active" : ""}`}
-          >
-            Hello
-          </a>
-          <a
-            href="/about"
-            onClick={(e) => handleNavClick("/about", e)}
-            className={`nav-link-item ${isAbout ? "active" : ""}`}
-          >
-            About
-          </a>
+          {PATHS.map((path) => {
+            let label = "Home";
+            if (path === "/portfolio") label = "Portfolio";
+            if (path === "/contact") label = "Contact";
+            if (path === "/about") label = "About";
+            
+            const active = location.pathname === path;
+            return (
+              <a
+                key={path}
+                href={path}
+                onClick={(e) => handleNavClick(path, e)}
+                className={`nav-link-item ${active ? "active" : ""}`}
+              >
+                {label}
+              </a>
+            );
+          })}
         </div>
 
         {/* Continuous Track Background */}
