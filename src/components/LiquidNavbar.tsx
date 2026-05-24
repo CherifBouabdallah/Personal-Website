@@ -94,7 +94,8 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
       handle: toggle,
       onDragStart: function () {
         const toggleBounds = toggle.getBoundingClientRect();
-        const bubbleWidth = 120;
+        const computedStyle = window.getComputedStyle(toggle);
+        const bubbleWidth = parseFloat(computedStyle.getPropertyValue("--bubble-width")) || 120;
         const travelDistance = toggleBounds.width - bubbleWidth;
         
         const currentIndex = PATHS.indexOf(location.pathname);

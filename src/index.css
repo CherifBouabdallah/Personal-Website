@@ -212,3 +212,28 @@
   opacity: 1;
   transform: scale(1.05);
 }
+
+/* Smartphone responsiveness adaptations */
+@media (max-width: 600px) {
+  .liquid-toggle {
+    --width: 345;
+    --bubble-width: 82;
+    --height: 24;
+    --bubble-height: 44;
+  }
+  .nav-link-item {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 350px) {
+  .liquid-toggle {
+    --width: 295;
+    --bubble-width: 70;
+    --height: 22;
+    --bubble-height: 40;
+  }
+  .nav-link-item {
+    font-size: 0.72rem;
+  }
+}
