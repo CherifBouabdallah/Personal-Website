@@ -8,10 +8,21 @@ export default function Home() {
     document.fonts.ready.then(() => setIsReady(true));
   }, []);
 
-  const text = "Hello, World!";
+  const text = "Cherif Bouabdallah";
 
   return (
-    <h1 className="font-maghfirea text-[clamp(2rem,12vw,200px)] text-[#6A994E] whitespace-nowrap flex justify-center selection:bg-[#6A994E] selection:text-[#F6F0DF]">
+    <h1 
+      /* 
+        ADJUST FONT SIZE HERE:
+        - text-[clamp(1.5rem,8vw,120px)] makes the text smaller.
+        - Format: clamp(MIN_SIZE, RESPONSIVE_SIZE, MAX_SIZE)
+        
+        ADJUST HEIGHT (VERTICAL POSITION) HERE:
+        - relative -translate-y-20 moves the text higher up.
+        - You can increase/decrease this (e.g., -translate-y-12, -translate-y-24, or custom value -translate-y-[100px])
+      */
+      className="font-maghfirea text-[clamp(1.5rem,8vw,120px)] text-[#6A994E] whitespace-nowrap flex justify-center selection:bg-[#6A994E] selection:text-[#F6F0DF] relative -translate-y-75"
+    >
       {text.split("").map((char, index) => (
         <span
           key={index}
