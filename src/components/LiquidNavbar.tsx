@@ -49,11 +49,11 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
       const distance = Math.abs(complete - targetVal);
       const factor = Math.max(0, 1 - distance / interval);
 
-      // Active color: #6A994E (rgb(106, 153, 78))
-      // Inactive color: #F6F0DF (rgb(246, 240, 223))
-      const r = Math.round(246 + (106 - 246) * factor);
-      const g = Math.round(240 + (153 - 240) * factor);
-      const b = Math.round(223 + (78 - 223) * factor);
+      // Active color: #F6F0DF (rgb(246, 240, 223))
+      // Inactive color: #386641 (rgb(56, 102, 65))
+      const r = Math.round(56 + (246 - 56) * factor);
+      const g = Math.round(102 + (240 - 102) * factor);
+      const b = Math.round(65 + (223 - 65) * factor);
 
       link.style.color = `rgb(${r}, ${g}, ${b})`;
       link.style.transform = `scale(${1 + 0.05 * factor})`;

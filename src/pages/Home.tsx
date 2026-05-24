@@ -11,7 +11,7 @@ export default function Home() {
   const text = "Cherif Bouabdallah";
 
   return (
-    <h1 
+    <h1
       /* 
         ADJUST FONT SIZE HERE:
         - text-[clamp(1.5rem,8vw,120px)] makes the text smaller.
@@ -21,7 +21,7 @@ export default function Home() {
         - relative -translate-y-20 moves the text higher up.
         - You can increase/decrease this (e.g., -translate-y-12, -translate-y-24, or custom value -translate-y-[100px])
       */
-      className="font-maghfirea text-[clamp(1.5rem,8vw,120px)] text-[#6A994E] whitespace-nowrap flex justify-center selection:bg-[#6A994E] selection:text-[#F6F0DF] relative -translate-y-75"
+      className="font-maghfirea text-[clamp(1.5rem,8vw,120px)] text-[#F6F0DF] whitespace-nowrap flex justify-center selection:bg-[#F6F0DF] selection:text-[#386641] relative -translate-y-75"
     >
       {text.split("").map((char, index) => (
         <span

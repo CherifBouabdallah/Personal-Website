@@ -19,7 +19,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-[#F6F0DF] overflow-hidden">
+    <div className="relative flex min-h-screen items-center justify-center bg-[#386641] overflow-hidden">
       {/* Liquid Navbar at top middle */}
       <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50">
         <motion.div
