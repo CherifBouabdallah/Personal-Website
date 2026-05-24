@@ -171,7 +171,7 @@ export default function Experimental() {
           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           className="w-full min-h-screen px-6 md:px-16 lg:px-24 xl:px-36 pb-32 flex flex-col items-center overflow-x-hidden selection:bg-[#F6F0DF] selection:text-[#386641]"
           style={{
-            paddingTop: "max(0px, calc(50vh - 30px - clamp(1.5rem, 8vw, 120px) / 2))"
+            paddingTop: "max(380px, calc(50vh - clamp(1.5rem, 8vw, 120px) / 2))"
           }}
         >
           {/* Dynamic Topographic Marble Pattern */}
