@@ -32,7 +32,7 @@ export default function App() {
   const isExp = location.pathname === "/exp";
 
   return (
-    <div className={`relative flex min-h-screen bg-[#386641] ${isExp ? "overflow-y-auto items-stretch justify-stretch" : "items-center justify-center overflow-hidden"}`}>
+    <div className={`relative flex min-h-screen bg-[#386641] ${isExp ? "overflow-y-auto overscroll-y-none items-stretch justify-stretch" : "items-center justify-center overflow-hidden"}`}>
       <AnimatePresence mode="wait">
         {!isSiteReady && (
           <motion.div

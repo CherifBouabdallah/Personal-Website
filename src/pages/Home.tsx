@@ -31,10 +31,10 @@ export default function Home() {
         >
           <motion.span
             className="inline-block"
-            initial={{ opacity: 0, y: 40 }}
-            animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+            animate={isReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 50, filter: "blur(10px)" }}
             transition={{
-              duration: 0.9,
+              duration: 1.0,
               ease: [0.21, 1, 0.36, 1],
               delay: index * 0.05,
             }}
