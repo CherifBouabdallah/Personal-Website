@@ -258,3 +258,40 @@ body {
     font-size: 0.72rem;
   }
 }
+
+/* Glassy Square Style - Matches Liquid Navbar Bubble styling but scaled up */
+.glass-square {
+  background: rgba(56, 102, 65, 0.35);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border: 1px solid rgba(246, 240, 223, 0.25);
+  border-radius: 24px;
+  box-shadow: 
+    1px -1px 2px hsl(0 0% 100% / 0.5) inset,
+    0px -1px 2px hsl(0 0% 100% / 0.5) inset,
+    -1px -1px 2px hsl(0 0% 100% / 0.5) inset,
+    1px 1px 2px hsl(0 0% 30% / 0.5) inset,
+    -8px 4px 10px -6px hsl(0 0% 30% / 0.25) inset,
+    -1px 1px 6px hsl(0 0% 30% / 0.25) inset,
+    -1px -1px 8px rgba(0, 0, 0, 0.1), 
+    1px 1px 2px rgba(0, 0, 0, 0.1),
+    2px 2px 6px rgba(0, 0, 0, 0.15),
+    -2px -1px 2px hsl(0 0% 100% / 0.25) inset,
+    3px 6px 16px -6px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.3s ease, background-color 0.3s ease, transform 0.3s ease;
+}
+
+.glass-square:hover {
+  background: rgba(56, 102, 65, 0.45);
+  border-color: rgba(246, 240, 223, 0.4);
+}
+
+/* Hide scrollbar utility for a borderless premium desktop aesthetic */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
