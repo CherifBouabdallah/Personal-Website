@@ -8,7 +8,7 @@ export default function About() {
     document.fonts.ready.then(() => setIsReady(true));
   }, []);
 
-  const text = "About Me";
+  const text = "About The Website";
 
   return (
     <h1 className="font-maghfirea text-[clamp(2rem,12vw,200px)] text-[#F6F0DF] whitespace-nowrap flex justify-center selection:bg-[#F6F0DF] selection:text-[#386641]">
