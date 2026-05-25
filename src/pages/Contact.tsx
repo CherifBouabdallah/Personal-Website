@@ -105,6 +105,15 @@ export default function Contact() {
 
   useEffect(() => {
     document.fonts.ready.then(() => setIsReady(true));
+    
+    // Apply no-scrollbar to HTML and Body to ensure clean scrollbar-free virtual scroll layout
+    document.documentElement.classList.add("no-scrollbar");
+    document.body.classList.add("no-scrollbar");
+    
+    return () => {
+      document.documentElement.classList.remove("no-scrollbar");
+      document.body.classList.remove("no-scrollbar");
+    };
   }, []);
 
   // Fetch the current year from the internet with a 3-second timeout fallback
@@ -208,6 +217,8 @@ export default function Contact() {
   const footerOpacity = useTransform(smoothProgress, [0.65, 0.98], [0, 0.35]);
   const footerY = useTransform(smoothProgress, [0.65, 0.98], ["15px", "0px"]);
 
+  const bgY = useTransform(smoothProgress, [0, 1], ["0px", "-100px"]);
+
   const socials = [
     {
       name: "GITHUB",
@@ -230,6 +241,23 @@ export default function Contact() {
 
   return (
     <div className="w-full h-screen min-h-screen flex flex-col items-center justify-center relative overflow-hidden select-none touch-none">
+      {/* Background Artwork Image */}
+      <motion.div 
+        style={{ 
+          opacity: 0.12,
+          y: bgY,
+          scale: 1.15,
+          transformOrigin: "center top",
+        }}
+        className="fixed inset-0 w-full h-screen pointer-events-none select-none z-0 overflow-hidden"
+      >
+        <img 
+          src="/Untitled_Artwork.png" 
+          alt="Background Artwork" 
+          className="w-full h-full object-cover"
+        />
+      </motion.div>
+
       {/* Title */}
       <motion.div
         style={{ y: titleY, scale: titleScale }}
@@ -354,13 +382,13 @@ export default function Contact() {
       {/* Selected Option A: Minimalist Sliding Line */}
       <motion.div
         style={{ opacity: inviteOpacity, y: inviteY }}
-        className="absolute bottom-12 flex flex-col items-center gap-2 z-10 pointer-events-none"
+        className="absolute bottom-12 flex flex-col items-center gap-2.5 z-10 pointer-events-none"
       >
-        <div className="h-[32px] flex flex-col items-center justify-center gap-1.5">
-          <span className="font-mono text-[8px] tracking-[0.3em] uppercase text-[#F6F0DF]/60">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-[#F6F0DF]/60">
             SCROLL
           </span>
-          <div className="w-[1px] h-[14px] bg-[#F6F0DF]/20 relative overflow-hidden">
+          <div className="w-[1.5px] h-[22px] bg-[#F6F0DF]/20 relative overflow-hidden">
             <motion.div
               animate={{
                 y: ["-100%", "100%"],
