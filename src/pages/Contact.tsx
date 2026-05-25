@@ -249,7 +249,7 @@ export default function Contact() {
           scale: 1.15,
           transformOrigin: "center top",
         }}
-        className="fixed inset-0 w-full h-screen pointer-events-none select-none z-0 overflow-hidden"
+        className="fixed top-0 left-0 right-0 bottom-[-300px] w-full pointer-events-none select-none z-0 overflow-hidden"
       >
         <img 
           src="/Untitled_Artwork.png" 
@@ -269,7 +269,7 @@ export default function Contact() {
           variants={{
             visible: { transition: { staggerChildren: 0.05 } }
           }}
-          className="font-maghfirea text-[clamp(2.5rem,12vw,200px)] text-[#F6F0DF] whitespace-nowrap flex justify-center selection:bg-[#F6F0DF] selection:text-[#386641]"
+          className="font-maghfirea text-[clamp(2.5rem,12vw,200px)] text-[#F6F0DF] whitespace-nowrap flex justify-center selection:bg-[#F6F0DF] selection:text-[#386641] px-4 w-full"
         >
           {text.split("").map((char, index) => (
             <span

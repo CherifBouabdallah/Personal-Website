@@ -11,7 +11,7 @@ export default function Portfolio() {
   const text = "Portfolio";
 
   return (
-    <h1 className="font-maghfirea text-[clamp(2rem,12vw,200px)] text-[#F6F0DF] whitespace-nowrap flex justify-center selection:bg-[#F6F0DF] selection:text-[#386641]">
+    <h1 className="font-maghfirea text-[clamp(2.5rem,12vw,200px)] text-[#F6F0DF] whitespace-nowrap flex justify-center selection:bg-[#F6F0DF] selection:text-[#386641] px-4 w-full">
       {text.split("").map((char, index) => (
         <span
           key={index}

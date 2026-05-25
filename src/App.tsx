@@ -29,10 +29,10 @@ export default function App() {
     img.onerror = () => setImageLoaded(true); // Fallback to avoid blocking if image path fails
   }, []);
 
-  const isExp = location.pathname === "/exp";
+  const isScrollable = location.pathname === "/exp" || location.pathname === "/about";
 
   return (
-    <div className={`relative flex min-h-screen bg-[#386641] ${isExp ? "overflow-y-auto no-scrollbar overscroll-y-none items-stretch justify-stretch" : "items-center justify-center overflow-hidden"}`}>
+    <div className={`relative flex min-h-screen bg-[#386641] ${isScrollable ? "overflow-y-auto no-scrollbar overscroll-y-none items-stretch justify-stretch" : "items-center justify-center overflow-hidden"}`}>
       <AnimatePresence mode="wait">
         {!isSiteReady && (
           <motion.div
@@ -62,7 +62,7 @@ export default function App() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-          className={`w-full min-h-screen relative ${isExp ? "flex flex-col items-stretch justify-start" : "flex items-center justify-center"}`}
+          className={`w-full min-h-screen relative ${isScrollable ? "flex flex-col items-stretch justify-start" : "flex items-center justify-center"}`}
         >
           {/* Liquid Navbar at top middle */}
           <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50">

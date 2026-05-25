@@ -17,6 +17,8 @@ body {
 /* 2. Add it to Tailwind's theme */
 @theme {
   --font-maghfirea: "Maghfirea", serif;
+  --color-theme-text: var(--theme-text, #F6F0DF);
+  --color-theme-bg: var(--theme-bg, #386641);
 }
 
 /* Liquid Toggle Styles */

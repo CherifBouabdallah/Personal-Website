@@ -12,35 +12,33 @@ export default function Home() {
 
   return (
     <h1
-      /* 
-        ADJUST FONT SIZE HERE:
-        - text-[clamp(1.5rem,8vw,120px)] makes the text smaller.
-        - Format: clamp(MIN_SIZE, RESPONSIVE_SIZE, MAX_SIZE)
-        
-        ADJUST HEIGHT (VERTICAL POSITION) HERE:
-        - relative -translate-y-20 moves the text higher up.
-        - You can increase/decrease this (e.g., -translate-y-12, -translate-y-24, or custom value -translate-y-[100px])
-      */
-      className="font-maghfirea text-[clamp(1.5rem,8vw,120px)] text-[#F6F0DF] whitespace-nowrap flex justify-center selection:bg-[#F6F0DF] selection:text-[#386641] relative -translate-y-35"
+      className="font-maghfirea text-[clamp(1.8rem,8vw,120px)] text-[#F6F0DF] flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] relative -translate-y-12 md:-translate-y-35 px-4 select-none w-full"
     >
-      {text.split("").map((char, index) => (
-        <span
-          key={index}
-          className="inline-block overflow-hidden"
-          style={{ paddingBottom: "0.12em", marginBottom: "-0.12em" }}
-        >
-          <motion.span
-            className="inline-block"
-            initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
-            animate={isReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 50, filter: "blur(10px)" }}
-            transition={{
-              duration: 1.0,
-              ease: [0.21, 1, 0.36, 1],
-              delay: index * 0.05,
-            }}
-          >
-            {char === " " ? "\u00A0" : char}
-          </motion.span>
+      {text.split(" ").map((word, wordIndex) => (
+        <span key={wordIndex} className="inline-block whitespace-nowrap">
+          {word.split("").map((char, charIndex) => {
+            const globalIndex = wordIndex * 7 + charIndex;
+            return (
+              <span
+                key={charIndex}
+                className="inline-block overflow-hidden"
+                style={{ paddingBottom: "0.12em", marginBottom: "-0.12em" }}
+              >
+                <motion.span
+                  className="inline-block"
+                  initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+                  animate={isReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 50, filter: "blur(10px)" }}
+                  transition={{
+                    duration: 1.0,
+                    ease: [0.21, 1, 0.36, 1],
+                    delay: globalIndex * 0.05,
+                  }}
+                >
+                  {char}
+                </motion.span>
+              </span>
+            );
+          })}
         </span>
       ))}
     </h1>

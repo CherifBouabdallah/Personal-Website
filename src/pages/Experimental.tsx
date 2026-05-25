@@ -5,13 +5,13 @@ import { useNavigate } from "react-router-dom";
 // Elegant self-drawing border divider rule
 function SelfDrawingLine({ className = "" }: { className?: string }) {
   return (
-    <div className={`relative w-full h-[1px] bg-[#F6F0DF]/10 overflow-hidden ${className}`}>
+    <div className={`relative w-full h-[1px] bg-theme-text/10 overflow-hidden ${className}`}>
       <motion.div
         initial={{ scaleX: 0 }}
         whileInView={{ scaleX: 1 }}
         viewport={{ once: true, margin: "-40px" }}
         transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute inset-0 bg-[#F6F0DF]/30 origin-left"
+        className="absolute inset-0 bg-theme-text/30 origin-left"
       />
     </div>
   );
@@ -105,7 +105,6 @@ export default function Experimental() {
   const contentRef = useRef<HTMLDivElement>(null);
   
   const [maxScroll, setMaxScroll] = useState(0);
-  const [showArtwork, setShowArtwork] = useState(true);
   
   const navigate = useNavigate();
   const currentScrollY = useRef(0);
@@ -119,8 +118,8 @@ export default function Experimental() {
   });
   
   const contentY = useTransform(smoothScrollY, y => -y);
-  const bgY = useTransform(smoothScrollY, y => -y * 0.15);
-
+  const bgY = useTransform(smoothScrollY, y => maxScroll > 0 ? (y / maxScroll) * -100 : 0);
+  
   useEffect(() => {
     setIsReady(true);
 
@@ -237,8 +236,6 @@ export default function Experimental() {
 
   const titleText = "Cherif Bouabdallah";
 
-
-
   // Micro-interaction entry animation variants
   const elementVariants: Variants = {
     hidden: { opacity: 0, y: 15 },
@@ -269,13 +266,15 @@ export default function Experimental() {
   };
 
   return (
-    <div className="w-full h-screen min-h-screen bg-[#386641] text-[#F6F0DF] relative overflow-hidden touch-none">
+    <div 
+      className="w-full h-screen min-h-screen relative overflow-hidden touch-none bg-theme-bg text-theme-text"
+    >
       {/* Background Artwork Image */}
       <motion.div 
         ref={bgRef}
-        className="fixed inset-0 w-full h-screen pointer-events-none select-none z-0 overflow-hidden transition-opacity duration-500"
+        className="fixed top-0 left-0 right-0 bottom-[-300px] w-full pointer-events-none select-none z-0 overflow-hidden transition-opacity duration-500"
         style={{ 
-          opacity: showArtwork ? 0.12 : 0,
+          opacity: 0.12,
           y: bgY,
           scale: 1.15,
           transformOrigin: "center top",
@@ -312,7 +311,7 @@ export default function Experimental() {
             <div className="flex flex-col gap-12 md:gap-20">
 
               {/* Apple-style animated responsive title */}
-              <h1 className="font-maghfirea text-[clamp(2.8rem,9vw,120px)] text-[#F6F0DF] flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] relative translate-y-0 md:-translate-y-48">
+              <h1 className="font-maghfirea text-[clamp(2.8rem,9vw,120px)] text-theme-text flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] relative translate-y-0 md:-translate-y-48">
                 {titleText.split(" ").map((word, wordIndex) => (
                   <span key={wordIndex} className="inline-block whitespace-nowrap">
                     {word.split("").map((char, charIndex) => {
@@ -347,7 +346,7 @@ export default function Experimental() {
 
                 {/* Column 1: Portrait Frame with simple border (no animations) */}
                 <div className="col-span-1 md:col-span-4 flex flex-col items-center md:items-stretch w-full max-w-[280px] md:max-w-none mx-auto aspect-[4/5] md:aspect-auto min-h-[350px] lg:min-h-[420px]">
-                  <div className="w-full h-full border border-[#F6F0DF] overflow-hidden bg-white/5 relative select-none">
+                  <div className="w-full h-full border border-theme-text overflow-hidden bg-white/5 relative select-none">
                     <img
                       src="/IMG_2656.JPEG"
                       alt="Portrait of Cherif Bouabdallah"
@@ -369,19 +368,10 @@ export default function Experimental() {
                   </div>
                   <motion.p
                     variants={blurRevealVariants}
-                    className="text-base md:text-lg lg:text-xl leading-relaxed text-[#F6F0DF]/80 font-normal"
+                    className="text-base md:text-lg lg:text-xl leading-relaxed text-theme-text/80 font-normal"
                   >
                     I am a designer and full-stack software engineer who focuses on bridging the gap between aesthetics and clean code. I build performant front-ends and interactive experiences that are highly responsive and structured. Driven by curiosity, I aim to craft memorable digital products that look beautiful and feel extremely premium.
                   </motion.p>
-                  <button
-                    onClick={() => setShowArtwork(!showArtwork)}
-                    className="font-mono text-[8px] tracking-[0.2em] uppercase text-[#F6F0DF]/40 hover:text-[#F6F0DF] transition-colors duration-200 cursor-pointer flex items-center gap-2 mt-6 select-none justify-center md:justify-start"
-                  >
-                    <span>Artwork:</span>
-                    <span className={showArtwork ? "text-[#F6F0DF] font-bold" : "opacity-50"}>ON</span>
-                    <span className="opacity-30">|</span>
-                    <span className={!showArtwork ? "text-[#F6F0DF] font-bold" : "opacity-50"}>OFF</span>
-                  </button>
                 </motion.div>
 
                 {/* Column 3: Skills List with Layout Options */}
@@ -396,13 +386,13 @@ export default function Experimental() {
                     02 / My Skills
                   </div>
 
-                  <div className="w-full font-mono text-[10px] sm:text-[11px] divide-y divide-[#F6F0DF]/10">
+                  <div className="w-full font-mono text-[10px] sm:text-[11px] divide-y divide-theme-text/10">
                     {skillsData.map((skill) => (
                       <motion.div
                         key={skill.name}
                         whileHover={{ x: 4 }}
                         transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="flex justify-between items-center py-3.5 text-left text-[#F6F0DF]/75 hover:text-white cursor-default transition-colors duration-200"
+                        className="flex justify-between items-center py-3.5 text-left text-theme-text/75 hover:text-white cursor-default transition-colors duration-200"
                       >
                         <span className="font-bold tracking-wide">{skill.name}</span>
                         <span className="opacity-75 hover:opacity-100 transition-opacity">
@@ -440,13 +430,13 @@ export default function Experimental() {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-80px" }}
-                  className="space-y-6 text-base md:text-lg lg:text-xl leading-relaxed text-[#F6F0DF]/80 font-normal"
+                  className="space-y-6 text-base md:text-lg lg:text-xl leading-relaxed text-theme-text/80 font-normal"
                 >
                   <p>
-                    Currently pursuing software engineering at <span className="text-[#F6F0DF] font-semibold underline decoration-[#F6F0DF]/30 underline-offset-4">EPFL</span> (École Polytechnique Fédérale de Lausanne), focusing on distributed architectures, interactive computer graphics, and engineering clean web environments.
+                    Currently pursuing software engineering at <span className="text-theme-text font-semibold underline decoration-theme-text/30 underline-offset-4">EPFL</span> (École Polytechnique Fédérale de Lausanne), focusing on distributed architectures, interactive computer graphics, and engineering clean web environments.
                   </p>
                   <p>
-                    When I am not coding, you will find me playing competitive <span className="text-[#F6F0DF] font-semibold">Volleyball</span>, designing high-fidelity layouts, or studying new patterns in digital systems. I enjoy creating seamless interactions and testing fluid web interfaces.
+                    When I am not coding, you will find me playing competitive <span className="text-theme-text font-semibold">Volleyball</span>, designing high-fidelity layouts, or studying new patterns in digital systems. I enjoy creating seamless interactions and testing fluid web interfaces.
                   </p>
                 </motion.div>
               </motion.div>
@@ -464,20 +454,20 @@ export default function Experimental() {
                   <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">
                     04 / Connect
                   </div>
-                  <div className="font-mono text-[8px] tracking-[0.2em] text-[#F6F0DF]/40 uppercase mt-0.5">
+                  <div className="font-mono text-[8px] tracking-[0.2em] text-theme-text/40 uppercase mt-0.5">
                     Route: /contact
                   </div>
                 </div>
 
                 <div className="my-2">
-                  <span className="font-maghfirea text-2xl sm:text-3xl text-[#F6F0DF] tracking-wide block transition-transform duration-300 group-hover:translate-x-1.5">
+                  <span className="font-maghfirea text-2xl sm:text-3xl text-theme-text tracking-wide block transition-transform duration-300 group-hover:translate-x-1.5">
                     Get In Touch
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between font-mono text-[9px] pt-1">
                   <span className="opacity-0"></span>
-                  <span className="text-[#F6F0DF]/50 group-hover:text-white group-hover:translate-x-1 transition-all duration-300 flex items-center gap-1.5">
+                  <span className="text-theme-text/50 group-hover:text-white group-hover:translate-x-1 transition-all duration-300 flex items-center gap-1.5">
                     ENTER GATE <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
                   </span>
                 </div>
@@ -490,12 +480,12 @@ export default function Experimental() {
           {/* ========================================== */}
           {/* MINIMAL FOOTER                             */}
           {/* ========================================== */}
-          <footer className="mt-32 w-full pt-8 border-t border-[#F6F0DF]/10 flex flex-col sm:flex-row items-center justify-between text-xs text-[#F6F0DF]/40 gap-4 z-10 select-none text-center sm:text-left">
+          <footer className="mt-32 w-full pt-8 border-t border-theme-text/10 flex flex-col sm:flex-row items-center justify-between text-xs text-theme-text/40 gap-4 z-10 select-none text-center sm:text-left">
             <div>
               🔬 Simple Luxury Experimental Sandbox — EPFL Edition
             </div>
             <div className="font-mono text-[10px] break-all">
-              To delete: remove <code className="text-[#F6F0DF]/60 bg-white/5 px-1 py-0.5 rounded">src/pages/Experimental.tsx</code> & route in <code className="text-[#F6F0DF]/60 bg-white/5 px-1 py-0.5 rounded">src/App.tsx</code>
+              To delete: remove <code className="text-theme-text/60 bg-white/5 px-1 py-0.5 rounded">src/pages/Experimental.tsx</code> & route in <code className="text-theme-text/60 bg-white/5 px-1 py-0.5 rounded">src/App.tsx</code>
             </div>
           </footer>
         </motion.div>
