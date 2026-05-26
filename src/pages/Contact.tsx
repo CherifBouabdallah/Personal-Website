@@ -243,8 +243,10 @@ export default function Contact() {
     <div className="w-full h-screen min-h-screen flex flex-col items-center justify-center relative overflow-hidden select-none touch-none">
       {/* Background Artwork Image */}
       <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.12 }}
+        transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
         style={{ 
-          opacity: 0.12,
           y: bgY,
           scale: 1.15,
           transformOrigin: "center top",

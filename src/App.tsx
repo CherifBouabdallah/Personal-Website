@@ -22,11 +22,22 @@ export default function App() {
     // Fonts load check
     document.fonts.ready.then(() => setFontsLoaded(true));
 
-    // Preload heavy image sitewide to prevent navigation and animation lag
-    const img = new Image();
-    img.src = "/IMG_2656.JPEG";
-    img.onload = () => setImageLoaded(true);
-    img.onerror = () => setImageLoaded(true); // Fallback to avoid blocking if image path fails
+    // Preload heavy images sitewide to prevent navigation and animation lag
+    const imagesToPreload = ["/IMG_2656.JPEG", "/Untitled_Artwork.png"];
+    let loadedCount = 0;
+
+    imagesToPreload.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+      const handleLoad = () => {
+        loadedCount++;
+        if (loadedCount === imagesToPreload.length) {
+          setImageLoaded(true);
+        }
+      };
+      img.onload = handleLoad;
+      img.onerror = handleLoad; // Fallback to avoid blocking if image path fails
+    });
   }, []);
 
   const isScrollable = location.pathname === "/exp" || location.pathname === "/about";
