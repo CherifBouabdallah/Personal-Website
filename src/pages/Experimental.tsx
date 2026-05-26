@@ -103,12 +103,12 @@ export default function Experimental() {
   const [isReady, setIsReady] = useState(false);
   const bgRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  
+
   const [maxScroll, setMaxScroll] = useState(0);
-  
+
   const navigate = useNavigate();
   const currentScrollY = useRef(0);
-  
+
   // Smooth virtual scroll values matching Contact page spring settings
   const scrollProgress = useMotionValue(0);
   const smoothScrollY = useSpring(scrollProgress, {
@@ -116,10 +116,10 @@ export default function Experimental() {
     stiffness: 120,
     mass: 0.8,
   });
-  
+
   const contentY = useTransform(smoothScrollY, y => -y);
   const bgY = useTransform(smoothScrollY, y => maxScroll > 0 ? (y / maxScroll) * -100 : 0);
-  
+
   useEffect(() => {
     setIsReady(true);
 
@@ -133,7 +133,7 @@ export default function Experimental() {
         const viewportHeight = window.innerHeight;
         const newMax = Math.max(0, contentHeight - viewportHeight);
         setMaxScroll(newMax);
-        
+
         // Clamp current scroll if it exceeds new max
         if (currentScrollY.current > newMax) {
           currentScrollY.current = newMax;
@@ -153,14 +153,14 @@ export default function Experimental() {
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
-      
+
       const contentHeight = contentRef.current ? contentRef.current.scrollHeight : 0;
       const viewportHeight = window.innerHeight;
       const activeMax = Math.max(0, contentHeight - viewportHeight);
 
       // Snappy and natural wheel multiplier
       const delta = e.deltaY * 1.8;
-      
+
       currentScrollY.current = Math.max(0, Math.min(activeMax, currentScrollY.current + delta));
       scrollProgress.set(currentScrollY.current);
     };
@@ -172,7 +172,7 @@ export default function Experimental() {
 
     const handleTouchMove = (e: TouchEvent) => {
       if (e.cancelable) e.preventDefault();
-      
+
       const contentHeight = contentRef.current ? contentRef.current.scrollHeight : 0;
       const viewportHeight = window.innerHeight;
       const activeMax = Math.max(0, contentHeight - viewportHeight);
@@ -189,7 +189,7 @@ export default function Experimental() {
       const contentHeight = contentRef.current ? contentRef.current.scrollHeight : 0;
       const viewportHeight = window.innerHeight;
       const activeMax = Math.max(0, contentHeight - viewportHeight);
-      
+
       if (e.key === "ArrowDown") {
         currentScrollY.current = Math.max(0, Math.min(activeMax, currentScrollY.current + 100));
         scrollProgress.set(currentScrollY.current);
@@ -266,23 +266,23 @@ export default function Experimental() {
   };
 
   return (
-    <div 
+    <div
       className="w-full h-screen min-h-screen relative overflow-hidden touch-none bg-theme-bg text-theme-text"
     >
       {/* Background Artwork Image */}
-      <motion.div 
+      <motion.div
         ref={bgRef}
         className="fixed top-0 left-0 right-0 bottom-[-300px] w-full pointer-events-none select-none z-0 overflow-hidden"
-        style={{ 
+        style={{
           opacity: 0.12,
           y: bgY,
           scale: 1.15,
           transformOrigin: "center top",
         }}
       >
-        <img 
-          src="/Untitled_Artwork.png" 
-          alt="Background Artwork" 
+        <img
+          src="/Untitled_Artwork.png"
+          alt="Background Artwork"
           className="w-full h-full object-cover"
         />
       </motion.div>
