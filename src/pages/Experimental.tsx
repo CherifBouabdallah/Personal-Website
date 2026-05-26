@@ -272,11 +272,9 @@ export default function Experimental() {
       {/* Background Artwork Image */}
       <motion.div 
         ref={bgRef}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.12 }}
-        transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
         className="fixed top-0 left-0 right-0 bottom-[-300px] w-full pointer-events-none select-none z-0 overflow-hidden"
         style={{ 
+          opacity: 0.12,
           y: bgY,
           scale: 1.15,
           transformOrigin: "center top",
