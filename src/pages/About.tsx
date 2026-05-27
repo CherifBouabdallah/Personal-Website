@@ -663,6 +663,7 @@ export default function About() {
   const [isReady, setIsReady] = useState(false);
   const [showArtwork, setShowArtwork] = useState(true);
   const [maxScroll, setMaxScroll] = useState(0);
+  const maxScrollRef = useRef(0);
   const [isMobile, setIsMobile] = useState(false);
   
   const contentRef = useRef<HTMLDivElement>(null);
@@ -677,7 +678,14 @@ export default function About() {
   });
   
   const contentY = useTransform(smoothScrollY, y => -y);
-  const bgY = useTransform(smoothScrollY, y => maxScroll > 0 ? (y / maxScroll) * -100 : 0);
+  const bgY = useTransform(smoothScrollY, y => {
+    const max = maxScrollRef.current;
+    if (max <= 0) return "0px";
+    const progress = y / max;
+    // Scale travel range between -100px (short pages) and -300px (long pages)
+    const travel = Math.min(300, Math.max(100, max * 0.1));
+    return `${progress * -travel}px`;
+  });
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -686,9 +694,14 @@ export default function About() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   
-  // Dynamic header and text reveals
+  // Dynamic header and text reveals loader trigger
   useEffect(() => {
     document.fonts.ready.then(() => setIsReady(true));
+  }, []);
+
+  // Scroll and Resize Observer initialization
+  useEffect(() => {
+    if (!isReady) return;
     
     document.documentElement.classList.add("no-scrollbar");
     document.body.classList.add("no-scrollbar");
@@ -699,6 +712,7 @@ export default function About() {
         const viewportHeight = window.innerHeight;
         const newMax = Math.max(0, contentHeight - viewportHeight);
         setMaxScroll(newMax);
+        maxScrollRef.current = newMax;
         
         if (currentScrollY.current > newMax) {
           currentScrollY.current = newMax;
@@ -791,7 +805,7 @@ export default function About() {
       document.documentElement.classList.remove("no-scrollbar");
       document.body.classList.remove("no-scrollbar");
     };
-  }, []);
+  }, [isReady]);
 
   const headerText = "The Museum";
   

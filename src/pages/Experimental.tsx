@@ -111,6 +111,112 @@ const backgroundParagraphs = [
   "When I am not coding, you will find me playing competitive Volleyball, designing high-fidelity layouts, or studying new patterns in digital systems. I enjoy creating seamless interactions and testing fluid web interfaces."
 ];
 
+interface DiagnosticsPanelProps {
+  smoothScrollY: any;
+  maxScroll: number;
+}
+
+function DiagnosticsPanel({ smoothScrollY, maxScroll }: DiagnosticsPanelProps) {
+  const [scrollYVal, setScrollYVal] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = smoothScrollY.on("change", (latest: number) => {
+      setScrollYVal(latest);
+    });
+    return () => unsubscribe();
+  }, [smoothScrollY]);
+
+  const maxSafeTravel = 0.15 * window.innerHeight + 345;
+  const translation = (maxScroll > 0 ? (scrollYVal / maxScroll) : 0) * -maxSafeTravel;
+
+  return (
+    <div className="w-full max-w-7xl mx-auto mt-24 border border-theme-text/10 rounded-2xl p-6 md:p-8 bg-black/20 backdrop-blur-sm z-10 flex flex-col gap-8 text-left">
+      <div className="flex justify-between items-center border-b border-theme-text/10 pb-4">
+        <div className="flex flex-col gap-1">
+          <h3 className="font-mono text-xs tracking-[0.35em] uppercase font-bold text-theme-text">05 / Parallax Calibration & Diagnostics</h3>
+          <span className="font-mono text-[8px] tracking-[0.2em] text-theme-text/40">CALIBRATING: UNTITLED_ARTWORK.PNG</span>
+        </div>
+        <div className="px-3 py-1 bg-white/5 border border-theme-text/20 rounded font-mono text-[9px] text-theme-text/75 uppercase tracking-widest animate-pulse">
+          SYSTEM ACTIVE
+        </div>
+      </div>
+
+      {/* Dynamic Diagnostics Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-[10px] text-theme-text/80">
+        <div className="border border-theme-text/10 rounded-xl p-4 bg-white/[0.02] flex flex-col gap-2">
+          <div className="font-bold border-b border-theme-text/5 pb-1 text-theme-text/50">1. SCROLL METRICS</div>
+          <div><span className="font-bold">SCROLL_Y (y):</span> {Math.round(scrollYVal)}px</div>
+          <div><span className="font-bold">MAX_SCROLL:</span> {Math.round(maxScroll)}px</div>
+          <div><span className="font-bold">SCROLL_PERCENT:</span> {maxScroll > 0 ? Math.round((scrollYVal / maxScroll) * 100) : 0}%</div>
+        </div>
+
+        <div className="border border-theme-text/10 rounded-xl p-4 bg-white/[0.02] flex flex-col gap-2">
+          <div className="font-bold border-b border-theme-text/5 pb-1 text-theme-text/50">2. ARTWORK TRANSLATION</div>
+          <div><span className="font-bold">TRANSLATION (bgY):</span> {Math.round(translation)}px</div>
+          <div><span className="font-bold">SCALE FACTOR:</span> 1.15x</div>
+          <div><span className="font-bold">PARALLAX RATE:</span> {maxScroll > 0 ? (maxSafeTravel / maxScroll).toFixed(3) : "0.000"}x</div>
+        </div>
+
+        <div className="border border-theme-text/10 rounded-xl p-4 bg-white/[0.02] flex flex-col gap-2">
+          <div className="font-bold border-b border-theme-text/5 pb-1 text-theme-text/50">3. SAFETY THRESHOLDS</div>
+          <div><span className="font-bold">VIEWPORT_HEIGHT:</span> {window.innerHeight}px</div>
+          <div><span className="font-bold">MAX_SAFE_TRAVEL:</span> -{Math.round(maxSafeTravel)}px</div>
+          <div>
+            <span className="font-bold">EDGE_SAFETY_MARGIN:</span> 
+            {" "}{Math.max(0, Math.round(maxSafeTravel + translation))}px
+          </div>
+        </div>
+      </div>
+
+      {/* Parallax Limit Meter */}
+      <div className="w-full flex flex-col gap-2">
+        <div className="flex justify-between font-mono text-[9px] text-theme-text/50 tracking-wider">
+          <span>PARALLAX LIMIT CAP:</span>
+          <span>{Math.round(Math.abs(translation))}px / {Math.round(maxSafeTravel)}px</span>
+        </div>
+        <div className="w-full h-2.5 bg-white/5 border border-theme-text/15 rounded-full overflow-hidden p-[2px]">
+          <div 
+            className="h-full bg-theme-text rounded-full origin-left transition-all duration-100 ease-out"
+            style={{
+              width: `${Math.min(100, (maxScroll > 0 ? (scrollYVal / maxScroll) : 0) * 100)}%`
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Calibration Instructions & Placeholder text */}
+      <div className="space-y-4 font-normal text-xs md:text-sm text-theme-text/75 leading-relaxed pt-2">
+        <p className="font-bold text-theme-text">Testing scroll limits:</p>
+        <p>
+          We have added dense placeholder paragraphs of calibration text below. Scroll to the bottom of the page to watch the progress bar fill and witness the background artwork reach its exact physical translation limit of -{Math.round(maxSafeTravel)}px.
+        </p>
+        
+        {/* DENSE PLACEHOLDER PARAGRAPHS */}
+        <div className="space-y-6 opacity-35 border-l border-theme-text/10 pl-6 py-2 select-text font-mono text-[10px] uppercase tracking-wide leading-loose">
+          <p>
+            [CALIBRATION_BLOCK_A] Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          </p>
+          <p>
+            [CALIBRATION_BLOCK_B] Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
+          </p>
+          <p>
+            [CALIBRATION_BLOCK_C] Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? Ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.
+          </p>
+          <p>
+            [CALIBRATION_BLOCK_D] At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.
+          </p>
+          <p>
+            [CALIBRATION_BLOCK_E] Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.
+          </p>
+          <p>
+            [CALIBRATION_BLOCK_F] Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Experimental() {
   const [isReady, setIsReady] = useState(false);
   const [layoutMode, setLayoutMode] = useState<"monograph" | "cinema" | "blueprint" | "techscroll" | "blueprintnarrative">("monograph");
@@ -118,6 +224,7 @@ export default function Experimental() {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const [maxScroll, setMaxScroll] = useState(0);
+  const maxScrollRef = useRef(0);
 
   const navigate = useNavigate();
   const currentScrollY = useRef(0);
@@ -131,10 +238,20 @@ export default function Experimental() {
   });
 
   const contentY = useTransform(smoothScrollY, y => -y);
-  const bgY = useTransform(smoothScrollY, y => maxScroll > 0 ? (y / maxScroll) * -100 : 0);
+  const bgY = useTransform(smoothScrollY, y => {
+    const max = maxScrollRef.current;
+    if (max <= 0) return "0px";
+    const progress = y / max;
+    const maxSafeTravel = 0.15 * window.innerHeight + 345;
+    return `${progress * -maxSafeTravel}px`;
+  });
 
   useEffect(() => {
     setIsReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isReady) return;
 
     // Apply no-scrollbar to HTML and Body to hide vertical scrollbars globally on PC/Desktop
     document.documentElement.classList.add("no-scrollbar");
@@ -146,6 +263,7 @@ export default function Experimental() {
         const viewportHeight = window.innerHeight;
         const newMax = Math.max(0, contentHeight - viewportHeight);
         setMaxScroll(newMax);
+        maxScrollRef.current = newMax;
 
         // Clamp current scroll if it exceeds new max
         if (currentScrollY.current > newMax) {
@@ -245,7 +363,7 @@ export default function Experimental() {
       document.documentElement.classList.remove("no-scrollbar");
       document.body.classList.remove("no-scrollbar");
     };
-  }, []);
+  }, [isReady]);
 
   const titleText = "Cherif Bouabdallah";
 
@@ -874,6 +992,11 @@ export default function Experimental() {
             </div>
 
           </div>
+
+          {/* ========================================== */}
+          {/* PARALLAX CALIBRATION & PLACEHOLDER SECTION */}
+          {/* ========================================== */}
+          <DiagnosticsPanel smoothScrollY={smoothScrollY} maxScroll={maxScroll} />
 
           {/* ========================================== */}
           {/* MINIMAL FOOTER                             */}
