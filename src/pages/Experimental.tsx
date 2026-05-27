@@ -1,6 +1,7 @@
-import { motion, Variants, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, AnimatePresence, Variants, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { SegmentCascade, Segment } from "../components/BiographyAnimations";
 
 // Elegant self-drawing border divider rule
 function SelfDrawingLine({ className = "" }: { className?: string }) {
@@ -99,8 +100,20 @@ const skillsData: SkillData[] = [
   { name: "Creative web design", logo: <DesignLogo /> }
 ];
 
+const biographySegments: Segment[] = [
+  { text: "I am a designer and full-stack software engineer who focuses on bridging the gap between aesthetics and clean code.", className: "text-[#E1E0CC] font-normal" },
+  { text: " I build performant front-ends and interactive experiences that are highly responsive and structured.", className: "font-serif italic text-[#DEDBC8]" },
+  { text: " Driven by curiosity, I aim to craft memorable digital products that look beautiful and feel extremely premium.", className: "text-[#E1E0CC] font-medium" }
+];
+
+const backgroundParagraphs = [
+  "Currently pursuing software engineering at EPFL (École Polytechnique Fédérale de Lausanne), focusing on distributed architectures, interactive computer graphics, and engineering clean web environments.",
+  "When I am not coding, you will find me playing competitive Volleyball, designing high-fidelity layouts, or studying new patterns in digital systems. I enjoy creating seamless interactions and testing fluid web interfaces."
+];
+
 export default function Experimental() {
   const [isReady, setIsReady] = useState(false);
+  const [layoutMode, setLayoutMode] = useState<"monograph" | "cinema" | "blueprint" | "techscroll" | "blueprintnarrative">("monograph");
   const bgRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -306,9 +319,9 @@ export default function Experimental() {
           <div className="w-full max-w-none flex flex-col gap-16 md:gap-28 z-10">
 
             {/* ========================================== */}
-            {/* SECTION 1: HERO & 3-COLUMN FULL-WIDTH GRID */}
+            {/* HERO TITLE & DYNAMIC LAYOUT PORTALS        */}
             {/* ========================================== */}
-            <div className="flex flex-col gap-12 md:gap-20">
+            <div className="flex flex-col gap-12 md:gap-20 w-full animate-layout-container">
 
               {/* Apple-style animated responsive title */}
               <h1 className="font-maghfirea text-[clamp(2.8rem,9vw,120px)] text-theme-text flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] relative translate-y-0 md:-translate-y-48">
@@ -341,138 +354,523 @@ export default function Experimental() {
                 ))}
               </h1>
 
-              {/* 3-Column Minimal Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 lg:gap-16 items-start mt-8 md:-mt-48">
-
-                {/* Column 1: Portrait Frame with simple border (no animations) */}
-                <div className="col-span-1 md:col-span-4 flex flex-col items-center md:items-stretch w-full max-w-[280px] md:max-w-none mx-auto aspect-[4/5] md:aspect-auto min-h-[350px] lg:min-h-[420px]">
-                  <div className="w-full h-full border border-theme-text overflow-hidden bg-white/5 relative select-none">
-                    <img
-                      src="/IMG_2656.JPEG"
-                      alt="Portrait of Cherif Bouabdallah"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+              {/* Elegant Layout Switcher Panel */}
+              <div className="flex flex-col items-center gap-3 select-none mb-8 md:-mt-40 z-20">
+                <span className="font-mono text-[8px] tracking-[0.3em] opacity-35">EXPERIMENT_LAYOUT_VIEWPORT</span>
+                <div className="flex p-1 bg-white/5 border border-theme-text/10 rounded-full backdrop-blur-sm relative">
+                  {[
+                    { id: "monograph", name: "01 / MONOGRAPH" },
+                    { id: "cinema", name: "02 / CINEMA" },
+                    { id: "blueprint", name: "03 / BLUEPRINT" },
+                    { id: "techscroll", name: "04 / TECH SCROLL" },
+                    { id: "blueprintnarrative", name: "05 / NARRATIVE GRID" }
+                  ].map((layout) => (
+                    <button
+                      key={layout.id}
+                      onClick={() => setLayoutMode(layout.id as any)}
+                      className={`px-4 py-1.5 rounded-full font-mono text-[9px] tracking-wider uppercase transition-all duration-500 cursor-pointer ${
+                        layoutMode === layout.id
+                          ? "bg-theme-text text-theme-bg font-bold scale-[1.02] shadow-lg"
+                          : "text-theme-text/50 hover:text-theme-text hover:bg-white/5"
+                      }`}
+                    >
+                      {layout.name}
+                    </button>
+                  ))}
                 </div>
-
-                {/* Column 2: Biography Text Block with Blur Reveal */}
-                <motion.div
-                  custom={2}
-                  initial="hidden"
-                  animate={isReady ? "visible" : "hidden"}
-                  variants={elementVariants}
-                  className="col-span-1 md:col-span-5 flex flex-col justify-start text-center md:text-left select-text"
-                >
-                  <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 md:mb-6 select-none">
-                    01 / Biography
-                  </div>
-                  <motion.p
-                    variants={blurRevealVariants}
-                    className="text-base md:text-lg lg:text-xl leading-relaxed text-theme-text/80 font-normal"
-                  >
-                    I am a designer and full-stack software engineer who focuses on bridging the gap between aesthetics and clean code. I build performant front-ends and interactive experiences that are highly responsive and structured. Driven by curiosity, I aim to craft memorable digital products that look beautiful and feel extremely premium.
-                  </motion.p>
-                </motion.div>
-
-                {/* Column 3: Skills List with Layout Options */}
-                <motion.div
-                  custom={3}
-                  initial="hidden"
-                  animate={isReady ? "visible" : "hidden"}
-                  variants={elementVariants}
-                  className="col-span-1 md:col-span-3 flex flex-col justify-start select-text glass-square p-5 md:p-6"
-                >
-                  <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none text-left">
-                    02 / My Skills
-                  </div>
-
-                  <div className="w-full font-mono text-[10px] sm:text-[11px] divide-y divide-theme-text/10">
-                    {skillsData.map((skill) => (
-                      <motion.div
-                        key={skill.name}
-                        whileHover={{ x: 4 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="flex justify-between items-center py-3.5 text-left text-theme-text/75 hover:text-white cursor-default transition-colors duration-200"
-                      >
-                        <span className="font-bold tracking-wide">{skill.name}</span>
-                        <span className="opacity-75 hover:opacity-100 transition-opacity">
-                          {skill.logo}
-                        </span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-
               </div>
-            </div>
 
-            {/* Self-Drawing Line Divider */}
-            <SelfDrawingLine className="mt-4 md:mt-8" />
-
-            {/* ========================================== */}
-            {/* SECTION 2: 2-COLUMN FULL-WIDTH GRID        */}
-            {/* ========================================== */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16 items-start">
-
-              {/* Column 1: Studies & Hobbies Details with Blur Reveal */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
-                className="col-span-1 md:col-span-8 flex flex-col justify-start select-text text-center md:text-left"
-              >
-                <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 md:mb-6 select-none">
-                  03 / Background
-                </div>
+              {/* Layout Content wrapper with smooth Leica-style transition */}
+              <AnimatePresence mode="wait">
                 <motion.div
-                  variants={blurRevealVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-80px" }}
-                  className="space-y-6 text-base md:text-lg lg:text-xl leading-relaxed text-theme-text/80 font-normal"
+                  key={layoutMode}
+                  initial={{ opacity: 0, filter: "blur(8px)", y: 15 }}
+                  animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                  exit={{ opacity: 0, filter: "blur(8px)", y: -15 }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  className="w-full mt-4 md:-mt-32"
                 >
-                  <p>
-                    Currently pursuing software engineering at <span className="text-theme-text font-semibold underline decoration-theme-text/30 underline-offset-4">EPFL</span> (École Polytechnique Fédérale de Lausanne), focusing on distributed architectures, interactive computer graphics, and engineering clean web environments.
-                  </p>
-                  <p>
-                    When I am not coding, you will find me playing competitive <span className="text-theme-text font-semibold">Volleyball</span>, designing high-fidelity layouts, or studying new patterns in digital systems. I enjoy creating seamless interactions and testing fluid web interfaces.
-                  </p>
+                  {layoutMode === "monograph" && (
+                    <div className="w-full flex flex-col gap-16 md:gap-28 animate-fade-in">
+                      {/* Section 1: Portrait & Bio */}
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 lg:gap-16 items-center">
+                        {/* Column 1: Portrait Frame with coordinates */}
+                        <div className="col-span-1 md:col-span-5 flex flex-col justify-start w-full max-w-[280px] md:max-w-none mx-auto select-none">
+                          <div className="w-full aspect-[4/5] border border-theme-text/30 overflow-hidden bg-white/5 relative">
+                            <img
+                              src="/IMG_2656.JPEG"
+                              alt="Portrait of Cherif Bouabdallah"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="font-mono text-[8px] tracking-[0.25em] opacity-40 mt-3 text-center md:text-left">
+                            IMG_2656 // 46.5191° N, 6.5668° E
+                          </div>
+                        </div>
+
+                        {/* Column 2: Biography with Cascade Animation */}
+                        <div className="col-span-1 md:col-span-7 flex flex-col justify-center text-center md:text-left select-text">
+                          <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 md:mb-6 select-none">
+                            01 / Biography
+                          </div>
+                          <SegmentCascade segments={biographySegments} containerClassName="text-lg md:text-xl lg:text-2xl leading-relaxed text-theme-text/80" />
+                        </div>
+                      </div>
+
+                      {/* Divider line */}
+                      <SelfDrawingLine className="my-2" />
+
+                      {/* Section 2: Skills & Background & Connect */}
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 lg:gap-16 items-start">
+                        {/* Column 1: Skills Index */}
+                        <div className="col-span-1 md:col-span-4 flex flex-col justify-start text-left select-text">
+                          <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none">
+                            02 / Skills Index
+                          </div>
+                          <div className="w-full font-mono text-[10px] divide-y divide-theme-text/10">
+                            {skillsData.map((skill) => (
+                              <div
+                                key={skill.name}
+                                className="flex justify-between items-center py-3.5 text-theme-text/75 hover:text-white transition-colors duration-200"
+                              >
+                                <span className="font-bold tracking-wide">{skill.name}</span>
+                                <span>{skill.logo}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Column 2: Background Details with on-scroll animation */}
+                        <motion.div 
+                          initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
+                          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                          viewport={{ once: true, margin: "-80px" }}
+                          transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+                          className="col-span-1 md:col-span-5 flex flex-col justify-start text-center md:text-left select-text"
+                        >
+                          <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none">
+                            03 / Background
+                          </div>
+                          <div className="space-y-6 text-sm md:text-base leading-relaxed text-theme-text/85 font-normal">
+                            <p>
+                              Currently pursuing software engineering at <span className="text-theme-text font-semibold underline decoration-theme-text/30 underline-offset-4">EPFL</span> (École Polytechnique Fédérale de Lausanne), focusing on distributed architectures, interactive computer graphics, and engineering clean web environments.
+                            </p>
+                            <p>
+                              When I am not coding, you will find me playing competitive <span className="text-theme-text font-semibold">Volleyball</span>, designing high-fidelity layouts, or studying new patterns in digital systems. I enjoy creating seamless interactions.
+                            </p>
+                          </div>
+                        </motion.div>
+
+                        {/* Column 3: Connect Gate */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 15 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, margin: "-60px" }}
+                          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                          onClick={() => navigate("/contact")}
+                          className="col-span-1 md:col-span-3 border border-theme-text/20 hover:border-theme-text rounded-2xl p-6 flex flex-col justify-between min-h-[220px] cursor-pointer group select-none transition-all duration-300 text-left bg-white/[0.01]"
+                        >
+                          <div className="flex flex-col gap-1 w-full">
+                            <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">
+                              04 / Connect
+                            </div>
+                            <div className="font-mono text-[8px] tracking-[0.2em] text-theme-text/40 uppercase mt-0.5">
+                              Route: /contact
+                            </div>
+                          </div>
+                          <div className="my-2">
+                            <span className="font-maghfirea text-2xl text-theme-text tracking-wide block transition-transform duration-300 group-hover:translate-x-1.5">
+                              Get In Touch
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between font-mono text-[9px] pt-1">
+                            <span className="opacity-0"></span>
+                            <span className="text-theme-text/50 group-hover:text-white group-hover:translate-x-1 transition-all duration-300 flex items-center gap-1.5">
+                              ENTER GATE <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
+                            </span>
+                          </div>
+                        </motion.div>
+                      </div>
+                    </div>
+                  )}
+
+                  {layoutMode === "cinema" && (
+                    <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-16 md:gap-24 animate-fade-in">
+                      {/* Vertical Scroll Indicator */}
+                      <div className="flex flex-col items-center gap-3 select-none">
+                        <span className="font-mono text-[8px] tracking-[0.3em] uppercase opacity-30">READ DOWN</span>
+                        <div className="w-[1px] h-10 bg-theme-text/10 relative overflow-hidden">
+                          <motion.div
+                            animate={{ y: ["-100%", "100%"] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute inset-0 bg-theme-text/50"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Double-Bordered Portrait */}
+                      <div className="flex justify-center w-full select-none">
+                        <div className="relative p-2.5 border border-theme-text/10 rounded-2xl">
+                          <div className="absolute inset-0 border border-theme-text/25 m-1 rounded-xl pointer-events-none" />
+                          <div className="w-[260px] sm:w-[300px] aspect-[4/5] overflow-hidden bg-white/5 relative rounded-lg">
+                            <img
+                              src="/IMG_2656.JPEG"
+                              alt="Portrait of Cherif Bouabdallah"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Narrative Story */}
+                      <div className="max-w-2xl mx-auto text-center md:text-left select-text space-y-8 px-4 w-full">
+                        <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 text-center mb-6 select-none">
+                          01 / The Narrative
+                        </div>
+                        <SegmentCascade segments={biographySegments} containerClassName="text-base md:text-lg lg:text-xl leading-relaxed text-theme-text/90" />
+                        
+                        <div className="w-12 h-[1px] bg-theme-text/20 mx-auto my-8" />
+                        
+                        <motion.div 
+                          initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
+                          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                          viewport={{ once: true, margin: "-80px" }}
+                          transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+                          className="space-y-6 text-sm md:text-base leading-relaxed text-theme-text/75 font-normal text-center md:text-left"
+                        >
+                          <p>{backgroundParagraphs[0]}</p>
+                          <p>{backgroundParagraphs[1]}</p>
+                        </motion.div>
+                      </div>
+
+                      {/* Horizontal Capabilities */}
+                      <div className="w-full px-4 text-center">
+                        <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-8 select-none">
+                          02 / Capabilities
+                        </div>
+                        <div className="flex flex-wrap justify-center gap-3 font-mono text-[10px] max-w-2xl mx-auto">
+                          {skillsData.map((skill) => (
+                            <div
+                              key={skill.name}
+                              className="px-4 py-2.5 bg-white/5 border border-theme-text/10 rounded-full flex items-center gap-2 hover:bg-white/10 hover:border-theme-text/30 transition-all duration-300 cursor-default"
+                            >
+                              <span className="font-bold tracking-wide text-theme-text/80">{skill.name}</span>
+                              <span className="opacity-75">{skill.logo}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Centered Connect Gate */}
+                      <div className="w-full px-4 flex justify-center">
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, margin: "-60px" }}
+                          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                          onClick={() => navigate("/contact")}
+                          className="max-w-md w-full border border-theme-text/20 hover:border-theme-text rounded-2xl p-8 flex flex-col items-center justify-center gap-6 cursor-pointer group select-none transition-all duration-500 bg-white/[0.01] text-center"
+                        >
+                          <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">
+                            03 / Gateway
+                          </div>
+                          <span className="font-maghfirea text-3xl sm:text-4xl text-theme-text tracking-wide block transition-transform duration-300 group-hover:scale-103">
+                            Get In Touch
+                          </span>
+                          <span className="font-mono text-[9px] text-theme-text/50 group-hover:text-white transition-colors duration-300 flex items-center gap-1.5">
+                            ENTER SYSTEM PORTAL <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
+                          </span>
+                        </motion.div>
+                      </div>
+                    </div>
+                  )}
+
+                  {layoutMode === "blueprint" && (
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start relative text-left animate-fade-in">
+                      {/* Lane 1: Left (3 cols) */}
+                      <div className="col-span-1 md:col-span-3 flex flex-col gap-8 md:border-r md:border-theme-text/10 md:pr-8">
+                        <div>
+                          <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
+                            01 / Portrait
+                          </div>
+                          <div className="w-full aspect-[4/5] border border-theme-text/20 overflow-hidden bg-white/5 relative rounded-lg">
+                            <img
+                              src="/IMG_2656.JPEG"
+                              alt="Portrait of Cherif Bouabdallah"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
+                            02 / Tools
+                          </div>
+                          <div className="flex flex-col gap-2 font-mono text-[9px] text-theme-text/75">
+                            {skillsData.slice(0, 6).map((skill) => (
+                              <div key={skill.name} className="flex justify-between items-center py-1.5 border-b border-theme-text/5">
+                                <span>{skill.name}</span>
+                                <span className="scale-75 opacity-60">{skill.logo}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Lane 2: Center (6 cols) */}
+                      <div className="col-span-1 md:col-span-6 flex flex-col gap-12 md:px-4">
+                        <div>
+                          <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none">
+                            03 / Monologue
+                          </div>
+                          <SegmentCascade segments={biographySegments} containerClassName="text-base md:text-lg leading-relaxed text-theme-text/90" />
+                        </div>
+
+                        <div className="w-full h-[1px] bg-theme-text/10" />
+
+                        <motion.div
+                          initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
+                          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                          viewport={{ once: true, margin: "-80px" }}
+                          transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+                        >
+                          <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none">
+                            04 / Background
+                          </div>
+                          <div className="space-y-6 text-sm md:text-base leading-relaxed text-theme-text/80">
+                            {backgroundParagraphs.map((para, i) => (
+                              <p key={i}>{para}</p>
+                            ))}
+                          </div>
+                        </motion.div>
+                      </div>
+
+                      {/* Lane 3: Right (3 cols) */}
+                      <div className="col-span-1 md:col-span-3 flex flex-col gap-8 md:border-l md:border-theme-text/10 md:pl-8">
+                        <div>
+                          <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
+                            05 / Metadata
+                          </div>
+                          <div className="font-mono text-[8px] leading-relaxed text-theme-text/50 space-y-2 border border-theme-text/10 rounded-xl p-4 bg-black/10">
+                            <div><span className="text-theme-text opacity-80 font-bold">CLIENT:</span> Cherif Bouabdallah</div>
+                            <div><span className="text-theme-text opacity-80 font-bold">ROLE:</span> EPFL CS Engineer</div>
+                            <div><span className="text-theme-text opacity-80 font-bold">GRID:</span> Modular Swiss 12-Col</div>
+                            <div><span className="text-theme-text opacity-80 font-bold">LOC:</span> Lausanne, CH</div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
+                            06 / Portal
+                          </div>
+                          <motion.div
+                            initial={{ opacity: 0, y: 15 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-50px" }}
+                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                            onClick={() => navigate("/contact")}
+                            className="w-full border border-theme-text/20 hover:border-theme-text rounded-2xl p-5 flex flex-col justify-between min-h-[140px] cursor-pointer group select-none transition-all duration-300 bg-white/[0.01]"
+                          >
+                            <span className="font-maghfirea text-lg text-theme-text tracking-wide block transition-transform duration-300 group-hover:translate-x-1">
+                              Contact
+                            </span>
+                            <span className="font-mono text-[8px] text-theme-text/50 group-hover:text-white transition-colors flex items-center gap-1">
+                              OPEN →
+                            </span>
+                          </motion.div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {layoutMode === "techscroll" && (
+                    <div className="max-w-4xl mx-auto relative px-8 md:px-16 py-8 flex flex-col items-center gap-16 md:gap-24 animate-fade-in">
+                      {/* Left Blueprint vertical guide line */}
+                      <div className="absolute left-0 top-0 bottom-0 w-[1px] bg-theme-text/10" />
+                      {/* Right Blueprint vertical guide line */}
+                      <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-theme-text/10" />
+
+                      {/* Centered Double-Bordered Portrait with coordinates */}
+                      <div className="flex flex-col items-center select-none w-full">
+                        <div className="relative p-2.5 border border-theme-text/10 rounded-2xl">
+                          <div className="absolute inset-0 border border-theme-text/25 m-1 rounded-xl pointer-events-none" />
+                          <div className="w-[240px] sm:w-[285px] aspect-[4/5] overflow-hidden bg-white/5 relative rounded-lg">
+                            <img
+                              src="/IMG_2656.JPEG"
+                              alt="Portrait of Cherif Bouabdallah"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
+                        <div className="font-mono text-[7px] tracking-[0.25em] opacity-40 mt-3.5 text-center">
+                          TECH_SCROLL_MODEL // 46.5191° N, 6.5668° E
+                        </div>
+                      </div>
+
+                      {/* Narrative Story */}
+                      <div className="max-w-2xl text-center md:text-left select-text space-y-8 px-4 w-full">
+                        <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40 text-center mb-4 select-none">
+                          01 / The Narrative Specimen
+                        </div>
+                        <SegmentCascade segments={biographySegments} containerClassName="text-base md:text-lg leading-relaxed text-theme-text/90" />
+                        
+                        <div className="w-full h-[1px] bg-theme-text/10 my-6" />
+                        
+                        <motion.div 
+                          initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
+                          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                          viewport={{ once: true, margin: "-80px" }}
+                          transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+                          className="space-y-6 text-sm md:text-base leading-relaxed text-theme-text/75 font-normal text-center md:text-left"
+                        >
+                          <p>{backgroundParagraphs[0]}</p>
+                          <p>{backgroundParagraphs[1]}</p>
+                        </motion.div>
+                      </div>
+
+                      {/* Capabilities in a structured blueprint tags block */}
+                      <div className="w-full px-4 text-center">
+                        <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40 mb-8 select-none">
+                          02 / Technical Stack Directory
+                        </div>
+                        <div className="flex flex-wrap justify-center gap-3 font-mono text-[9px] max-w-2xl mx-auto">
+                          {skillsData.map((skill) => (
+                            <div
+                              key={skill.name}
+                              className="px-4 py-2 border border-theme-text/15 hover:border-theme-text rounded-none bg-black/10 flex items-center gap-2 hover:bg-white/5 transition-all duration-300 cursor-default"
+                            >
+                              <span className="font-bold tracking-wide text-theme-text/80">{skill.name}</span>
+                              <span className="scale-75 opacity-70">{skill.logo}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Centered Connect Gate with blueprint frame look */}
+                      <div className="w-full px-4 flex justify-center">
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, margin: "-60px" }}
+                          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                          onClick={() => navigate("/contact")}
+                          className="max-w-md w-full border border-theme-text/15 hover:border-theme-text p-8 flex flex-col items-center justify-center gap-4 cursor-pointer group select-none transition-all duration-500 bg-white/[0.01] text-center"
+                        >
+                          <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40">
+                            03 / Gate
+                          </div>
+                          <span className="font-maghfirea text-2xl sm:text-3xl text-theme-text tracking-wide block transition-transform duration-300 group-hover:scale-103">
+                            Get In Touch
+                          </span>
+                          <span className="font-mono text-[8px] text-theme-text/50 group-hover:text-white transition-colors duration-300 flex items-center gap-1.5">
+                            ENTER GATEWAY <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
+                          </span>
+                        </motion.div>
+                      </div>
+                    </div>
+                  )}
+
+                  {layoutMode === "blueprintnarrative" && (
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start relative text-left animate-fade-in">
+                      {/* Lane 1: Left (3 cols) */}
+                      <div className="col-span-1 md:col-span-3 flex flex-col gap-10 md:border-r md:border-theme-text/10 md:pr-8">
+                        <div>
+                          <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
+                            01 / Grid Metadata
+                          </div>
+                          <div className="font-mono text-[8px] leading-relaxed text-theme-text/50 space-y-2 border border-theme-text/10 rounded-xl p-4 bg-black/10">
+                            <div><span className="text-theme-text opacity-85 font-bold">MODE:</span> Narrative Grid</div>
+                            <div><span className="text-theme-text opacity-85 font-bold">CLIENT:</span> Cherif Bouabdallah</div>
+                            <div><span className="text-theme-text opacity-85 font-bold">LOC:</span> EPFL Lausanne</div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
+                            02 / Details
+                          </div>
+                          <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-40px" }}
+                            transition={{ duration: 0.8 }}
+                            className="space-y-4 text-xs leading-relaxed text-theme-text/75 font-normal"
+                          >
+                            <p>{backgroundParagraphs[0]}</p>
+                            <p>{backgroundParagraphs[1]}</p>
+                          </motion.div>
+                        </div>
+                      </div>
+
+                      {/* Center Column (6 cols) */}
+                      <div className="col-span-1 md:col-span-6 flex flex-col gap-16 md:px-4 items-center">
+                        {/* Portrait */}
+                        <div className="flex justify-center w-full select-none">
+                          <div className="relative p-2 border border-theme-text/10 rounded-xl">
+                            <div className="w-[200px] sm:w-[240px] aspect-[4/5] overflow-hidden bg-white/5 relative rounded-lg">
+                              <img
+                                src="/IMG_2656.JPEG"
+                                alt="Portrait of Cherif Bouabdallah"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Monologue */}
+                        <div className="w-full">
+                          <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none text-left">
+                            03 / Monologue
+                          </div>
+                          <SegmentCascade segments={biographySegments} containerClassName="text-base leading-relaxed text-theme-text/90 text-left" />
+                        </div>
+
+                        {/* Capabilities */}
+                        <div className="w-full">
+                          <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none text-left">
+                            04 / Capabilities
+                          </div>
+                          <div className="flex flex-wrap gap-2 font-mono text-[8px]">
+                            {skillsData.map((skill) => (
+                              <div
+                                key={skill.name}
+                                className="px-3 py-1.5 bg-white/5 border border-theme-text/10 rounded-full flex items-center gap-1.5"
+                              >
+                                <span className="font-bold tracking-wide text-theme-text/80">{skill.name}</span>
+                                <span className="opacity-75 scale-90">{skill.logo}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Lane 3: Right (3 cols) */}
+                      <div className="col-span-1 md:col-span-3 flex flex-col gap-8 md:border-l md:border-theme-text/10 md:pl-8">
+                        <div>
+                          <div className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
+                            05 / Connection
+                          </div>
+                          <motion.div
+                            initial={{ opacity: 0, y: 15 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-50px" }}
+                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                            onClick={() => navigate("/contact")}
+                            className="w-full border border-theme-text/20 hover:border-theme-text rounded-2xl p-5 flex flex-col justify-between min-h-[140px] cursor-pointer group select-none transition-all duration-300 bg-white/[0.01]"
+                          >
+                            <span className="font-maghfirea text-lg text-theme-text tracking-wide block transition-transform duration-300 group-hover:translate-x-1">
+                              Contact
+                            </span>
+                            <span className="font-mono text-[8px] text-theme-text/50 group-hover:text-white transition-colors flex items-center gap-1">
+                              OPEN PORTAL →
+                            </span>
+                          </motion.div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
-              </motion.div>
-
-              {/* Column 2: Interactive Guidance Transition to Contact (Simplified Gate) */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1], delay: 0.1 }}
-                onClick={() => navigate("/contact")}
-                className="col-span-1 md:col-span-4 glass-square p-6 flex flex-col justify-between min-h-[145px] cursor-pointer group select-none relative overflow-hidden text-left"
-              >
-                <div className="flex flex-col gap-1 w-full">
-                  <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">
-                    04 / Connect
-                  </div>
-                  <div className="font-mono text-[8px] tracking-[0.2em] text-theme-text/40 uppercase mt-0.5">
-                    Route: /contact
-                  </div>
-                </div>
-
-                <div className="my-2">
-                  <span className="font-maghfirea text-2xl sm:text-3xl text-theme-text tracking-wide block transition-transform duration-300 group-hover:translate-x-1.5">
-                    Get In Touch
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between font-mono text-[9px] pt-1">
-                  <span className="opacity-0"></span>
-                  <span className="text-theme-text/50 group-hover:text-white group-hover:translate-x-1 transition-all duration-300 flex items-center gap-1.5">
-                    ENTER GATE <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
-                  </span>
-                </div>
-              </motion.div>
-
+              </AnimatePresence>
             </div>
 
           </div>
