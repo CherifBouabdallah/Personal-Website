@@ -134,7 +134,7 @@ function DiagnosticsPanel({ smoothScrollY, maxScroll }: DiagnosticsPanelProps) {
       <div className="flex justify-between items-center border-b border-theme-text/10 pb-4">
         <div className="flex flex-col gap-1">
           <h3 className="font-mono text-xs tracking-[0.35em] uppercase font-bold text-theme-text">05 / Parallax Calibration & Diagnostics</h3>
-          <span className="font-mono text-[8px] tracking-[0.2em] text-theme-text/40">CALIBRATING: UNTITLED_ARTWORK.PNG</span>
+          <span className="font-mono text-[8px] tracking-[0.2em] text-theme-text/40">CALIBRATING: OG.PNG</span>
         </div>
         <div className="px-3 py-1 bg-white/5 border border-theme-text/20 rounded font-mono text-[9px] text-theme-text/75 uppercase tracking-widest animate-pulse">
           SYSTEM ACTIVE
@@ -412,7 +412,7 @@ export default function Experimental() {
         }}
       >
         <img
-          src="/Untitled_Artwork.png"
+          src="/OG.png"
           alt="Background Artwork"
           className="w-full h-full object-cover"
         />

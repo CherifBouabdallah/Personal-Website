@@ -292,7 +292,7 @@ function CanvasParallaxExhibit() {
               transition={{ type: "spring", stiffness: 150, damping: 22 }}
             >
               <img 
-                src="/Untitled_Artwork.png" 
+                src="/OG.png" 
                 alt="Framed Artwork Specimen" 
                 className="w-full h-full object-cover scale-110 opacity-70"
               />
@@ -853,7 +853,7 @@ export default function About() {
         }}
       >
         <img 
-          src="/Untitled_Artwork.png" 
+          src="/OG.png" 
           alt="Atmospheric Background Artwork" 
           className="w-full h-full object-cover"
         />

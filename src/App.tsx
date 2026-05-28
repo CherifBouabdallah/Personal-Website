@@ -23,7 +23,7 @@ export default function App() {
     document.fonts.ready.then(() => setFontsLoaded(true));
 
     // Preload heavy images sitewide to prevent navigation and animation lag
-    const imagesToPreload = ["/IMG_2656.JPEG", "/Untitled_Artwork.png"];
+    const imagesToPreload = ["/IMG_2656.JPEG", "/OG.png"];
     let loadedCount = 0;
 
     imagesToPreload.forEach((src) => {

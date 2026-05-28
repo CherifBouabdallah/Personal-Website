@@ -61,8 +61,8 @@ const popupVariants = {
 export default function Contact() {
   const [isReady, setIsReady] = useState(false);
   const [year, setYear] = useState<string>(() => String(new Date().getFullYear()));
-  const [showEmailPopup, setShowEmailPopup] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [activePopup, setActivePopup] = useState<"EMAIL" | "GITHUB" | "LINKEDIN" | null>(null);
+  const [copiedType, setCopiedType] = useState<"EMAIL" | "GITHUB" | "LINKEDIN" | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -74,26 +74,26 @@ export default function Contact() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleCopy = (e: React.MouseEvent) => {
+  const handleCopyText = (text: string, type: "EMAIL" | "GITHUB" | "LINKEDIN", e: React.MouseEvent) => {
     e.stopPropagation();
-    navigator.clipboard.writeText("chrif.bouabdallah@gmail.com");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    navigator.clipboard.writeText(text);
+    setCopiedType(type);
+    setTimeout(() => setCopiedType(null), 2000);
   };
 
   useEffect(() => {
-    if (!showEmailPopup) return;
+    if (!activePopup) return;
 
     const handleOutsideClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (!target.closest(".email-container")) {
-        setShowEmailPopup(false);
+      if (!target.closest(".social-container")) {
+        setActivePopup(null);
       }
     };
 
     document.addEventListener("click", handleOutsideClick);
     return () => document.removeEventListener("click", handleOutsideClick);
-  }, [showEmailPopup]);
+  }, [activePopup]);
 
   // Smooth virtual scroll tracking
   const scrollProgress = useMotionValue(0);
@@ -221,21 +221,19 @@ export default function Contact() {
 
   const socials = [
     {
-      name: "GITHUB",
+      name: "GITHUB" as const,
       url: "https://github.com/CherifBouabdallah",
       icon: <GithubIcon />,
-      isLink: true
     },
     {
-      name: "EMAIL",
+      name: "EMAIL" as const,
+      url: "",
       icon: <EmailIcon />,
-      isLink: false
     },
     {
-      name: "LINKEDIN",
+      name: "LINKEDIN" as const,
       url: "https://www.linkedin.com/in/cherif-bouabdallah/",
       icon: <LinkedinIcon />,
-      isLink: true
     },
   ];
 
@@ -252,7 +250,7 @@ export default function Contact() {
         className="fixed top-0 left-0 right-0 bottom-[-300px] w-full pointer-events-none select-none z-0 overflow-hidden"
       >
         <img 
-          src="/Untitled_Artwork.png" 
+          src="/OG.png" 
           alt="Background Artwork" 
           className="w-full h-full object-cover"
         />
@@ -313,69 +311,98 @@ export default function Contact() {
             </>
           );
 
-          if (social.isLink) {
-            return (
-              <a
-                key={social.name}
-                href={social.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center group cursor-pointer"
-              >
-                {content}
-              </a>
-            );
-          } else {
-            return (
-              <div
-                key={social.name}
-                className="email-container flex flex-col items-center group cursor-pointer relative"
-                onClick={() => setShowEmailPopup(!showEmailPopup)}
-              >
-                {content}
+          return (
+            <div
+              key={social.name}
+              className="social-container flex flex-col items-center group cursor-pointer relative"
+              onClick={() => setActivePopup(activePopup === social.name ? null : social.name)}
+            >
+              {content}
 
-                <AnimatePresence>
-                  {showEmailPopup && (
-                    <motion.div
-                      variants={popupVariants}
-                      initial="initial"
-                      animate="animate"
-                      exit="exit"
-                      style={{ originX: 0.5, originY: 0 }}
-                      className="absolute top-full mt-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2.5 bg-[#F6F0DF]/5 backdrop-blur-[4px] text-[#F6F0DF]/90 p-3 rounded-2xl border border-[#F6F0DF]/20 z-50 whitespace-nowrap min-w-[240px]"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <span className="font-mono text-[11px] font-bold select-all text-[#F6F0DF]/90 tracking-wide">
-                        chrif.bouabdallah@gmail.com
-                      </span>
-                      <button
-                        onClick={handleCopy}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#F6F0DF] text-[#386641] font-mono text-[10px] font-bold tracking-wider hover:bg-[#F6F0DF]/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
-                      >
-                        {copied ? (
-                          <>
+              <AnimatePresence>
+                {activePopup === social.name && (
+                  <motion.div
+                    variants={popupVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    style={{ originX: 0.5, originY: 0 }}
+                    className="absolute top-full mt-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2.5 bg-[#F6F0DF]/5 backdrop-blur-[4px] text-[#F6F0DF]/90 p-3 rounded-2xl border border-[#F6F0DF]/20 z-50 whitespace-nowrap min-w-[280px]"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {social.name === "EMAIL" ? (
+                      <>
+                        <span className="font-mono text-[11px] font-bold select-all text-[#F6F0DF]/90 tracking-wide">
+                          chrif.bouabdallah@gmail.com
+                        </span>
+                        <button
+                          onClick={(e) => handleCopyText("chrif.bouabdallah@gmail.com", "EMAIL", e)}
+                          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#F6F0DF] text-[#386641] font-mono text-[10px] font-bold tracking-wider hover:bg-[#F6F0DF]/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                        >
+                          {copiedType === "EMAIL" ? (
+                            <>
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                              </svg>
+                              COPIED!
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                              </svg>
+                              COPY ADDRESS
+                            </>
+                          )}
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-mono text-[11px] font-bold select-all text-[#F6F0DF]/90 tracking-wide">
+                          {social.name === "GITHUB" ? "github.com/CherifBouabdallah" : "linkedin.com/in/cherif-bouabdallah"}
+                        </span>
+                        <div className="flex flex-row gap-2 w-full">
+                          <button
+                            onClick={(e) => handleCopyText(social.url, social.name, e)}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#F6F0DF] text-[#386641] font-mono text-[10px] font-bold tracking-wider hover:bg-[#F6F0DF]/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                          >
+                            {copiedType === social.name ? (
+                              <>
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                </svg>
+                                COPIED!
+                              </>
+                            ) : (
+                              <>
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                                </svg>
+                                COPY LINK
+                              </>
+                            )}
+                          </button>
+                          <a
+                            href={social.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#F6F0DF]/10 text-[#F6F0DF] border border-[#F6F0DF]/20 font-mono text-[10px] font-bold tracking-wider hover:bg-[#F6F0DF]/20 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                          >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                             </svg>
-                            COPIED!
-                          </>
-                        ) : (
-                          <>
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-                              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                            </svg>
-                            COPY ADDRESS
-                          </>
-                        )}
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-              </div>
-            );
-          }
+                            GO TO PAGE
+                          </a>
+                        </div>
+                      </>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
         })}
       </motion.div>
 
