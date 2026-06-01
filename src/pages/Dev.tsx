@@ -144,67 +144,65 @@ export default function Dev() {
       <div className="fixed inset-0 z-0 bg-[#141212] pointer-events-none" />
 
       {/* 1. MOCKUP ALCOVE HEADER (Fixed top edge-to-edge nav) */}
-      <header className="fixed top-0 left-0 right-0 w-full flex justify-center border-b border-[#FDFBF7]/5 bg-[#1C1917]/85 backdrop-blur-md px-6 sm:px-12 md:px-16 py-4.5 shadow-md z-30">
-        <div className="w-full max-w-[1440px] flex items-center justify-between">
-          {/* Logo element */}
-          <div className="flex items-center cursor-pointer group" onClick={() => navigate("/")}>
-            <div className="relative mr-3 w-8 h-8 rounded-lg border-2 border-[#FDFBF7] overflow-hidden flex items-center justify-center bg-stone-950">
-              {/* Sliding cover gradient */}
-              <div className="absolute inset-[1.5px] rounded-[5px] bg-gradient-to-t from-orange-500/20 to-orange-500/90 transition-transform duration-500 ease-out group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-25" />
-              {/* Logo SVG symbol */}
-              <svg className="w-4 h-4 text-[#FDFBF7] z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+      <header className="fixed top-0 left-0 right-0 w-full flex items-center justify-between border-b border-[#FDFBF7]/5 bg-[#1C1917]/85 backdrop-blur-md px-4 py-4.5 shadow-md z-30">
+        {/* Logo element */}
+        <div className="flex items-center cursor-pointer group" onClick={() => navigate("/")}>
+          <div className="relative mr-3 w-8 h-8 rounded-lg border-2 border-[#FDFBF7] overflow-hidden flex items-center justify-center bg-stone-950">
+            {/* Sliding cover gradient */}
+            <div className="absolute inset-[1.5px] rounded-[5px] bg-gradient-to-t from-orange-500/20 to-orange-500/90 transition-transform duration-500 ease-out group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-25" />
+            {/* Logo SVG symbol */}
+            <svg className="w-4 h-4 text-[#FDFBF7] z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+          </div>
+          <span className="alcove-font-bricolage text-xl font-bold tracking-tight">Alcove</span>
+        </div>
+
+        {/* Nav links right */}
+        <div className="flex items-center gap-4 sm:gap-6">
+          {/* FAQs link */}
+          <a href="/faq" onClick={(e) => { e.preventDefault(); navigate("/contact"); }} className="group flex items-center text-sm font-bold text-[#FDFBF7]/70 hover:text-[#FDFBF7] transition duration-300">
+            <svg className="w-4.5 h-4.5 mr-1.5 fill-current transition-transform duration-300 group-hover:-rotate-12" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>FAQs</span>
+          </a>
+
+          {/* Download Button with Arrow Slide */}
+          <button 
+            onClick={() => navigate("/contact")}
+            className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 overflow-hidden pl-10 pr-4 select-none h-11 border border-[#FDFBF7]/5"
+          >
+            {/* Apple icon left */}
+            <div className="absolute left-3.5 transition-all duration-300 group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-0 group-hover:blur-xs">
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93 1.11-3.06 0-.16-.02-.31-.05-.47-.99.04-2.19.67-2.9 1.49-.61.7-1.15 1.84-1.15 2.96 0 .17.02.34.06.39.06.01.17.02.28.02.94 0 2-1.52 2.65-2.33z"/>
               </svg>
             </div>
-            <span className="alcove-font-bricolage text-xl font-bold tracking-tight">Alcove</span>
-          </div>
-
-          {/* Nav links right */}
-          <div className="flex items-center gap-4 sm:gap-6">
-            {/* FAQs link */}
-            <a href="/faq" onClick={(e) => { e.preventDefault(); navigate("/contact"); }} className="group flex items-center text-sm font-bold text-[#FDFBF7]/70 hover:text-[#FDFBF7] transition duration-300">
-              <svg className="w-4.5 h-4.5 mr-1.5 fill-current transition-transform duration-300 group-hover:-rotate-12" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            {/* Centered label */}
+            <div className="transition-transform duration-300 group-hover:-translate-x-3.5 whitespace-nowrap">
+              Download <span className="hidden sm:inline">for Mac</span>
+            </div>
+            {/* Arrow right sliding in */}
+            <div className="absolute right-3.5 translate-x-full scale-x-50 opacity-0 blur-xs transition-all duration-300 group-hover:translate-x-0 group-hover:scale-x-100 group-hover:opacity-100 group-hover:blur-none text-[#F97316]">
+              <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-              <span>FAQs</span>
-            </a>
+            </div>
+          </button>
 
-            {/* Download Button with Arrow Slide */}
-            <button 
-              onClick={() => navigate("/contact")}
-              className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 overflow-hidden pl-10 pr-4 select-none h-11 border border-[#FDFBF7]/5"
-            >
-              {/* Apple icon left */}
-              <div className="absolute left-3.5 transition-all duration-300 group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-0 group-hover:blur-xs">
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93 1.11-3.06 0-.16-.02-.31-.05-.47-.99.04-2.19.67-2.9 1.49-.61.7-1.15 1.84-1.15 2.96 0 .17.02.34.06.39.06.01.17.02.28.02.94 0 2-1.52 2.65-2.33z"/>
-                </svg>
-              </div>
-              {/* Centered label */}
-              <div className="transition-transform duration-300 group-hover:-translate-x-3.5 whitespace-nowrap">
-                Download <span className="hidden sm:inline">for Mac</span>
-              </div>
-              {/* Arrow right sliding in */}
-              <div className="absolute right-3.5 translate-x-full scale-x-50 opacity-0 blur-xs transition-all duration-300 group-hover:translate-x-0 group-hover:scale-x-100 group-hover:opacity-100 group-hover:blur-none text-[#F97316]">
-                <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </div>
-            </button>
-
-            {/* Purchase Badge Button */}
-            <button 
-              onClick={() => navigate("/contact")}
-              className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7] text-stone-900 hover:bg-[#FDFBF7]/90 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 h-11 border border-[#FDFBF7]/10"
-            >
-              {/* Gear/Star SVG badge */}
-              <svg className="mr-2 w-4 h-4 fill-current text-orange-500 animate-gear-spin-hover" viewBox="0 0 24 24">
-                <path className="animate-gear-spin-hover origin-center gear-icon" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.11-1.03-.41-2.01-.91-2.92l1.64-1.64c.39-.39.39-1.02 0-1.41l-1.41-1.41c-.39-.39-1.02-.39-1.41 0l-1.64 1.64c-.91-.5-1.89-.8-2.92-.91V3.5c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1V5.7c-1.03.11-2.01.41-2.92.91L5.03 4.97c-.39-.39-1.02-.39-1.41 0L2.21 6.38c-.39.39-.39 1.02 0 1.41l1.64 1.64c-.5.91-.8 1.89-.91 2.92H1.5c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1h1.44c.11 1.03.41 2.01.91 2.92l-1.64 1.64c-.39.39-.39 1.02 0 1.41l1.41 1.41c.39.39 1.02.39 1.41 0l1.64-1.64c.91.5 1.89.8 2.92.91v2.24c0 .55.45 1 1 1h2c.55 0 1-.45 1-1V18.3c1.03-.11 2.01-.41 2.92-.91l1.64 1.64c.39.39 1.02.39 1.41 0l1.41-1.41c.39-.39.39-1.02 0-1.41l-1.64-1.64c.5-.91.8-1.89.91-2.92h2.24c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2.24z"/>
-              </svg>
-              <span>Purchase</span>
-              <span className="ml-2 rounded-md bg-stone-900 text-stone-100 text-[10px] px-1.5 py-0.5 tracking-wider">$13.99</span>
-            </button>
-          </div>
+          {/* Purchase Badge Button */}
+          <button 
+            onClick={() => navigate("/contact")}
+            className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7] text-stone-900 hover:bg-[#FDFBF7]/90 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 h-11 border border-[#FDFBF7]/10"
+          >
+            {/* Gear/Star SVG badge */}
+            <svg className="mr-2 w-4 h-4 fill-current text-orange-500 animate-gear-spin-hover" viewBox="0 0 24 24">
+              <path className="animate-gear-spin-hover origin-center gear-icon" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.11-1.03-.41-2.01-.91-2.92l1.64-1.64c.39-.39.39-1.02 0-1.41l-1.41-1.41c-.39-.39-1.02-.39-1.41 0l-1.64 1.64c-.91-.5-1.89-.8-2.92-.91V3.5c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1V5.7c-1.03.11-2.01.41-2.92.91L5.03 4.97c-.39-.39-1.02-.39-1.41 0L2.21 6.38c-.39.39-.39 1.02 0 1.41l1.64 1.64c-.5.91-.8 1.89-.91 2.92H1.5c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1h1.44c.11 1.03.41 2.01.91 2.92l-1.64 1.64c-.39.39-.39 1.02 0 1.41l1.41 1.41c.39.39 1.02.39 1.41 0l1.64-1.64c.91.5 1.89.8 2.92.91v2.24c0 .55.45 1 1 1h2c.55 0 1-.45 1-1V18.3c1.03-.11 2.01-.41 2.92-.91l1.64 1.64c.39.39 1.02.39 1.41 0l1.41-1.41c.39-.39.39-1.02 0-1.41l-1.64-1.64c.5-.91.8-1.89.91-2.92h2.24c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2.24z"/>
+            </svg>
+            <span>Purchase</span>
+            <span className="ml-2 rounded-md bg-stone-900 text-stone-100 text-[10px] px-1.5 py-0.5 tracking-wider">$13.99</span>
+          </button>
         </div>
       </header>
 
