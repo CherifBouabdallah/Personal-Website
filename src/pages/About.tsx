@@ -952,7 +952,7 @@ export default function About() {
           <div className="w-full h-screen flex-shrink-0" />
 
           {/* Intro Description Block (Scrolls up into view) */}
-          <div className="w-full max-w-7xl flex flex-col items-center gap-6 mb-16 md:mb-24 z-10 text-center select-none pt-12">
+          <div className="w-full max-w-[1440px] flex flex-col items-center gap-6 mb-16 md:mb-24 z-10 text-center select-none pt-12">
               <motion.p
                 initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -973,10 +973,10 @@ export default function About() {
               </button>
             </div>
 
-            <SelfDrawingLine className="mb-16 max-w-7xl mx-auto" />
+            <SelfDrawingLine className="mb-16 max-w-[1440px] mx-auto" />
 
           {/* Exhibition Grid Layout */}
-          <div className="grid grid-cols-12 gap-8 md:gap-12 w-full max-w-7xl mx-auto z-10 items-stretch">
+          <div className="grid grid-cols-12 gap-8 md:gap-12 w-full max-w-[1440px] mx-auto z-10 items-stretch">
             {/* Exhibit 1: Typeface Specimen */}
             <motion.div 
               custom={1}
@@ -1075,7 +1075,7 @@ export default function About() {
           </div>
 
           {/* Minimal Editorial Footer */}
-          <footer className="mt-32 w-full max-w-7xl pt-8 border-t border-[#F6F0DF]/10 flex flex-col md:flex-row items-center justify-between text-[10px] text-[#F6F0DF]/40 gap-4 z-10 select-none text-center md:text-left">
+          <footer className="mt-32 w-full max-w-[1440px] pt-8 border-t border-[#F6F0DF]/10 flex flex-col md:flex-row items-center justify-between text-[10px] text-[#F6F0DF]/40 gap-4 z-10 select-none text-center md:text-left">
             <div>
               🏛️ Digital Craft Archive — EPFL Exhibition Room
             </div>

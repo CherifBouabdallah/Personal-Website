@@ -10,6 +10,7 @@ import Portfolio from "./pages/Portfolio";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Experimental from "./pages/Experimental";
+import Dev from "./pages/Dev";
 import LiquidNavbar from "./components/LiquidNavbar";
 
 export default function App() {
@@ -40,7 +41,7 @@ export default function App() {
     });
   }, []);
 
-  const isScrollable = location.pathname === "/exp" || location.pathname === "/about";
+  const isScrollable = location.pathname === "/exp" || location.pathname === "/about" || location.pathname === "/dev";
 
   return (
     <div className={`relative flex min-h-screen bg-[#386641] ${isScrollable ? "overflow-y-auto no-scrollbar overscroll-y-none items-stretch justify-stretch" : "items-center justify-center overflow-hidden"}`}>
@@ -93,6 +94,7 @@ export default function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
             <Route path="/exp" element={<Experimental />} />
+            <Route path="/dev" element={<Dev />} />
           </Routes>
         </motion.div>
       )}

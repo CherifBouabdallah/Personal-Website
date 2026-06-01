@@ -130,7 +130,7 @@ function DiagnosticsPanel({ smoothScrollY, maxScroll }: DiagnosticsPanelProps) {
   const translation = (maxScroll > 0 ? (scrollYVal / maxScroll) : 0) * -maxSafeTravel;
 
   return (
-    <div className="w-full max-w-7xl mx-auto mt-24 border border-theme-text/10 rounded-2xl p-6 md:p-8 bg-black/20 backdrop-blur-sm z-10 flex flex-col gap-8 text-left">
+    <div className="w-full max-w-[1440px] mx-auto mt-24 border border-theme-text/10 rounded-2xl p-6 md:p-8 bg-black/20 backdrop-blur-sm z-10 flex flex-col gap-8 text-left">
       <div className="flex justify-between items-center border-b border-theme-text/10 pb-4">
         <div className="flex flex-col gap-1">
           <h3 className="font-mono text-xs tracking-[0.35em] uppercase font-bold text-theme-text">05 / Parallax Calibration & Diagnostics</h3>
