@@ -4,14 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { 
   Type, 
   Palette, 
-  MoveHorizontal, 
-  Image as ImageIcon, 
   Activity, 
-  User, 
   Copy, 
   Check, 
-  Sparkles, 
-  RotateCw 
+  Sparkles,
+  MoveHorizontal 
 } from "lucide-react";
 
 // Elegant self-drawing border divider rule
@@ -33,7 +30,7 @@ function SelfDrawingLine({ className = "" }: { className?: string }) {
 // EXHIBIT I: TYPOGRAPHICAL SPECIMEN (MAGHFIREA FONT)
 // ----------------------------------------------------------------------
 function TypographyExhibit() {
-  const [customText, setCustomText] = useState("The Museum");
+  const [customText, setCustomText] = useState("Edit me !");
   
   return (
     <div className="glass-square p-6 md:p-8 flex flex-col justify-between h-full select-text text-left">
@@ -99,11 +96,11 @@ function SwatchesExhibit() {
         <div className="grid grid-cols-2 gap-4 mb-6">
           {/* Swatch 1 */}
           <div 
-            onClick={() => copyColor("#386641")}
+            onClick={() => copyColor("#223D27")}
             className="flex flex-col gap-3 group cursor-pointer"
           >
-            <div className="w-full h-24 rounded-xl border border-[#F6F0DF]/20 bg-[#386641] transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] relative overflow-hidden flex items-center justify-center">
-              {copiedColor === "#386641" ? (
+            <div className="w-full h-24 rounded-xl border border-[#F6F0DF]/20 bg-[#223D27] transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] relative overflow-hidden flex items-center justify-center">
+              {copiedColor === "#223D27" ? (
                 <Check size={16} className="text-[#F6F0DF] drop-shadow" />
               ) : (
                 <Copy size={16} className="opacity-0 group-hover:opacity-100 text-[#F6F0DF] transition-opacity duration-300 drop-shadow" />
@@ -111,7 +108,7 @@ function SwatchesExhibit() {
             </div>
             <div className="font-mono text-[9px] leading-tight">
               <div className="text-[#F6F0DF] font-bold">FOREST GREEN</div>
-              <div className="text-[#F6F0DF]/60 mt-0.5">#386641</div>
+              <div className="text-[#F6F0DF]/60 mt-0.5">#223D27</div>
             </div>
           </div>
           
@@ -122,9 +119,9 @@ function SwatchesExhibit() {
           >
             <div className="w-full h-24 rounded-xl border border-[#F6F0DF]/20 bg-[#F6F0DF] transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-[0_8px_24px_rgba(0,0,0,0.15)] relative overflow-hidden flex items-center justify-center">
               {copiedColor === "#F6F0DF" ? (
-                <Check size={16} className="text-[#386641]" />
+                <Check size={16} className="text-[#223D27]" />
               ) : (
-                <Copy size={16} className="opacity-0 group-hover:opacity-100 text-[#386641] transition-opacity duration-300" />
+                <Copy size={16} className="opacity-0 group-hover:opacity-100 text-[#223D27] transition-opacity duration-300" />
               )}
             </div>
             <div className="font-mono text-[9px] leading-tight">
@@ -137,7 +134,7 @@ function SwatchesExhibit() {
       
       <div>
         <p className="font-mono text-[10px] leading-relaxed text-[#F6F0DF]/60">
-          The palette uses natural Forest Green (`#386641`) as the base to represent grounding stability, contrasted by Warm Butter Cream (`#F6F0DF`) for text and borders, avoiding harsh digital white. Click color cards to copy.
+          The palette uses natural Forest Green (`#223D27`) as the base to represent grounding stability, contrasted by Warm Butter Cream (`#F6F0DF`) for text and borders, avoiding harsh digital white. Click color cards to copy.
         </p>
       </div>
     </div>
@@ -202,7 +199,7 @@ function LiquidToggleExhibit() {
               <button 
                 key={idx}
                 onClick={() => setActiveTab(idx)}
-                className={`absolute h-10 rounded-full flex items-center justify-center font-mono text-[10px] font-bold z-10 cursor-pointer transition-colors duration-300 ${activeTab === idx ? "text-[#386641]" : "text-[#F6F0DF]"}`}
+                className={`absolute h-10 rounded-full flex items-center justify-center font-mono text-[10px] font-bold z-10 cursor-pointer transition-colors duration-300 ${activeTab === idx ? "text-[#223D27]" : "text-[#F6F0DF]"}`}
                 style={{
                   left: `${tab.left}px`,
                   width: `${tab.width}px`,
@@ -232,84 +229,6 @@ function LiquidToggleExhibit() {
           </filter>
         </defs>
       </svg>
-    </div>
-  );
-}
-
-// ----------------------------------------------------------------------
-// EXHIBIT IV: CANVAS PARALLAX
-// ----------------------------------------------------------------------
-function CanvasParallaxExhibit() {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [rotateX, setRotateX] = useState(0);
-  const [rotateY, setRotateY] = useState(0);
-  
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    
-    // Relative coordinate from center (-0.5 to 0.5)
-    const xVal = (e.clientX - rect.left) / width - 0.5;
-    const yVal = (e.clientY - rect.top) / height - 0.5;
-    
-    setRotateX(-yVal * 16); // Max 16 degree tilt
-    setRotateY(xVal * 16);
-  };
-  
-  const handleMouseLeave = () => {
-    setRotateX(0);
-    setRotateY(0);
-  };
-  
-  return (
-    <div className="glass-square p-6 md:p-8 flex flex-col justify-between h-full text-left select-none">
-      <div>
-        <div className="flex justify-between items-center mb-6">
-          <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">04 / Canvas Parallax</span>
-          <ImageIcon size={16} className="text-[#F6F0DF]/60" />
-        </div>
-        
-        {/* Floating framed canvas */}
-        <div className="perspective-[1000px] mb-6 flex items-center justify-center">
-          <motion.div 
-            ref={cardRef}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            animate={{ rotateX, rotateY }}
-            transition={{ type: "spring", stiffness: 120, damping: 20 }}
-            style={{ transformStyle: "preserve-3d" }}
-            className="w-full h-28 border border-[#F6F0DF]/20 bg-[#386641]/40 rounded-xl overflow-hidden cursor-crosshair relative"
-          >
-            {/* Parallax inner picture */}
-            <motion.div 
-              className="absolute inset-[-15px] pointer-events-none"
-              animate={{
-                x: rotateY * -1.2,
-                y: rotateX * 1.2,
-              }}
-              transition={{ type: "spring", stiffness: 150, damping: 22 }}
-            >
-              <img 
-                src="/OG.png" 
-                alt="Framed Artwork Specimen" 
-                className="w-full h-full object-cover scale-110 opacity-70"
-              />
-            </motion.div>
-            
-            <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/40 border border-[#F6F0DF]/10 rounded font-mono text-[8px] tracking-widest text-[#F6F0DF]/60">
-              FRAME_SPECIMEN.PNG
-            </div>
-          </motion.div>
-        </div>
-      </div>
-      
-      <div>
-        <p className="font-mono text-[10px] leading-relaxed text-[#F6F0DF]/60">
-          The background artwork is a custom digital canvas layered at low opacity. Move your pointer over the specimen above to test the interactive 3D parallax displacement.
-        </p>
-      </div>
     </div>
   );
 }
@@ -401,14 +320,14 @@ function ButtonCollectionExhibit() {
             {/* Social icons row */}
             <div className="flex gap-4">
               {/* GitHub mini representation */}
-              <div className="w-10 h-10 rounded-full border border-[#F6F0DF]/20 flex items-center justify-center text-[#F6F0DF] bg-[#F6F0DF]/5 backdrop-blur-[2px] transition-all duration-300 hover:bg-[#F6F0DF] hover:text-[#386641] hover:scale-105 cursor-pointer">
+              <div className="w-10 h-10 rounded-full border border-[#F6F0DF]/20 flex items-center justify-center text-[#F6F0DF] bg-[#F6F0DF]/5 backdrop-blur-[2px] transition-all duration-300 hover:bg-[#F6F0DF] hover:text-[#223D27] hover:scale-105 cursor-pointer">
                 <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
                 </svg>
               </div>
               
               {/* LinkedIn mini representation */}
-              <div className="w-10 h-10 rounded-full border border-[#F6F0DF]/20 flex items-center justify-center text-[#F6F0DF] bg-[#F6F0DF]/5 backdrop-blur-[2px] transition-all duration-300 hover:bg-[#F6F0DF] hover:text-[#386641] hover:scale-105 cursor-pointer">
+              <div className="w-10 h-10 rounded-full border border-[#F6F0DF]/20 flex items-center justify-center text-[#F6F0DF] bg-[#F6F0DF]/5 backdrop-blur-[2px] transition-all duration-300 hover:bg-[#F6F0DF] hover:text-[#223D27] hover:scale-105 cursor-pointer">
                 <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
                   <rect x="2" y="9" width="4" height="12" />
@@ -438,7 +357,7 @@ function ButtonCollectionExhibit() {
             {/* Copy Address Button */}
             <button
               onClick={handleCopy}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#F6F0DF] text-[#386641] font-mono text-[9px] font-bold tracking-wider hover:bg-[#F6F0DF]/90 active:scale-[0.97] transition-all duration-200 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#F6F0DF] text-[#223D27] font-mono text-[9px] font-bold tracking-wider hover:bg-[#F6F0DF]/90 active:scale-[0.97] transition-all duration-200 cursor-pointer"
             >
               {copied ? (
                 <>
@@ -474,194 +393,11 @@ function ButtonCollectionExhibit() {
 }
 
 // ----------------------------------------------------------------------
-// EXHIBIT VII: GOOEY SHADER MATRIX
-// ----------------------------------------------------------------------
-function GooeyShaderExhibit() {
-  const [blurVal, setBlurVal] = useState(8);
-  const [contrastVal, setContrastVal] = useState(19);
-  
-  const filterId = "gooey-playground-filter";
-  
-  return (
-    <div className="glass-square p-6 md:p-8 flex flex-col justify-between h-full text-left select-none">
-      <div>
-        <div className="flex justify-between items-center mb-6">
-          <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">07 / Gooey Shader Matrix</span>
-          <MoveHorizontal size={16} className="text-[#F6F0DF]/60" />
-        </div>
-        
-        {/* Interactive shader playground */}
-        <div className="h-32 w-full border border-[#F6F0DF]/10 rounded-xl bg-black/15 flex items-center justify-center relative mb-6 overflow-hidden">
-          {/* Gooey container */}
-          <div 
-            className="relative w-44 h-16 flex items-center justify-center"
-            style={{ filter: `url(#${filterId})` }}
-          >
-            {/* Circle A */}
-            <div className="absolute w-10 h-10 rounded-full bg-[#F6F0DF] left-4" />
-            
-            {/* Circle B */}
-            <motion.div 
-              className="absolute w-10 h-10 rounded-full bg-[#F6F0DF]"
-              animate={{
-                left: [64, 114, 64]
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-          </div>
-          
-          <div className="absolute top-2 left-2 font-mono text-[6px] tracking-widest text-[#F6F0DF]/35 uppercase">
-            Live Shader Output
-          </div>
-        </div>
-        
-        {/* Controls */}
-        <div className="space-y-4 mb-4">
-          <div className="flex flex-col gap-1.5">
-            <div className="flex justify-between font-mono text-[8px] tracking-wide text-[#F6F0DF]/50">
-              <span>BLUR STANDARD DEVIATION: {blurVal}px</span>
-              <span>1px - 15px</span>
-            </div>
-            <input 
-              type="range" 
-              min="1" 
-              max="15" 
-              value={blurVal} 
-              onChange={(e) => setBlurVal(Number(e.target.value))}
-              className="w-full h-1 bg-[#F6F0DF]/15 rounded-lg appearance-none cursor-pointer accent-[#F6F0DF]"
-            />
-          </div>
-          
-          <div className="flex flex-col gap-1.5">
-            <div className="flex justify-between font-mono text-[8px] tracking-wide text-[#F6F0DF]/50">
-              <span>ALPHA CONTRAST THRESHOLD: {contrastVal}</span>
-              <span>10 - 30</span>
-            </div>
-            <input 
-              type="range" 
-              min="10" 
-              max="30" 
-              value={contrastVal} 
-              onChange={(e) => setContrastVal(Number(e.target.value))}
-              className="w-full h-1 bg-[#F6F0DF]/15 rounded-lg appearance-none cursor-pointer accent-[#F6F0DF]"
-            />
-          </div>
-        </div>
-      </div>
-      
-      <div>
-        <p className="font-mono text-[10px] leading-relaxed text-[#F6F0DF]/60">
-          Gaussian blur spreads pixels, and a steep alpha color matrix clips transparent edges to create gooey links. Adjust the parameters above to see how the connection morphs.
-        </p>
-      </div>
-      
-      {/* SVG local definitions */}
-      <svg className="absolute w-0 h-0" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <filter id={filterId}>
-            <feGaussianBlur in="SourceGraphic" stdDeviation={blurVal} result="blur" />
-            <feColorMatrix in="blur" mode="matrix" values={`1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 ${contrastVal} -${Math.floor(contrastVal / 2)}`} result="goo" />
-            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-          </filter>
-        </defs>
-      </svg>
-    </div>
-  );
-}
-
-// ----------------------------------------------------------------------
-// EXHIBIT VIII: FLUID CLAMP TYPOGRAPHY
-// ----------------------------------------------------------------------
-function FluidScaleExhibit() {
-  const [viewportWidth, setViewportWidth] = useState(1024);
-  const [windowSize, setWindowSize] = useState({ w: 0, h: 0 });
-  
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({ w: window.innerWidth, h: window.innerHeight });
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-  
-  // Calculate dynamic size matching the clamp calculation
-  const simulatedSize = Math.max(14, Math.min(40, viewportWidth * 0.025));
-  
-  return (
-    <div className="glass-square p-6 md:p-8 flex flex-col justify-between h-full text-left select-none">
-      <div>
-        <div className="flex justify-between items-center mb-6">
-          <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">08 / Fluid Scale Specimen</span>
-          <Type size={16} className="text-[#F6F0DF]/60" />
-        </div>
-        
-        {/* Real-time viewport specs */}
-        <div className="grid grid-cols-2 gap-3 mb-6 font-mono text-[9px] text-[#F6F0DF]/50 leading-relaxed border border-[#F6F0DF]/10 rounded-xl p-3 bg-black/10">
-          <div>
-            <span className="text-[#F6F0DF] font-bold">CLIENT_WIDTH:</span> {windowSize.w}px
-          </div>
-          <div>
-            <span className="text-[#F6F0DF] font-bold">CLIENT_HEIGHT:</span> {windowSize.h}px
-          </div>
-        </div>
-        
-        {/* Simulator Specimen */}
-        <div className="h-28 w-full border border-[#F6F0DF]/10 rounded-xl bg-black/15 flex flex-col items-center justify-center p-3 relative mb-6">
-          {/* Simulated text */}
-          <div className="text-center overflow-hidden w-full px-4">
-            <span 
-              className="font-maghfirea text-[#F6F0DF] block whitespace-nowrap"
-              style={{ fontSize: `${simulatedSize}px` }}
-            >
-              Responsive Scale
-            </span>
-            <span className="font-mono text-[8px] text-[#F6F0DF]/40 block mt-1">
-              Simulated Font Size: {simulatedSize.toFixed(1)}px
-            </span>
-          </div>
-          
-          <div className="absolute top-2 left-2 font-mono text-[6px] tracking-widest text-[#F6F0DF]/35 uppercase">
-            Viewport Scaler Simulator
-          </div>
-        </div>
-        
-        {/* Simulator Slider */}
-        <div className="flex flex-col gap-1.5 mb-4">
-          <div className="flex justify-between font-mono text-[8px] tracking-wide text-[#F6F0DF]/50">
-            <span>VIRTUAL VIEWPORT WIDTH: {viewportWidth}px</span>
-            <span>320px - 1440px</span>
-          </div>
-          <input 
-            type="range" 
-            min="320" 
-            max="1440" 
-            value={viewportWidth} 
-            onChange={(e) => setViewportWidth(Number(e.target.value))}
-            className="w-full h-1 bg-[#F6F0DF]/15 rounded-lg appearance-none cursor-pointer accent-[#F6F0DF]"
-          />
-        </div>
-      </div>
-      
-      <div>
-        <p className="font-mono text-[10px] leading-relaxed text-[#F6F0DF]/60">
-          Using CSS `clamp()` and viewport-relative units (`vw`) allows typography and spacing coordinates to scale dynamically. Adjust the virtual screen size above to watch the font fluidly adapt.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ----------------------------------------------------------------------
 // MAIN ABOUT PAGE
 // ----------------------------------------------------------------------
 export default function About() {
   const [isReady, setIsReady] = useState(false);
-  const [showArtwork, setShowArtwork] = useState(true);
+  const [showArtwork, setShowArtwork] = useState(false);
   const [maxScroll, setMaxScroll] = useState(0);
   const maxScrollRef = useRef(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -840,7 +576,7 @@ export default function About() {
   };
 
   return (
-    <div className="w-full h-screen min-h-screen bg-[#386641] text-[#F6F0DF] relative overflow-hidden touch-none">
+    <div className="w-full h-screen min-h-screen bg-[#223D27] text-[#F6F0DF] relative overflow-hidden touch-none">
 
       {/* Parallax Background Artwork */}
       <motion.div 
@@ -853,7 +589,7 @@ export default function About() {
         }}
       >
         <img 
-          src="/OG.png" 
+          src="/OG2.PNG" 
           alt="Atmospheric Background Artwork" 
           className="w-full h-full object-cover"
         />
@@ -868,7 +604,7 @@ export default function About() {
           <motion.h1
             initial="hidden"
             animate="visible"
-            className="font-maghfirea text-[clamp(2.5rem,12vw,200px)] text-[#F6F0DF] flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] selection:bg-[#F6F0DF] selection:text-[#386641] px-4 w-full"
+            className="font-maghfirea text-[clamp(2.5rem,12vw,200px)] text-[#F6F0DF] flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] selection:bg-[#F6F0DF] selection:text-[#223D27] px-4 w-full"
           >
             {(() => {
               let charCounter = 0;
@@ -952,7 +688,7 @@ export default function About() {
           <div className="w-full h-screen flex-shrink-0" />
 
           {/* Intro Description Block (Scrolls up into view) */}
-          <div className="w-full max-w-[1440px] flex flex-col items-center gap-6 mb-16 md:mb-24 z-10 text-center select-none pt-12">
+          <div className="w-full max-w-[1440px] flex flex-col items-center gap-6 mb-8 md:mb-10 z-10 text-center select-none pt-12">
               <motion.p
                 initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -964,7 +700,7 @@ export default function About() {
 
               <button
                 onClick={() => setShowArtwork(!showArtwork)}
-                className="font-mono text-[8px] tracking-[0.2em] uppercase text-[#F6F0DF]/40 hover:text-[#F6F0DF] transition-colors duration-200 cursor-pointer flex items-center gap-2 mt-4 select-none"
+                className="font-mono text-[10px] md:text-[11px] tracking-[0.2em] uppercase text-[#F6F0DF]/50 hover:text-[#F6F0DF] cursor-pointer flex items-center gap-2.5 mt-4 select-none transition-all duration-200"
               >
                 <span>Artwork:</span>
                 <span className={showArtwork ? "text-[#F6F0DF] font-bold" : "opacity-50"}>ON</span>
@@ -973,7 +709,7 @@ export default function About() {
               </button>
             </div>
 
-            <SelfDrawingLine className="mb-16 max-w-[1440px] mx-auto" />
+            <SelfDrawingLine className="mb-10 max-w-[1440px] mx-auto" />
 
           {/* Exhibition Grid Layout */}
           <div className="grid grid-cols-12 gap-8 md:gap-12 w-full max-w-[1440px] mx-auto z-10 items-stretch">
@@ -1013,21 +749,9 @@ export default function About() {
               <LiquidToggleExhibit />
             </motion.div>
 
-            {/* Exhibit 4: Canvas Parallax */}
-            <motion.div 
-              custom={4}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-40px" }}
-              variants={cardRevealVariants}
-              className="col-span-12 lg:col-span-7"
-            >
-              <CanvasParallaxExhibit />
-            </motion.div>
-
             {/* Exhibit 5: Spring Dynamics */}
             <motion.div 
-              custom={5}
+              custom={4}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-40px" }}
@@ -1039,49 +763,20 @@ export default function About() {
 
             {/* Exhibit 6: UI Component Showcase */}
             <motion.div 
-              custom={6}
+              custom={5}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-40px" }}
               variants={cardRevealVariants}
-              className="col-span-12 md:col-span-6 lg:col-span-5"
+              className="col-span-12"
             >
               <ButtonCollectionExhibit />
-            </motion.div>
-
-            {/* Exhibit 7: Gooey Shader Specimen */}
-            <motion.div 
-              custom={7}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-40px" }}
-              variants={cardRevealVariants}
-              className="col-span-12 md:col-span-6 lg:col-span-5"
-            >
-              <GooeyShaderExhibit />
-            </motion.div>
-
-            {/* Exhibit 8: Fluid Scale Specimen */}
-            <motion.div 
-              custom={8}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-40px" }}
-              variants={cardRevealVariants}
-              className="col-span-12 md:col-span-6 lg:col-span-7"
-            >
-              <FluidScaleExhibit />
             </motion.div>
           </div>
 
           {/* Minimal Editorial Footer */}
-          <footer className="mt-32 w-full max-w-[1440px] pt-8 border-t border-[#F6F0DF]/10 flex flex-col md:flex-row items-center justify-between text-[10px] text-[#F6F0DF]/40 gap-4 z-10 select-none text-center md:text-left">
-            <div>
-              🏛️ Digital Craft Archive — EPFL Exhibition Room
-            </div>
-            <div className="font-mono text-[8px] tracking-wider uppercase">
-              Curated by Cherif Bouabdallah © {new Date().getFullYear()}
-            </div>
+          <footer className="mt-32 w-full max-w-[1440px] pt-8 border-t border-[#F6F0DF]/10 flex items-center justify-center text-[9px] font-mono tracking-[0.2em] text-[#F6F0DF]/40 z-10 select-none">
+            © {new Date().getFullYear()} CHERIF BOUABDALLAH
           </footer>
         </motion.div>
       )}

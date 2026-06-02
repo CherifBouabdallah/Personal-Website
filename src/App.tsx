@@ -4,7 +4,7 @@
  */
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Link } from "react-router-dom";
 import Home from "./pages/Home";
 import Portfolio from "./pages/Portfolio";
 import Contact from "./pages/Contact";
@@ -24,7 +24,7 @@ export default function App() {
     document.fonts.ready.then(() => setFontsLoaded(true));
 
     // Preload heavy images sitewide to prevent navigation and animation lag
-    const imagesToPreload = ["/IMG_2656.JPEG", "/OG.png"];
+    const imagesToPreload = ["/IMG_2656.JPEG", "/OG2.PNG"];
     let loadedCount = 0;
 
     imagesToPreload.forEach((src) => {
@@ -44,7 +44,7 @@ export default function App() {
   const isScrollable = location.pathname === "/exp" || location.pathname === "/about" || location.pathname === "/dev";
 
   return (
-    <div className={`relative flex min-h-screen bg-[#386641] ${isScrollable ? "overflow-y-auto no-scrollbar overscroll-y-none items-stretch justify-stretch" : "items-center justify-center overflow-hidden"}`}>
+    <div className={`relative flex min-h-screen bg-[#223D27] ${isScrollable ? "overflow-y-auto no-scrollbar overscroll-y-none items-stretch justify-stretch" : "items-center justify-center overflow-hidden"}`}>
       <AnimatePresence mode="wait">
         {!isSiteReady && (
           <motion.div
@@ -52,7 +52,7 @@ export default function App() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
-            className="fixed inset-0 w-full h-full bg-[#386641] z-[999] flex flex-col items-center justify-center select-none"
+            className="fixed inset-0 w-full h-full bg-[#223D27] z-[999] flex flex-col items-center justify-center select-none"
           >
             <motion.div
               initial={{ opacity: 0.3 }}
@@ -77,7 +77,21 @@ export default function App() {
           className={`w-full min-h-screen relative ${isScrollable ? "flex flex-col items-stretch justify-start" : "flex items-center justify-center"}`}
         >
           {/* Liquid Navbar at top middle */}
-          <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50">
+          <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4">
+            {location.pathname === "/" && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+              >
+                <Link
+                  to="/exp"
+                  className="px-4 py-1.5 border border-[#F6F0DF]/15 rounded-full bg-black/25 backdrop-blur-md text-[#F6F0DF]/70 hover:text-[#F6F0DF] hover:border-[#F6F0DF]/40 hover:bg-white/5 transition-all duration-300 font-mono text-[9px] tracking-widest uppercase font-bold cursor-pointer whitespace-nowrap shadow-md"
+                >
+                  EXP
+                </Link>
+              </motion.div>
+            )}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -85,6 +99,20 @@ export default function App() {
             >
               <LiquidNavbar />
             </motion.div>
+            {location.pathname === "/" && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+              >
+                <Link
+                  to="/dev"
+                  className="px-4 py-1.5 border border-[#F6F0DF]/15 rounded-full bg-black/25 backdrop-blur-md text-[#F6F0DF]/70 hover:text-[#F6F0DF] hover:border-[#F6F0DF]/40 hover:bg-white/5 transition-all duration-300 font-mono text-[9px] tracking-widest uppercase font-bold cursor-pointer whitespace-nowrap shadow-md"
+                >
+                  DEV
+                </Link>
+              </motion.div>
+            )}
           </div>
 
           {/* Main Content */}

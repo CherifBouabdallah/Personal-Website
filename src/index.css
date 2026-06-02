@@ -3,7 +3,7 @@
 html,
 body {
   overscroll-behavior: none;
-  background-color: #386641;
+  background-color: #223D27;
 }
 
 @font-face {
@@ -18,7 +18,7 @@ body {
 @theme {
   --font-maghfirea: "Maghfirea", serif;
   --color-theme-text: var(--theme-text, #F6F0DF);
-  --color-theme-bg: var(--theme-bg, #386641);
+  --color-theme-bg: var(--theme-bg, #223D27);
 }
 
 /* Liquid Toggle Styles */
@@ -39,7 +39,7 @@ body {
 .liquid-toggle {
   --unchecked: hsl(218, 8%, 81%);
   --hue: 98;
-  /* Custom matched to site green #386641 */
+  /* Custom matched to site green #223D27 */
   --complete: 0;
   --delta: 0;
   --checked: hsl(var(--hue),
@@ -70,7 +70,7 @@ body {
 }
 
 .liquid-toggle:focus-visible {
-  outline: 4px solid color-mix(in oklch, #386641, transparent);
+  outline: 4px solid color-mix(in oklch, #223D27, transparent);
 }
 
 .liquid-toggle:active {
@@ -131,7 +131,7 @@ body {
   width: calc((var(--bubble-width) * 1px) - (2 * var(--border)));
   container-type: inline-size;
   top: 50%;
-  background: rgba(56, 102, 65, 0.3);
+  background: rgba(34, 61, 39, 0.3);
   /* Green glass bubble base */
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -205,7 +205,7 @@ body {
   font-size: 1.1rem;
   letter-spacing: 0.02em;
   text-decoration: none;
-  color: #386641;
+  color: #223D27;
   /* unselected menu color */
   opacity: 0.7;
   /* Cream color matching background for inactive state */
@@ -263,7 +263,7 @@ body {
 
 /* Glassy Square Style - Matches Liquid Navbar Bubble styling but scaled up */
 .glass-square {
-  background: rgba(56, 102, 65, 0.35);
+  background: rgba(34, 61, 39, 0.35);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   border: 1px solid rgba(246, 240, 223, 0.25);
@@ -284,7 +284,7 @@ body {
 }
 
 .glass-square:hover {
-  background: rgba(56, 102, 65, 0.45);
+  background: rgba(34, 61, 39, 0.45);
   border-color: rgba(246, 240, 223, 0.4);
 }
 

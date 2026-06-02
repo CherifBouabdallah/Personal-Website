@@ -239,22 +239,6 @@ export default function Contact() {
 
   return (
     <div className="w-full h-screen min-h-screen flex flex-col items-center justify-center relative overflow-hidden select-none touch-none">
-      {/* Background Artwork Image */}
-      <motion.div 
-        style={{ 
-          opacity: 0.12,
-          y: bgY,
-          scale: 1.15,
-          transformOrigin: "center top",
-        }}
-        className="fixed top-0 left-0 right-0 bottom-[-300px] w-full pointer-events-none select-none z-0 overflow-hidden"
-      >
-        <img 
-          src="/OG.png" 
-          alt="Background Artwork" 
-          className="w-full h-full object-cover"
-        />
-      </motion.div>
 
       {/* Title */}
       <motion.div
@@ -267,7 +251,7 @@ export default function Contact() {
           variants={{
             visible: { transition: { staggerChildren: 0.05 } }
           }}
-          className="font-maghfirea text-[clamp(2.5rem,12vw,200px)] text-[#F6F0DF] whitespace-nowrap flex justify-center selection:bg-[#F6F0DF] selection:text-[#386641] px-4 w-full"
+          className="font-maghfirea text-[clamp(2.5rem,12vw,200px)] text-[#F6F0DF] whitespace-nowrap flex justify-center selection:bg-[#F6F0DF] selection:text-[#223D27] px-4 w-full"
         >
           {text.split("").map((char, index) => (
             <span
@@ -302,7 +286,7 @@ export default function Contact() {
         {socials.map((social) => {
           const content = (
             <>
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-[#F6F0DF]/20 flex items-center justify-center text-[#F6F0DF]/90 bg-[#F6F0DF]/5 backdrop-blur-[4px] transition-all duration-500 ease-[0.16,1,0.3,1] group-hover:bg-[#F6F0DF] group-hover:text-[#386641] group-hover:scale-105 group-hover:border-[#F6F0DF] group-hover:shadow-[0_8px_30px_rgb(246,240,223,0.15)]">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-[#F6F0DF]/20 flex items-center justify-center text-[#F6F0DF]/90 bg-[#F6F0DF]/5 backdrop-blur-[4px] transition-all duration-500 ease-[0.16,1,0.3,1] group-hover:bg-[#F6F0DF] group-hover:text-[#223D27] group-hover:scale-105 group-hover:border-[#F6F0DF] group-hover:shadow-[0_8px_30px_rgb(34,61,39,0.15)]">
                 {social.icon}
               </div>
               <span className="font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#F6F0DF]/40 mt-4 transition-colors duration-300 group-hover:text-[#F6F0DF]/80">
@@ -337,7 +321,7 @@ export default function Contact() {
                         </span>
                         <button
                           onClick={(e) => handleCopyText("chrif.bouabdallah@gmail.com", "EMAIL", e)}
-                          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#F6F0DF] text-[#386641] font-mono text-[10px] font-bold tracking-wider hover:bg-[#F6F0DF]/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#F6F0DF] text-[#223D27] font-mono text-[10px] font-bold tracking-wider hover:bg-[#F6F0DF]/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
                         >
                           {copiedType === "EMAIL" ? (
                             <>
@@ -365,7 +349,7 @@ export default function Contact() {
                         <div className="flex flex-row gap-2 w-full">
                           <button
                             onClick={(e) => handleCopyText(social.url, social.name, e)}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#F6F0DF] text-[#386641] font-mono text-[10px] font-bold tracking-wider hover:bg-[#F6F0DF]/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#F6F0DF] text-[#223D27] font-mono text-[10px] font-bold tracking-wider hover:bg-[#F6F0DF]/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
                           >
                             {copiedType === social.name ? (
                               <>

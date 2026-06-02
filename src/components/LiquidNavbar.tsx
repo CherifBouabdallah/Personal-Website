@@ -50,10 +50,10 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
       const factor = Math.max(0, 1 - distance / interval);
 
       // Active color: #F6F0DF (rgb(246, 240, 223))
-      // Inactive color: #386641 (rgb(56, 102, 65))
-      const r = Math.round(56 + (246 - 56) * factor);
-      const g = Math.round(102 + (240 - 102) * factor);
-      const b = Math.round(65 + (223 - 65) * factor);
+      // Inactive color: #223D27 (rgb(34, 61, 39))
+      const r = Math.round(34 + (246 - 34) * factor);
+      const g = Math.round(61 + (240 - 61) * factor);
+      const b = Math.round(39 + (223 - 39) * factor);
 
       link.style.color = `rgb(${r}, ${g}, ${b})`;
       link.style.transform = `scale(${1 + 0.05 * factor})`;

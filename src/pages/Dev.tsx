@@ -32,13 +32,13 @@ export default function Dev() {
     // CSS Keyframe styles
     const style = document.createElement("style");
     style.innerHTML = `
-      .alcove-font-bricolage {
+      .vortex-font-bricolage {
         font-family: 'Bricolage Grotesque', sans-serif;
       }
-      .alcove-font-sans {
+      .vortex-font-sans {
         font-family: 'Plus Jakarta Sans', sans-serif;
       }
-      .alcove-font-mono {
+      .vortex-font-mono {
         font-family: 'Geist Mono', monospace;
       }
       @keyframes gear-spin {
@@ -139,11 +139,11 @@ export default function Dev() {
   }, [isPlaying, isLocked]);
 
   return (
-    <div className="w-full relative flex flex-col items-center min-h-screen bg-[#141212] text-[#FDFBF7] alcove-font-sans overflow-x-hidden select-none pb-24">
+    <div className="w-full relative flex flex-col items-center min-h-screen bg-[#141212] text-[#FDFBF7] vortex-font-sans overflow-x-hidden select-none pb-24">
       {/* Background Override Overlay */}
       <div className="fixed inset-0 z-0 bg-[#141212] pointer-events-none" />
 
-      {/* 1. MOCKUP ALCOVE HEADER (Fixed top edge-to-edge nav) */}
+      {/* 1. MOCKUP VORTEX HEADER (Fixed top edge-to-edge nav) */}
       <header className="fixed top-0 left-0 right-0 w-full flex items-center justify-between border-b border-[#FDFBF7]/5 bg-[#1C1917]/85 backdrop-blur-md px-4 py-4.5 shadow-md z-30">
         {/* Logo element */}
         <div className="flex items-center cursor-pointer group" onClick={() => navigate("/")}>
@@ -155,33 +155,35 @@ export default function Dev() {
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
           </div>
-          <span className="alcove-font-bricolage text-xl font-bold tracking-tight">Alcove</span>
+          <span className="vortex-font-bricolage text-xl font-bold tracking-tight">Vortex</span>
         </div>
 
         {/* Nav links right */}
         <div className="flex items-center gap-4 sm:gap-6">
-          {/* FAQs link */}
-          <a href="/faq" onClick={(e) => { e.preventDefault(); navigate("/contact"); }} className="group flex items-center text-sm font-bold text-[#FDFBF7]/70 hover:text-[#FDFBF7] transition duration-300">
+          {/* Portfolio link */}
+          <a href="/portfolio" onClick={(e) => { e.preventDefault(); navigate("/portfolio"); }} className="group flex items-center text-sm font-bold text-[#FDFBF7]/70 hover:text-[#FDFBF7] transition duration-300">
             <svg className="w-4.5 h-4.5 mr-1.5 fill-current transition-transform duration-300 group-hover:-rotate-12" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z" />
             </svg>
-            <span>FAQs</span>
+            <span>Portfolio</span>
           </a>
 
-          {/* Download Button with Arrow Slide */}
-          <button 
-            onClick={() => navigate("/contact")}
-            className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 overflow-hidden pl-10 pr-4 select-none h-11 border border-[#FDFBF7]/5"
+          {/* GitHub Link Button with Arrow Slide */}
+          <a 
+            href="https://github.com/CherifBouabdallah"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 overflow-hidden pl-10 pr-4 select-none h-11 border border-[#FDFBF7]/5 text-[#FDFBF7] decoration-none"
           >
-            {/* Apple icon left */}
+            {/* GitHub icon left */}
             <div className="absolute left-3.5 transition-all duration-300 group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-0 group-hover:blur-xs">
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93 1.11-3.06 0-.16-.02-.31-.05-.47-.99.04-2.19.67-2.9 1.49-.61.7-1.15 1.84-1.15 2.96 0 .17.02.34.06.39.06.01.17.02.28.02.94 0 2-1.52 2.65-2.33z"/>
+              <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
               </svg>
             </div>
             {/* Centered label */}
             <div className="transition-transform duration-300 group-hover:-translate-x-3.5 whitespace-nowrap">
-              Download <span className="hidden sm:inline">for Mac</span>
+              View GitHub
             </div>
             {/* Arrow right sliding in */}
             <div className="absolute right-3.5 translate-x-full scale-x-50 opacity-0 blur-xs transition-all duration-300 group-hover:translate-x-0 group-hover:scale-x-100 group-hover:opacity-100 group-hover:blur-none text-[#F97316]">
@@ -189,19 +191,19 @@ export default function Dev() {
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </div>
-          </button>
+          </a>
 
-          {/* Purchase Badge Button */}
+          {/* Hire Cherif Button */}
           <button 
             onClick={() => navigate("/contact")}
-            className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7] text-stone-900 hover:bg-[#FDFBF7]/90 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 h-11 border border-[#FDFBF7]/10"
+            className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7] text-stone-900 hover:bg-[#FDFBF7]/90 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 h-11 border border-[#FDFBF7]/10 cursor-pointer"
           >
             {/* Gear/Star SVG badge */}
             <svg className="mr-2 w-4 h-4 fill-current text-orange-500 animate-gear-spin-hover" viewBox="0 0 24 24">
               <path className="animate-gear-spin-hover origin-center gear-icon" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.11-1.03-.41-2.01-.91-2.92l1.64-1.64c.39-.39.39-1.02 0-1.41l-1.41-1.41c-.39-.39-1.02-.39-1.41 0l-1.64 1.64c-.91-.5-1.89-.8-2.92-.91V3.5c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1V5.7c-1.03.11-2.01.41-2.92.91L5.03 4.97c-.39-.39-1.02-.39-1.41 0L2.21 6.38c-.39.39-.39 1.02 0 1.41l1.64 1.64c-.5.91-.8 1.89-.91 2.92H1.5c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1h1.44c.11 1.03.41 2.01.91 2.92l-1.64 1.64c-.39.39-.39 1.02 0 1.41l1.41 1.41c.39.39 1.02.39 1.41 0l1.64-1.64c.91.5 1.89.8 2.92.91v2.24c0 .55.45 1 1 1h2c.55 0 1-.45 1-1V18.3c1.03-.11 2.01-.41 2.92-.91l1.64 1.64c.39.39 1.02.39 1.41 0l1.41-1.41c.39-.39.39-1.02 0-1.41l-1.64-1.64c.5-.91.8-1.89.91-2.92h2.24c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2.24z"/>
             </svg>
-            <span>Purchase</span>
-            <span className="ml-2 rounded-md bg-stone-900 text-stone-100 text-[10px] px-1.5 py-0.5 tracking-wider">$13.99</span>
+            <span>Hire Cherif</span>
+            <span className="ml-2 rounded-md bg-stone-900 text-stone-100 text-[10px] px-1.5 py-0.5 tracking-wider uppercase font-bold">EPFL</span>
           </button>
         </div>
       </header>
@@ -212,8 +214,8 @@ export default function Dev() {
         {/* 2. HERO TITLE SECTION WITH THE SVG HANDDRAWN LOOP          */}
         {/* ========================================================= */}
         <section className="w-full max-w-4xl flex flex-col items-center gap-6 text-center">
-          <h1 className="alcove-font-bricolage text-5xl sm:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tight text-center relative select-none">
-            Dynamic Island
+          <h1 className="vortex-font-bricolage text-5xl sm:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tight text-center relative select-none">
+            Vortex Sandbox
             <br />
             for {" "}
             <mark className="relative bg-transparent text-inherit inline-block overflow-visible px-2 sm:px-4">
@@ -234,18 +236,18 @@ export default function Dev() {
           </h1>
           
           <p className="max-w-xl mx-auto text-base sm:text-lg text-[#FDFBF7]/60 leading-relaxed font-medium">
-            An entirely new way to experience development. Testing spring dynamics, notch modules, and custom widgets in one beautiful sandbox.
+            An interactive creative tech sandbox showcasing high-performance web engineering. Test custom spring models, gooey filters, keyframe physics, and dynamic HUD widgets.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 mt-6">
-            <button onClick={() => setIsLocked(false)} className="group relative inline-flex items-center justify-center rounded-2xl bg-[#FDFBF7] text-stone-950 font-bold px-7 py-4 text-base transition duration-300 shadow-xl shadow-orange-950/20 hover:scale-[1.02] pl-14">
+            <button onClick={() => setIsLocked(false)} className="group relative inline-flex items-center justify-center rounded-2xl bg-[#FDFBF7] text-stone-950 font-bold px-7 py-4 text-base transition duration-300 shadow-xl shadow-orange-950/20 hover:scale-[1.02] pl-14 cursor-pointer">
               <div className="absolute left-5 transition-all duration-300 group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-0 group-hover:blur-xs">
                 <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                   <path d="M19 13H5v-2h14v2z" />
                 </svg>
               </div>
               <div className="transition-transform duration-300 group-hover:-translate-x-4">
-                Unlock Desktop
+                Unlock Sandbox
               </div>
               <div className="absolute right-5 translate-x-full scale-x-50 opacity-0 blur-xs transition-all duration-300 group-hover:translate-x-0 group-hover:scale-x-100 group-hover:opacity-100 group-hover:blur-none text-orange-500">
                 <svg className="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
@@ -254,12 +256,12 @@ export default function Dev() {
               </div>
             </button>
             
-            <button onClick={() => navigate("/contact")} className="group relative inline-flex items-center justify-center rounded-2xl bg-[#FDFBF7]/10 text-[#FDFBF7] font-bold px-6 py-4 text-base transition duration-300 border border-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15">
+            <button onClick={() => navigate("/contact")} className="group relative inline-flex items-center justify-center rounded-2xl bg-[#FDFBF7]/10 text-[#FDFBF7] font-bold px-6 py-4 text-base transition duration-300 border border-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 cursor-pointer">
               <svg className="mr-2.5 w-5 h-5 fill-current text-orange-500 group-hover:rotate-180 transition-transform duration-500" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
               </svg>
-              <span>Get Token</span>
-              <span className="ml-2 rounded-lg bg-stone-950 px-2 py-0.5 text-xs text-[#FDFBF7]/80">$13.99</span>
+              <span>Get In Touch</span>
+              <span className="ml-2 rounded-lg bg-stone-950 px-2 py-0.5 text-xs text-[#FDFBF7]/80">EPFL</span>
             </button>
           </div>
 
@@ -268,7 +270,7 @@ export default function Dev() {
             <svg className="w-3.5 h-3.5 fill-current animate-bounce" viewBox="0 0 24 24">
               <path d="M19 15l-1.41-1.41-5.59 5.59V3h-2v16.17l-5.59-5.59L3 15l9 9 9-9z" />
             </svg>
-            <span>Psst… it's interactive! Try unlocking the screen</span>
+            <span>Psst… it's interactive! Try unlocking the sandbox</span>
           </div>
         </section>
 
@@ -340,13 +342,14 @@ export default function Dev() {
               {/* macOS Menu bar */}
               <div className="w-full h-8 bg-black/40 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 text-[11px] font-medium text-stone-200 select-none z-10">
                 <div className="flex items-center gap-4">
-                  <svg className="w-3.5 h-3.5 fill-current text-[#FDFBF7]" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93 1.11-3.06 0-.16-.02-.31-.05-.47-.99.04-2.19.67-2.9 1.49-.61.7-1.15 1.84-1.15 2.96 0 .17.02.34.06.39.06.01.17.02.28.02.94 0 2-1.52 2.65-2.33z"/></svg>
-                  <span className="font-bold">Sandbox</span>
-                  <span className="hidden sm:inline opacity-70">File</span>
-                  <span className="hidden sm:inline opacity-70">Edit</span>
-                  <span className="hidden sm:inline opacity-70">View</span>
-                  <span className="hidden sm:inline opacity-70">Window</span>
-                  <span className="hidden sm:inline opacity-70">Help</span>
+                  <svg className="w-3.5 h-3.5 text-[#FDFBF7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                  </svg>
+                  <span className="font-bold">Vortex OS</span>
+                  <span className="hidden sm:inline opacity-70">Engine</span>
+                  <span className="hidden sm:inline opacity-70">Simulation</span>
+                  <span className="hidden sm:inline opacity-70">Performance</span>
+                  <span className="hidden sm:inline opacity-70">Logs</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="opacity-80 font-semibold">{timeStr}</span>
@@ -374,16 +377,16 @@ export default function Dev() {
                     <AnimatePresence mode="wait">
                       {!isIslandExpanded ? (
                         <motion.div 
-                          key="island-collapsed"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.15 }}
-                          className="w-full h-full flex items-center justify-between px-3 text-[9px]"
+                           key="island-collapsed"
+                           initial={{ opacity: 0 }}
+                           animate={{ opacity: 1 }}
+                           exit={{ opacity: 0 }}
+                           transition={{ duration: 0.15 }}
+                           className="w-full h-full flex items-center justify-between px-3 text-[9px]"
                         >
                           <div className="flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
-                            <span className="font-mono tracking-widest text-orange-500 font-bold">ALCOVE</span>
+                            <span className="font-mono tracking-widest text-orange-500 font-bold">VORTEX</span>
                           </div>
                           
                           <div className="flex items-center gap-1 text-[#FDFBF7]/40 font-mono">
@@ -557,7 +560,6 @@ export default function Dev() {
           <span className="font-mono text-[9px] tracking-[0.4em] text-[#FDFBF7]/35 uppercase mb-2">Sandbox Features Directory</span>
           <div className="w-full h-[1px] bg-[#FDFBF7]/5" />
         </div>
-
         {/* ========================================================= */}
         {/* 4. THE 8 FEATURE CARDS GRID WITH SIGNATURE HOVER EFFECTS   */}
         {/* ========================================================= */}
@@ -565,7 +567,8 @@ export default function Dev() {
           
           {/* Card 1: Fluid Transitions (Gooey Circles) */}
           <div className="group relative flex flex-col items-center justify-center p-6 bg-stone-900/40 border border-stone-800 rounded-3xl min-h-[220px] transition-all duration-300 hover:bg-stone-900/60 hover:border-orange-500/30 shadow-lg cursor-pointer">
-            <div className="h-20 flex items-center justify-center mb-4 overflow-visible">
+            <span className="font-mono text-[8px] uppercase tracking-wider text-orange-500 mb-2 font-bold px-2 py-0.5 rounded bg-orange-950/20 border border-orange-500/10">framer-motion / svg filter</span>
+            <div className="h-20 flex items-center justify-center mb-2 overflow-visible">
               <div className="flex items-center justify-center space-x-3.5 gooey-filter-container relative w-24 h-16">
                 <div className="w-9 h-9 rounded-full bg-[#FDFBF7] transition-all duration-500 ease-out group-hover:translate-x-7" />
                 <div className="w-6 h-6 rounded-full bg-[#FDFBF7] transition-all duration-500 ease-out group-hover:-translate-x-7" />
@@ -582,15 +585,16 @@ export default function Dev() {
                 </svg>
               </div>
             </div>
-            <h3 className="text-xl font-bold text-[#FDFBF7] tracking-tight">Fluid transitions</h3>
-            <p className="text-[11px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
-              Smooth fluid spring-based shape interpolations.
+            <h3 className="text-base font-bold text-[#FDFBF7] tracking-tight">Fluid Transitions</h3>
+            <p className="text-[10px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
+              Gooey morphing vectors using SVG blend-mode filters and spring animations.
             </p>
           </div>
 
-          {/* Card 2: Instant Notifications (Swinging Bell) */}
+          {/* Card 2: Interactive Physics (Swinging Bell) */}
           <div className="group relative flex flex-col items-center justify-center p-6 bg-stone-900/40 border border-stone-800 rounded-3xl min-h-[220px] transition-all duration-300 hover:bg-stone-900/60 hover:border-orange-500/30 shadow-lg cursor-pointer">
-            <div className="h-20 flex items-center justify-center mb-4 overflow-visible">
+            <span className="font-mono text-[8px] uppercase tracking-wider text-orange-500 mb-2 font-bold px-2 py-0.5 rounded bg-orange-950/20 border border-orange-500/10">keyframe physics</span>
+            <div className="h-20 flex items-center justify-center mb-2 overflow-visible">
               <div className="relative">
                 {/* Notification Badge dot */}
                 <div className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-orange-500 border border-stone-950 transition-transform duration-300 group-hover:scale-125 z-10" />
@@ -601,15 +605,16 @@ export default function Dev() {
                 </svg>
               </div>
             </div>
-            <h3 className="text-xl font-bold text-[#FDFBF7] tracking-tight">Instant Notifications</h3>
-            <p className="text-[11px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
-              Elastic shake alerts and notification badges.
+            <h3 className="text-base font-bold text-[#FDFBF7] tracking-tight">Interactive Physics</h3>
+            <p className="text-[10px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
+              Bell shake notification triggers styled with custom CSS keyframes and spring physics.
             </p>
           </div>
 
-          {/* Card 3: Live Activities (Spinning Clock) */}
+          {/* Card 3: Real-Time Data (Spinning Clock) */}
           <div className="group relative flex flex-col items-center justify-center p-6 bg-stone-900/40 border border-stone-800 rounded-3xl min-h-[220px] transition-all duration-300 hover:bg-stone-900/60 hover:border-orange-500/30 shadow-lg cursor-pointer">
-            <div className="h-20 flex items-center justify-center mb-4 overflow-visible">
+            <span className="font-mono text-[8px] uppercase tracking-wider text-orange-500 mb-2 font-bold px-2 py-0.5 rounded bg-orange-950/20 border border-orange-500/10">react hooks</span>
+            <div className="h-20 flex items-center justify-center mb-2 overflow-visible">
               <svg className="w-12 h-12 fill-none stroke-[#FDFBF7] stroke-2" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" />
                 {/* Minute hand rotates 540 degrees */}
@@ -618,15 +623,16 @@ export default function Dev() {
                 <path className="origin-center transition-transform duration-500 ease-out group-hover:rotate-[180deg]" strokeLinecap="round" d="M12 12h4" style={{ transformOrigin: "12px 12px" }} />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-[#FDFBF7] tracking-tight">Live Activities</h3>
-            <p className="text-[11px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
-              Synchronized timer and clock hands models.
+            <h3 className="text-base font-bold text-[#FDFBF7] tracking-tight">Real-Time Data</h3>
+            <p className="text-[10px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
+              Synchronized date-time engines driven by modular React scheduler states.
             </p>
           </div>
 
-          {/* Card 4: Swipe Gestures (Tilting Hand & Wave lines) */}
+          {/* Card 4: Gesture Interaction (Tilting Hand & Wave lines) */}
           <div className="group relative flex flex-col items-center justify-center p-6 bg-stone-900/40 border border-stone-800 rounded-3xl min-h-[220px] transition-all duration-300 hover:bg-stone-900/60 hover:border-orange-500/30 shadow-lg cursor-pointer">
-            <div className="h-20 flex items-center justify-center mb-4 overflow-visible relative">
+            <span className="font-mono text-[8px] uppercase tracking-wider text-orange-500 mb-2 font-bold px-2 py-0.5 rounded bg-orange-950/20 border border-orange-500/10">touch api / event handlers</span>
+            <div className="h-20 flex items-center justify-center mb-2 overflow-visible relative">
               
               {/* Ripple curves fading in and scaling */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -642,15 +648,16 @@ export default function Dev() {
                 <path d="M12 24c6.63 0 12-5.37 12-12S18.63 0 12 0 0 5.37 0 12s5.37 12 12 12zm-1-19.4c0-.33.27-.6.6-.6s.6.27.6.6v7.3h-1.2V4.6zm-2.4 1.7c0-.33.27-.6.6-.6s.6.27.6.6v5.6H8.6V6.3zm4.8.8c0-.33.27-.6.6-.6s.6.27.6.6v4.8h-1.2V7.1zm2.4 1.7c0-.33.27-.6.6-.6s.6.27.6.6v3.2h-1.2V8.8z"/>
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-[#FDFBF7] tracking-tight">Swipe gestures</h3>
-            <p className="text-[11px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
-              Elastic swipe signals and gesture indicators.
+            <h3 className="text-base font-bold text-[#FDFBF7] tracking-tight">Gesture Interaction</h3>
+            <p className="text-[10px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
+              Responsive mouse hover and touch swipe gestures with elastic boundary dampening.
             </p>
           </div>
 
-          {/* Card 5: Packed with Surprises (Lid Lift Box) */}
+          {/* Card 5: Vector Animations (Lid Lift Box) */}
           <div className="group relative flex flex-col items-center justify-center p-6 bg-stone-900/40 border border-stone-800 rounded-3xl min-h-[220px] transition-all duration-300 hover:bg-stone-900/60 hover:border-orange-500/30 shadow-lg cursor-pointer">
-            <div className="h-20 flex flex-col items-center justify-center mb-4 overflow-visible relative">
+            <span className="font-mono text-[8px] uppercase tracking-wider text-orange-500 mb-2 font-bold px-2 py-0.5 rounded bg-orange-950/20 border border-orange-500/10">css transforms</span>
+            <div className="h-20 flex flex-col items-center justify-center mb-2 overflow-visible relative">
               {/* Sparkle star pops up */}
               <svg className="absolute w-4 h-4 fill-current text-orange-500 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-[-24px] group-hover:scale-125 transition-all duration-500" viewBox="0 0 24 24">
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
@@ -667,15 +674,16 @@ export default function Dev() {
                 <path d="M8 0h4v15H8z" className="text-[#FDFBF7]"/>
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-[#FDFBF7] tracking-tight">Packed with surprises</h3>
-            <p className="text-[11px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
-              Bouncy lid lifting micro-interactions.
+            <h3 className="text-base font-bold text-[#FDFBF7] tracking-tight">Vector Animations</h3>
+            <p className="text-[10px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
+              Lid-lifting 3D effect present box utilizing complex CSS hover translations.
             </p>
           </div>
 
-          {/* Card 6: Customizable HUDs (Control knobs sliding) */}
+          {/* Card 6: HUD Control Panels (Control knobs sliding) */}
           <div className="group relative flex flex-col items-center justify-center p-6 bg-stone-900/40 border border-stone-800 rounded-3xl min-h-[220px] transition-all duration-300 hover:bg-stone-900/60 hover:border-orange-500/30 shadow-lg cursor-pointer">
-            <div className="h-20 flex items-center justify-center mb-4 overflow-visible">
+            <span className="font-mono text-[8px] uppercase tracking-wider text-orange-500 mb-2 font-bold px-2 py-0.5 rounded bg-orange-950/20 border border-orange-500/10">parametric state</span>
+            <div className="h-20 flex items-center justify-center mb-2 overflow-visible">
               <div className="w-16 h-12 border border-[#FDFBF7]/40 rounded-lg p-2.5 flex flex-col justify-between relative bg-stone-950/60">
                 {/* Slider Track 1 */}
                 <div className="w-full h-1.5 bg-white/10 rounded-full relative">
@@ -687,15 +695,16 @@ export default function Dev() {
                 </div>
               </div>
             </div>
-            <h3 className="text-xl font-bold text-[#FDFBF7] tracking-tight">Customizable HUDs</h3>
-            <p className="text-[11px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
-              Sliding knobs and values calibration feedback.
+            <h3 className="text-base font-bold text-[#FDFBF7] tracking-tight">HUD Control Panels</h3>
+            <p className="text-[10px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
+              Bidirectional custom control knobs with instantaneous React state interpolation.
             </p>
           </div>
 
-          {/* Card 7: Lock Screen Widgets (Widgets Dock) */}
+          {/* Card 7: Modular Widgets (Widgets Dock) */}
           <div className="group relative flex flex-col items-center justify-center p-6 bg-stone-900/40 border border-stone-800 rounded-3xl min-h-[220px] transition-all duration-300 hover:bg-stone-900/60 hover:border-orange-500/30 shadow-lg cursor-pointer">
-            <div className="h-20 flex items-center justify-center mb-4 overflow-visible gap-2">
+            <span className="font-mono text-[8px] uppercase tracking-wider text-orange-500 mb-2 font-bold px-2 py-0.5 rounded bg-orange-950/20 border border-orange-500/10">flexible grid</span>
+            <div className="h-20 flex items-center justify-center mb-2 overflow-visible gap-2">
               {/* Battery circular widget */}
               <div className="w-8 h-8 rounded-full border-2 border-dashed border-[#FDFBF7]/30 flex items-center justify-center group-hover:border-solid group-hover:border-orange-500 group-hover:scale-105 transition duration-300">
                 <span className="text-[7.5px] font-mono font-bold text-orange-400">87%</span>
@@ -708,15 +717,16 @@ export default function Dev() {
                 </svg>
               </div>
             </div>
-            <h3 className="text-xl font-bold text-[#FDFBF7] tracking-tight">Lock Screen Widgets</h3>
-            <p className="text-[11px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
-              Glanceable desktop widget layouts.
+            <h3 className="text-base font-bold text-[#FDFBF7] tracking-tight">Modular Widgets</h3>
+            <p className="text-[10px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
+              Responsive battery levels and weather docks with modular CSS grid architecture.
             </p>
           </div>
 
           {/* Card 8: Blazing Fast (Lightning Bolt Drawing) */}
           <div className="group relative flex flex-col items-center justify-center p-6 bg-stone-900/40 border border-stone-800 rounded-3xl min-h-[220px] transition-all duration-300 hover:bg-stone-900/60 hover:border-orange-500/30 shadow-lg cursor-pointer">
-            <div className="h-20 flex items-center justify-center mb-4 overflow-visible">
+            <span className="font-mono text-[8px] uppercase tracking-wider text-orange-500 mb-2 font-bold px-2 py-0.5 rounded bg-orange-950/20 border border-orange-500/10">svg line drawing</span>
+            <div className="h-20 flex items-center justify-center mb-2 overflow-visible">
               <svg className="w-12 h-12 text-[#FDFBF7] group-hover:text-orange-500 transition-colors duration-300 overflow-visible" viewBox="0 0 24 24">
                 <motion.path 
                   d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
@@ -738,9 +748,9 @@ export default function Dev() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-[#FDFBF7] tracking-tight">Blazing fast</h3>
-            <p className="text-[11px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
-              Self-drawing lightning stroke animations.
+            <h3 className="text-base font-bold text-[#FDFBF7] tracking-tight">Blazing Fast</h3>
+            <p className="text-[10px] text-stone-400 mt-2 max-w-[180px] leading-relaxed mx-auto font-medium">
+              Lightning-fast page rendering optimized using stroke line drawing variants.
             </p>
           </div>
 
@@ -760,22 +770,22 @@ export default function Dev() {
               <div className="absolute w-[360px] h-[360px] rounded-full border border-[#FDFBF7]" />
             </div>
 
-            <span className="alcove-font-mono text-[9px] tracking-[0.3em] uppercase text-orange-500 font-bold">
-              03 / CONSOLE GATEWAY
+            <span className="vortex-font-mono text-[9px] tracking-[0.3em] uppercase text-orange-500 font-bold">
+              03 / INVITATION GATEWAY
             </span>
             
-            <h3 className="alcove-font-bricolage text-3xl sm:text-4xl text-[#FDFBF7] tracking-tight block relative">
-              Launch Sandbox Terminal
+            <h3 className="vortex-font-bricolage text-3xl sm:text-4xl text-[#FDFBF7] tracking-tight block relative">
+              Start A Project With Cherif
               <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-orange-500 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
             </h3>
 
             {/* Sliding text link */}
             <div className="flex items-center gap-1.5 font-mono text-[9px] tracking-widest text-[#FDFBF7]/40 group-hover:text-[#FDFBF7]/90 transition-colors duration-300 relative h-4 overflow-hidden w-48 justify-center">
               <span className="ease transition-transform duration-300 group-hover:-translate-y-4">
-                GET DEVELOPMENT KEY
+                GET IN TOUCH
               </span>
               <span className="ease absolute translate-y-4 transition-transform duration-300 group-hover:translate-y-0 text-orange-500">
-                CLICK TO LAUNCH →
+                LET'S TALK →
               </span>
             </div>
           </div>
@@ -784,19 +794,14 @@ export default function Dev() {
       </div>
 
       {/* Footer */}
-      <footer className="mt-32 w-full max-w-[1440px] pt-8 border-t border-[#FDFBF7]/5 flex flex-col sm:flex-row items-center justify-between text-xs text-[#FDFBF7]/30 gap-4 z-10 select-none text-center sm:text-left px-6">
-        <div>
-          🔬 Dev Console Sandbox — Vortex Engine V1.2
-        </div>
-        <div className="font-mono text-[10px]">
-          Sandbox route at <code className="text-orange-500/80 bg-white/5 px-1 py-0.5 rounded">/dev</code>
-        </div>
+      <footer className="mt-32 w-full max-w-[1440px] pt-8 border-t border-[#FDFBF7]/5 flex items-center justify-center text-[9px] font-mono tracking-[0.2em] text-[#FDFBF7]/30 z-10 select-none px-6">
+        © {new Date().getFullYear()} CHERIF BOUABDALLAH
       </footer>
 
-      {/* Big typography shadow logo "Alcove" in background */}
+      {/* Big typography shadow logo "Vortex" in background */}
       <div className="absolute bottom-0 left-0 right-0 text-center select-none pointer-events-none overflow-hidden h-32 sm:h-48 z-0">
-        <span className="font-bold tracking-tight text-[12rem] sm:text-[18rem] md:text-[22rem] leading-none bg-gradient-to-b from-[#FDFBF7]/[0.02] to-transparent bg-clip-text text-transparent opacity-30 select-none uppercase font-bricolage">
-          Alcove
+        <span className="font-bold tracking-tight text-[12rem] sm:text-[18rem] md:text-[22rem] leading-none bg-gradient-to-b from-[#FDFBF7]/[0.02] to-transparent bg-clip-text text-transparent opacity-30 select-none uppercase vortex-font-bricolage">
+          Vortex
         </span>
       </div>
 
