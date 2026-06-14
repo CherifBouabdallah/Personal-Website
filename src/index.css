@@ -280,12 +280,78 @@ body {
     2px 2px 6px rgba(0, 0, 0, 0.15),
     -2px -1px 2px hsl(0 0% 100% / 0.25) inset,
     3px 6px 16px -6px rgba(0, 0, 0, 0.3);
-  transition: border-color 0.3s ease, background-color 0.3s ease, transform 0.3s ease;
+  transition: 
+    border-color 0.4s ease, 
+    background-color 0.4s ease, 
+    background-image 0.4s ease,
+    box-shadow 0.4s ease, 
+    backdrop-filter 0.4s ease,
+    border-radius 0.4s ease,
+    transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .glass-square:hover {
   background: rgba(34, 61, 39, 0.45);
   border-color: rgba(246, 240, 223, 0.4);
+}
+
+/* 1. Pure Liquid Blur Style (Minimalist, shadow-free) */
+.glass-square.glass-deep-blur {
+  background: rgba(246, 240, 223, 0.02);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(246, 240, 223, 0.08);
+  box-shadow: none !important;
+}
+.glass-square.glass-deep-blur:hover {
+  background: rgba(246, 240, 223, 0.05);
+  border-color: rgba(246, 240, 223, 0.15);
+  backdrop-filter: blur(45px);
+  -webkit-backdrop-filter: blur(45px);
+  box-shadow: none !important;
+}
+
+/* 2. Satin Frosted Blur (High blur + frosted texture) */
+.glass-square.glass-frosted-blur {
+  background: rgba(246, 240, 223, 0.06);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(246, 240, 223, 0.22);
+  background-image: 
+    radial-gradient(rgba(246, 240, 223, 0.08) 1px, transparent 0),
+    radial-gradient(rgba(246, 240, 223, 0.04) 1px, transparent 0);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.05),
+    0 15px 30px rgba(0, 0, 0, 0.15);
+}
+.glass-square.glass-frosted-blur:hover {
+  background: rgba(246, 240, 223, 0.1);
+  background-image: 
+    radial-gradient(rgba(246, 240, 223, 0.12) 1px, transparent 0),
+    radial-gradient(rgba(246, 240, 223, 0.06) 1px, transparent 0);
+  border-color: rgba(246, 240, 223, 0.3);
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+}
+
+/* 3. Emerald Tinted Blur (High blur + forest green base) */
+.glass-square.glass-emerald-blur {
+  background: rgba(34, 61, 39, 0.25);
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  border: 1px solid rgba(246, 240, 223, 0.12);
+  box-shadow: 
+    inset 0 10px 20px rgba(246, 240, 223, 0.03),
+    inset 0 -5px 15px rgba(0, 0, 0, 0.15),
+    0 20px 40px rgba(0, 0, 0, 0.2);
+}
+.glass-square.glass-emerald-blur:hover {
+  background: rgba(34, 61, 39, 0.32);
+  border-color: rgba(246, 240, 223, 0.22);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
 }
 
 /* Hide scrollbar utility for a borderless premium desktop aesthetic */

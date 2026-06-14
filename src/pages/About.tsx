@@ -29,11 +29,11 @@ function SelfDrawingLine({ className = "" }: { className?: string }) {
 // ----------------------------------------------------------------------
 // EXHIBIT I: TYPOGRAPHICAL SPECIMEN (MAGHFIREA FONT)
 // ----------------------------------------------------------------------
-function TypographyExhibit() {
+function TypographyExhibit({ glassClass = "glass-deep-blur" }: { glassClass?: string }) {
   const [customText, setCustomText] = useState("Edit me !");
   
   return (
-    <div className="glass-square p-6 md:p-8 flex flex-col justify-between h-full select-text text-left">
+    <div className={`glass-square ${glassClass} p-6 md:p-8 flex flex-col justify-between h-full select-text text-left relative overflow-hidden`}>
       <div>
         <div className="flex justify-between items-center mb-6 select-none">
           <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">01 / Typeface Specimen</span>
@@ -76,7 +76,7 @@ function TypographyExhibit() {
 // ----------------------------------------------------------------------
 // EXHIBIT II: COLOR SWATCHES
 // ----------------------------------------------------------------------
-function SwatchesExhibit() {
+function SwatchesExhibit({ glassClass = "glass-deep-blur" }: { glassClass?: string }) {
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
   
   const copyColor = (hex: string) => {
@@ -86,7 +86,7 @@ function SwatchesExhibit() {
   };
   
   return (
-    <div className="glass-square p-6 md:p-8 flex flex-col justify-between h-full text-left select-none">
+    <div className={`glass-square ${glassClass} p-6 md:p-8 flex flex-col justify-between h-full text-left select-none relative overflow-hidden`}>
       <div>
         <div className="flex justify-between items-center mb-6">
           <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">02 / Color Swatches</span>
@@ -144,7 +144,7 @@ function SwatchesExhibit() {
 // ----------------------------------------------------------------------
 // EXHIBIT III: LIQUID TOGGLE KINETICS
 // ----------------------------------------------------------------------
-function LiquidToggleExhibit() {
+function LiquidToggleExhibit({ glassClass = "glass-deep-blur" }: { glassClass?: string }) {
   const [activeTab, setActiveTab] = useState(0);
 
   // Configuration of varying widths and positions to bring organic variety
@@ -155,7 +155,7 @@ function LiquidToggleExhibit() {
   ];
   
   return (
-    <div className="glass-square p-6 md:p-8 flex flex-col justify-between h-full text-left select-none">
+    <div className={`glass-square ${glassClass} p-6 md:p-8 flex flex-col justify-between h-full text-left select-none relative overflow-hidden`}>
       <div>
         <div className="flex justify-between items-center mb-6">
           <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">03 / Liquid Nav Kinetics</span>
@@ -219,9 +219,10 @@ function LiquidToggleExhibit() {
         </p>
       </div>
       
-      {/* SVG gooey definition local to this card */}
-      <svg className="absolute w-0 h-0" xmlns="http://www.w3.org/2000/svg">
+      {/* SVG filter definitions local to this page */}
+      <svg className="absolute w-0 h-0 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
         <defs>
+          {/* Gooey filter for Liquid Kinetics Toggle */}
           <filter id="about-goo-filter">
             <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
             <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
@@ -236,12 +237,12 @@ function LiquidToggleExhibit() {
 // ----------------------------------------------------------------------
 // EXHIBIT V: MOTION PHYSICS (SPRING SIMULATOR)
 // ----------------------------------------------------------------------
-function MotionPhysicsExhibit() {
+function MotionPhysicsExhibit({ glassClass = "glass-deep-blur" }: { glassClass?: string }) {
   const dragX = useMotionValue(0);
   const dragY = useMotionValue(0);
   
   return (
-    <div className="glass-square p-6 md:p-8 flex flex-col justify-between h-full text-left select-none">
+    <div className={`glass-square ${glassClass} p-6 md:p-8 flex flex-col justify-between h-full text-left select-none relative overflow-hidden`}>
       <div>
         <div className="flex justify-between items-center mb-6">
           <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">05 / Inertial Springs</span>
@@ -292,7 +293,7 @@ function MotionPhysicsExhibit() {
 // ----------------------------------------------------------------------
 // EXHIBIT VI: CREATOR PORTRAIT
 // ----------------------------------------------------------------------
-function ButtonCollectionExhibit() {
+function ButtonCollectionExhibit({ glassClass = "glass-deep-blur" }: { glassClass?: string }) {
   const [copied, setCopied] = useState(false);
   const [testToggle, setTestToggle] = useState(true);
   
@@ -302,7 +303,7 @@ function ButtonCollectionExhibit() {
   };
   
   return (
-    <div className="glass-square p-6 md:p-8 flex flex-col justify-between h-full text-left select-none">
+    <div className={`glass-square ${glassClass} p-6 md:p-8 flex flex-col justify-between h-full text-left select-none relative overflow-hidden`}>
       <div>
         <div className="flex justify-between items-center mb-6">
           <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">06 / UI Component Showcase</span>
@@ -397,13 +398,29 @@ function ButtonCollectionExhibit() {
 // ----------------------------------------------------------------------
 export default function About() {
   const [isReady, setIsReady] = useState(false);
-  const [showArtwork, setShowArtwork] = useState(false);
+  const [showArtwork, setShowArtwork] = useState(true);
+  const [glassStyle, setGlassStyle] = useState<"pure" | "satin" | "emerald">("pure");
   const [maxScroll, setMaxScroll] = useState(0);
   const maxScrollRef = useRef(0);
   const [isMobile, setIsMobile] = useState(false);
   
   const contentRef = useRef<HTMLDivElement>(null);
   const currentScrollY = useRef(0);
+
+  const glassOptions = [
+    { id: "pure", label: "Pure Blur" },
+    { id: "satin", label: "Satin Frosted Blur" },
+    { id: "emerald", label: "Emerald Blur" }
+  ] as const;
+
+  const getGlassClass = () => {
+    switch (glassStyle) {
+      case "pure": return "glass-deep-blur";
+      case "satin": return "glass-frosted-blur";
+      case "emerald": return "glass-emerald-blur";
+      default: return "glass-deep-blur";
+    }
+  };
   
   // Smooth scroll tracking matching other scrollable screens
   const scrollProgress = useMotionValue(0);
@@ -575,6 +592,7 @@ export default function About() {
     })
   };
 
+
   return (
     <div className="w-full h-screen min-h-screen bg-[#223D27] text-[#F6F0DF] relative overflow-hidden touch-none">
 
@@ -582,7 +600,7 @@ export default function About() {
       <motion.div 
         className="fixed top-0 left-0 right-0 bottom-[-300px] w-full pointer-events-none select-none z-0 overflow-hidden transition-opacity duration-500"
         style={{ 
-          opacity: showArtwork ? 0.12 : 0,
+          opacity: showArtwork ? 0.15 : 0,
           y: bgY,
           scale: 1.15,
           transformOrigin: "center top",
@@ -686,7 +704,6 @@ export default function About() {
         >
           {/* Spacer to push exhibition cards below the fold */}
           <div className="w-full h-screen flex-shrink-0" />
-
           {/* Intro Description Block (Scrolls up into view) */}
           <div className="w-full max-w-[1440px] flex flex-col items-center gap-6 mb-8 md:mb-10 z-10 text-center select-none pt-12">
               <motion.p
@@ -698,17 +715,49 @@ export default function About() {
                 An archive of the design principles, visual systems, and motion dynamics defining this digital gallery.
               </motion.p>
 
+              {/* Glass Finish Style Segment Selector */}
+              <motion.div 
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.2, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="flex flex-col items-center gap-2.5 mt-4 max-w-full"
+              >
+                <span className="font-mono text-[8px] tracking-[0.3em] uppercase text-[#F6F0DF]/40">
+                  Select Liquid Blur Finish
+                </span>
+                <div className="flex items-center p-1 bg-black/25 border border-[#F6F0DF]/15 rounded-full backdrop-blur-md max-w-full overflow-x-auto no-scrollbar gap-1 shadow-inner">
+                  {glassOptions.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => setGlassStyle(opt.id)}
+                      className={`relative px-3 md:px-4 py-1.5 rounded-full font-mono text-[9px] md:text-[10px] uppercase tracking-wider font-bold transition-colors duration-300 cursor-pointer whitespace-nowrap z-10 ${
+                        glassStyle === opt.id ? "text-[#223D27]" : "text-[#F6F0DF]/60 hover:text-[#F6F0DF]"
+                      }`}
+                    >
+                      {glassStyle === opt.id && (
+                        <motion.div
+                          layoutId="activeGlassTab"
+                          transition={{ type: "spring", stiffness: 280, damping: 24 }}
+                          className="absolute inset-0 bg-[#F6F0DF] rounded-full z-[-1]"
+                        />
+                      )}
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+ 
               <button
                 onClick={() => setShowArtwork(!showArtwork)}
-                className="font-mono text-[10px] md:text-[11px] tracking-[0.2em] uppercase text-[#F6F0DF]/50 hover:text-[#F6F0DF] cursor-pointer flex items-center gap-2.5 mt-4 select-none transition-all duration-200"
+                className="font-mono text-[10px] md:text-[11px] tracking-[0.2em] uppercase text-[#F6F0DF]/40 hover:text-[#F6F0DF] cursor-pointer flex items-center gap-2.5 mt-2 select-none transition-all duration-200"
               >
-                <span>Artwork:</span>
+                <span>Atmospheric Artwork:</span>
                 <span className={showArtwork ? "text-[#F6F0DF] font-bold" : "opacity-50"}>ON</span>
                 <span className="opacity-30">|</span>
                 <span className={!showArtwork ? "text-[#F6F0DF] font-bold" : "opacity-50"}>OFF</span>
               </button>
             </div>
-
+ 
             <SelfDrawingLine className="mb-10 max-w-[1440px] mx-auto" />
 
           {/* Exhibition Grid Layout */}
@@ -722,7 +771,7 @@ export default function About() {
               variants={cardRevealVariants}
               className="col-span-12 lg:col-span-8"
             >
-              <TypographyExhibit />
+              <TypographyExhibit glassClass={getGlassClass()} />
             </motion.div>
 
             {/* Exhibit 2: Color Palette */}
@@ -734,7 +783,7 @@ export default function About() {
               variants={cardRevealVariants}
               className="col-span-12 md:col-span-6 lg:col-span-4"
             >
-              <SwatchesExhibit />
+              <SwatchesExhibit glassClass={getGlassClass()} />
             </motion.div>
 
             {/* Exhibit 3: Liquid Kinetics */}
@@ -746,7 +795,7 @@ export default function About() {
               variants={cardRevealVariants}
               className="col-span-12 md:col-span-6 lg:col-span-5"
             >
-              <LiquidToggleExhibit />
+              <LiquidToggleExhibit glassClass={getGlassClass()} />
             </motion.div>
 
             {/* Exhibit 5: Spring Dynamics */}
@@ -758,7 +807,7 @@ export default function About() {
               variants={cardRevealVariants}
               className="col-span-12 md:col-span-6 lg:col-span-7"
             >
-              <MotionPhysicsExhibit />
+              <MotionPhysicsExhibit glassClass={getGlassClass()} />
             </motion.div>
 
             {/* Exhibit 6: UI Component Showcase */}
@@ -770,7 +819,7 @@ export default function About() {
               variants={cardRevealVariants}
               className="col-span-12"
             >
-              <ButtonCollectionExhibit />
+              <ButtonCollectionExhibit glassClass={getGlassClass()} />
             </motion.div>
           </div>
 
