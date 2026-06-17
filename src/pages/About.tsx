@@ -398,8 +398,7 @@ function ButtonCollectionExhibit({ glassClass = "glass-deep-blur" }: { glassClas
 // ----------------------------------------------------------------------
 export default function About() {
   const [isReady, setIsReady] = useState(false);
-  const [showArtwork, setShowArtwork] = useState(true);
-  const [glassStyle, setGlassStyle] = useState<"pure" | "satin" | "emerald">("pure");
+  const [showArtwork, setShowArtwork] = useState(false);
   const [maxScroll, setMaxScroll] = useState(0);
   const maxScrollRef = useRef(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -407,20 +406,7 @@ export default function About() {
   const contentRef = useRef<HTMLDivElement>(null);
   const currentScrollY = useRef(0);
 
-  const glassOptions = [
-    { id: "pure", label: "Pure Blur" },
-    { id: "satin", label: "Satin Frosted Blur" },
-    { id: "emerald", label: "Emerald Blur" }
-  ] as const;
-
-  const getGlassClass = () => {
-    switch (glassStyle) {
-      case "pure": return "glass-deep-blur";
-      case "satin": return "glass-frosted-blur";
-      case "emerald": return "glass-emerald-blur";
-      default: return "glass-deep-blur";
-    }
-  };
+  const getGlassClass = () => "glass-deep-blur";
   
   // Smooth scroll tracking matching other scrollable screens
   const scrollProgress = useMotionValue(0);
@@ -715,37 +701,7 @@ export default function About() {
                 An archive of the design principles, visual systems, and motion dynamics defining this digital gallery.
               </motion.p>
 
-              {/* Glass Finish Style Segment Selector */}
-              <motion.div 
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="flex flex-col items-center gap-2.5 mt-4 max-w-full"
-              >
-                <span className="font-mono text-[8px] tracking-[0.3em] uppercase text-[#F6F0DF]/40">
-                  Select Liquid Blur Finish
-                </span>
-                <div className="flex items-center p-1 bg-black/25 border border-[#F6F0DF]/15 rounded-full backdrop-blur-md max-w-full overflow-x-auto no-scrollbar gap-1 shadow-inner">
-                  {glassOptions.map((opt) => (
-                    <button
-                      key={opt.id}
-                      onClick={() => setGlassStyle(opt.id)}
-                      className={`relative px-3 md:px-4 py-1.5 rounded-full font-mono text-[9px] md:text-[10px] uppercase tracking-wider font-bold transition-colors duration-300 cursor-pointer whitespace-nowrap z-10 ${
-                        glassStyle === opt.id ? "text-[#223D27]" : "text-[#F6F0DF]/60 hover:text-[#F6F0DF]"
-                      }`}
-                    >
-                      {glassStyle === opt.id && (
-                        <motion.div
-                          layoutId="activeGlassTab"
-                          transition={{ type: "spring", stiffness: 280, damping: 24 }}
-                          className="absolute inset-0 bg-[#F6F0DF] rounded-full z-[-1]"
-                        />
-                      )}
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
+
  
               <button
                 onClick={() => setShowArtwork(!showArtwork)}

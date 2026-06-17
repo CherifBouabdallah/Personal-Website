@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <div className="w-full min-h-screen flex items-center justify-center relative overflow-hidden select-none">
       <h1
-        className="font-maghfirea text-[clamp(1.8rem,8vw,120px)] text-[#F6F0DF] flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] relative -translate-y-12 md:-translate-y-35 px-4 select-none w-full"
+        className="font-maghfirea text-[clamp(2.5rem,12vw,200px)] text-[#F6F0DF] flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] relative px-4 select-none w-full"
       >
         {text.split(" ").map((word, wordIndex) => (
           <span key={wordIndex} className="inline-block whitespace-nowrap">
