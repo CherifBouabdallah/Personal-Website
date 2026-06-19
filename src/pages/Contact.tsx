@@ -238,7 +238,7 @@ export default function Contact() {
   ];
 
   return (
-    <div className="w-full h-screen min-h-screen flex flex-col items-center justify-center relative overflow-hidden select-none touch-none">
+    <div className="w-full h-screen min-h-screen flex flex-col items-center justify-center relative overflow-hidden touch-none selection:bg-[#F6F0DF] selection:text-[#223D27]">
 
       {/* Title */}
       <motion.div
@@ -246,35 +246,38 @@ export default function Contact() {
         className="z-10 cursor-default"
       >
         <motion.h1
-          initial="hidden"
-          animate="visible"
-          variants={{
-            visible: { transition: { staggerChildren: 0.05 } }
-          }}
-          className="font-maghfirea text-[clamp(2.5rem,12vw,200px)] text-[#F6F0DF] whitespace-nowrap flex justify-center selection:bg-[#F6F0DF] selection:text-[#223D27] px-4 w-full"
+          className="font-maghfirea text-[clamp(2.5rem,12vw,200px)] text-[#F6F0DF] flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] selection:bg-[#F6F0DF] selection:text-[#223D27] px-4 w-full"
         >
-          {text.split("").map((char, index) => (
-            <span
-              key={index}
-              className="inline-block overflow-hidden"
-              style={{ paddingBottom: "0.12em", marginBottom: "-0.12em" }}
-            >
-              <motion.span
-                className="inline-block"
-                variants={{
-                  hidden: { opacity: 0, y: 50, filter: "blur(10px)" },
-                  visible: {
-                    opacity: 1,
-                    y: 0,
-                    filter: "blur(0px)",
-                    transition: { duration: 1.0, ease: [0.21, 1, 0.36, 1] }
-                  }
-                }}
-              >
-                {char === " " ? "\u00A0" : char}
-              </motion.span>
-            </span>
-          ))}
+          {(() => {
+            let charCounter = 0;
+            return text.split(" ").map((word, wordIndex) => (
+              <span key={wordIndex} className="inline-block whitespace-nowrap">
+                {word.split("").map((char, charIndex) => {
+                  const globalIndex = charCounter++;
+                  return (
+                    <span
+                      key={charIndex}
+                      className="inline-block overflow-hidden"
+                      style={{ paddingBottom: "0.12em", marginBottom: "-0.12em" }}
+                    >
+                      <motion.span
+                        className="inline-block"
+                        initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+                        animate={isReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 50, filter: "blur(10px)" }}
+                        transition={{
+                          duration: 1.0,
+                          ease: [0.21, 1, 0.36, 1],
+                          delay: globalIndex * 0.05,
+                        }}
+                      >
+                        {char}
+                      </motion.span>
+                    </span>
+                  );
+                })}
+              </span>
+            ));
+          })()}
         </motion.h1>
       </motion.div>
 

@@ -3,15 +3,25 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, lazy, ComponentType } from "react";
 import { Routes, Route, useLocation, Link } from "react-router-dom";
 import Home from "./pages/Home";
-import Portfolio from "./pages/Portfolio";
-import Contact from "./pages/Contact";
-import About from "./pages/About";
-import Experimental from "./pages/Experimental";
-import Dev from "./pages/Dev";
 import LiquidNavbar from "./components/LiquidNavbar";
+
+// Helper to support preloading on lazy components
+function lazyWithPreload<T extends ComponentType<any>>(
+  importFunc: () => Promise<{ default: T }>
+) {
+  const Component = lazy(importFunc);
+  (Component as any).preload = importFunc;
+  return Component as typeof Component & { preload: () => Promise<any> };
+}
+
+// Lazy load pages with preload hooks
+const Portfolio = lazyWithPreload(() => import("./pages/Portfolio"));
+const Contact = lazyWithPreload(() => import("./pages/Contact"));
+const About = lazyWithPreload(() => import("./pages/About"));
+const Dev = lazyWithPreload(() => import("./pages/Dev"));
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -39,9 +49,23 @@ export default function App() {
       img.onload = handleLoad;
       img.onerror = handleLoad; // Fallback to avoid blocking if image path fails
     });
+
+    // Idle-Time Preloading for lazy loaded page components
+    const preloadPages = () => {
+      Portfolio.preload();
+      Contact.preload();
+      About.preload();
+      Dev.preload();
+    };
+
+    if ("requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(preloadPages);
+    } else {
+      setTimeout(preloadPages, 1500);
+    }
   }, []);
 
-  const isScrollable = location.pathname === "/exp" || location.pathname === "/about" || location.pathname === "/dev";
+  const isScrollable = location.pathname === "/" || location.pathname === "/about" || location.pathname === "/dev";
 
   return (
     <div className={`relative flex min-h-screen bg-[#223D27] ${isScrollable ? "overflow-y-auto no-scrollbar overscroll-y-none items-stretch justify-stretch" : "items-center justify-center overflow-hidden"}`}>
@@ -77,21 +101,7 @@ export default function App() {
           className={`w-full min-h-screen relative ${isScrollable ? "flex flex-col items-stretch justify-start" : "flex items-center justify-center"}`}
         >
           {/* Liquid Navbar at top middle */}
-          <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4">
-            {location.pathname === "/" && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-              >
-                <Link
-                  to="/exp"
-                  className="px-4 py-1.5 border border-[#F6F0DF]/15 rounded-full bg-black/25 backdrop-blur-md text-[#F6F0DF]/70 hover:text-[#F6F0DF] hover:border-[#F6F0DF]/40 hover:bg-white/5 transition-all duration-300 font-mono text-[9px] tracking-widest uppercase font-bold cursor-pointer whitespace-nowrap shadow-md"
-                >
-                  EXP
-                </Link>
-              </motion.div>
-            )}
+          <div className="absolute top-8 left-1/2 -translate-x-1/2 z-50">
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -99,31 +109,18 @@ export default function App() {
             >
               <LiquidNavbar />
             </motion.div>
-            {location.pathname === "/" && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-              >
-                <Link
-                  to="/dev"
-                  className="px-4 py-1.5 border border-[#F6F0DF]/15 rounded-full bg-black/25 backdrop-blur-md text-[#F6F0DF]/70 hover:text-[#F6F0DF] hover:border-[#F6F0DF]/40 hover:bg-white/5 transition-all duration-300 font-mono text-[9px] tracking-widest uppercase font-bold cursor-pointer whitespace-nowrap shadow-md"
-                >
-                  DEV
-                </Link>
-              </motion.div>
-            )}
           </div>
 
           {/* Main Content */}
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/exp" element={<Experimental />} />
-            <Route path="/dev" element={<Dev />} />
-          </Routes>
+          <Suspense fallback={null}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/dev" element={<Dev />} />
+            </Routes>
+          </Suspense>
         </motion.div>
       )}
     </div>

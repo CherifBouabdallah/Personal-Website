@@ -86,7 +86,7 @@ function SwatchesExhibit({ glassClass = "glass-deep-blur" }: { glassClass?: stri
   };
   
   return (
-    <div className={`glass-square ${glassClass} p-6 md:p-8 flex flex-col justify-between h-full text-left select-none relative overflow-hidden`}>
+    <div className={`glass-square ${glassClass} p-6 md:p-8 flex flex-col justify-between h-full text-left select-text relative overflow-hidden`}>
       <div>
         <div className="flex justify-between items-center mb-6">
           <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">02 / Color Swatches</span>
@@ -155,7 +155,7 @@ function LiquidToggleExhibit({ glassClass = "glass-deep-blur" }: { glassClass?: 
   ];
   
   return (
-    <div className={`glass-square ${glassClass} p-6 md:p-8 flex flex-col justify-between h-full text-left select-none relative overflow-hidden`}>
+    <div className={`glass-square ${glassClass} p-6 md:p-8 flex flex-col justify-between h-full text-left select-text relative overflow-hidden`}>
       <div>
         <div className="flex justify-between items-center mb-6">
           <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">03 / Liquid Nav Kinetics</span>
@@ -242,7 +242,7 @@ function MotionPhysicsExhibit({ glassClass = "glass-deep-blur" }: { glassClass?:
   const dragY = useMotionValue(0);
   
   return (
-    <div className={`glass-square ${glassClass} p-6 md:p-8 flex flex-col justify-between h-full text-left select-none relative overflow-hidden`}>
+    <div className={`glass-square ${glassClass} p-6 md:p-8 flex flex-col justify-between h-full text-left select-text relative overflow-hidden`}>
       <div>
         <div className="flex justify-between items-center mb-6">
           <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">05 / Inertial Springs</span>
@@ -303,7 +303,7 @@ function ButtonCollectionExhibit({ glassClass = "glass-deep-blur" }: { glassClas
   };
   
   return (
-    <div className={`glass-square ${glassClass} p-6 md:p-8 flex flex-col justify-between h-full text-left select-none relative overflow-hidden`}>
+    <div className={`glass-square ${glassClass} p-6 md:p-8 flex flex-col justify-between h-full text-left select-text relative overflow-hidden`}>
       <div>
         <div className="flex justify-between items-center mb-6">
           <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">06 / UI Component Showcase</span>
@@ -600,10 +600,10 @@ export default function About() {
       </motion.div>
 
       {/* Big Centered Title */}
-      <div className="fixed inset-0 w-full h-screen flex flex-col items-center justify-center pointer-events-none select-none z-20">
+      <div className="fixed inset-0 w-full h-screen flex flex-col items-center justify-center pointer-events-none z-10">
         <motion.div
           style={{ y: titleY, scale: titleScale }}
-          className="cursor-default"
+          className="cursor-default pointer-events-auto select-text"
         >
           <motion.h1
             initial="hidden"
@@ -685,13 +685,13 @@ export default function About() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute top-0 left-0 w-full px-6 md:px-16 lg:px-24 xl:px-36 pb-32 flex flex-col items-center select-text"
+          className="absolute top-0 left-0 w-full px-6 md:px-16 lg:px-24 xl:px-36 pb-32 flex flex-col items-center select-text z-20"
           style={{ y: contentY }}
         >
           {/* Spacer to push exhibition cards below the fold */}
           <div className="w-full h-screen flex-shrink-0" />
           {/* Intro Description Block (Scrolls up into view) */}
-          <div className="w-full max-w-[1440px] flex flex-col items-center gap-6 mb-8 md:mb-10 z-10 text-center select-none pt-12">
+          <div className="w-full max-w-[1440px] flex flex-col items-center gap-6 mb-8 md:mb-10 z-10 text-center pt-12">
               <motion.p
                 initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}

@@ -139,7 +139,7 @@ export default function Dev() {
   }, [isPlaying, isLocked]);
 
   return (
-    <div className="w-full relative flex flex-col items-center min-h-screen bg-[#141212] text-[#FDFBF7] vortex-font-sans overflow-x-hidden select-none pb-24">
+    <div className="w-full relative flex flex-col items-center min-h-screen bg-[#141212] text-[#FDFBF7] vortex-font-sans overflow-x-hidden pb-24">
       {/* Background Override Overlay */}
       <div className="fixed inset-0 z-0 bg-[#141212] pointer-events-none" />
 
@@ -214,7 +214,7 @@ export default function Dev() {
         {/* 2. HERO TITLE SECTION WITH THE SVG HANDDRAWN LOOP          */}
         {/* ========================================================= */}
         <section className="w-full max-w-4xl flex flex-col items-center gap-6 text-center">
-          <h1 className="vortex-font-bricolage text-5xl sm:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tight text-center relative select-none">
+          <h1 className="vortex-font-bricolage text-5xl sm:text-7xl lg:text-8xl font-black leading-[1.05] tracking-tight text-center relative">
             Vortex Sandbox
             <br />
             for {" "}
