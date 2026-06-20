@@ -32,93 +32,62 @@ function SelfDrawingLine({ className = "" }: { className?: string }) {
 // ----------------------------------------------------------------------
 // PROJECT 1 PREVIEW: VORTEX OS MINI MOCKUP
 // ----------------------------------------------------------------------
-function VortexOSPreview() {
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [cpuVal, setCpuVal] = useState(12);
+function VortexOSPreview({ onClick }: { onClick: () => void }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0.35);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCpuVal(Math.floor(Math.random() * 15) + 6);
-    }, 1500);
-    return () => clearInterval(timer);
+    const updateScale = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.clientWidth;
+        // The component is designed for 1280px width
+        setScale(width / 1280);
+      }
+    };
+    
+    updateScale();
+    window.addEventListener("resize", updateScale);
+    const observer = new ResizeObserver(updateScale);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateScale);
+      observer.disconnect();
+    };
   }, []);
 
   return (
-    <div className="w-full h-full min-h-[220px] bg-[#141212] rounded-2xl border border-stone-800 overflow-hidden flex flex-col justify-between p-4 font-sans select-none relative shadow-xl">
-      {/* Top Header Mockup */}
-      <div className="flex items-center justify-between border-b border-stone-800 pb-2">
-        <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-          <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-          <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-        </div>
-        <div className="font-mono text-[8px] text-stone-500 tracking-wider">VORTEX_SANDBOX_MOCK.OS</div>
-        <div className="w-8" />
+    <motion.div 
+      ref={containerRef}
+      onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      layoutId="vortex-sandbox-card"
+      transition={{ type: "spring", stiffness: 180, damping: 25 }}
+      whileHover={{ scale: 1.02, y: -4 }}
+      className="w-full aspect-[16/10] bg-[#141212] rounded-2xl border border-white/10 overflow-hidden relative shadow-xl cursor-pointer select-none"
+    >
+      <div 
+        className="absolute top-0 left-0 origin-top-left pointer-events-none"
+        style={{
+          width: "1280px",
+          height: "800px",
+          transform: `scale(${scale})`,
+        }}
+      >
+        <Vortex isPreview={true} />
       </div>
-
-      {/* Main Preview Dashboard */}
-      <div className="flex-1 flex flex-col items-center justify-center py-6 gap-4 relative">
-        {/* Dynamic Island pill */}
-        <motion.div 
-          className="bg-black text-stone-100 border border-white/10 px-3 py-1.5 rounded-full flex items-center justify-between gap-3 shadow-lg z-10 cursor-pointer"
-          whileHover={{ scale: 1.05 }}
-        >
-          <div className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
-            <span className="font-mono text-[7.5px] font-bold text-orange-500 tracking-widest">VORTEX</span>
-          </div>
-          {/* Animated visualizer bars */}
-          <div className="flex items-end gap-[1px] h-2">
-            <motion.span 
-              animate={{ height: ["100%", "40%", "80%", "100%"] }} 
-              transition={{ repeat: Infinity, duration: 0.6, ease: "easeInOut" }} 
-              className="w-[1.5px] bg-orange-500" 
-            />
-            <motion.span 
-              animate={{ height: ["60%", "100%", "30%", "60%"] }} 
-              transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut", delay: 0.15 }} 
-              className="w-[1.5px] bg-orange-500" 
-            />
-            <motion.span 
-              animate={{ height: ["80%", "30%", "100%", "80%"] }} 
-              transition={{ repeat: Infinity, duration: 0.5, ease: "easeInOut", delay: 0.3 }} 
-              className="w-[1.5px] bg-orange-500" 
-            />
-          </div>
-        </motion.div>
-
-        {/* Small metric displays */}
-        <div className="grid grid-cols-2 gap-4 w-full px-6">
-          <div className="flex flex-col gap-1 border border-stone-800 rounded-xl p-2 bg-stone-900/30">
-            <span className="text-[7px] font-mono text-stone-500 uppercase tracking-wider">CPU Load</span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-xs font-mono font-bold text-orange-500">{cpuVal}%</span>
-              <span className="text-[7px] text-stone-600">STABLE</span>
-            </div>
-            <div className="w-full h-[3px] bg-stone-800 rounded-full overflow-hidden">
-              <motion.div animate={{ width: `${cpuVal}%` }} className="h-full bg-orange-500" />
-            </div>
-          </div>
-          
-          <div className="flex flex-col gap-1 border border-stone-800 rounded-xl p-2 bg-stone-900/30">
-            <span className="text-[7px] font-mono text-stone-500 uppercase tracking-wider">Physics</span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-xs font-mono font-bold text-stone-200">120 Hz</span>
-              <span className="text-[7px] text-stone-600">SPRING</span>
-            </div>
-            <div className="w-full h-[3px] bg-stone-800 rounded-full overflow-hidden">
-              <div className="h-full bg-stone-400 w-4/5" />
-            </div>
-          </div>
+      
+      {/* Overlay to dim on hover or show an Enter Sandbox indicator */}
+      <div className={`absolute inset-0 transition-colors duration-300 flex items-center justify-center ${isHovered ? "bg-black/25" : "bg-black/0"}`}>
+        <div className={`transition-opacity duration-300 bg-black/75 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 text-[#F6F0DF] font-mono text-[9px] tracking-widest uppercase ${isHovered ? "opacity-100" : "opacity-0"}`}>
+          Open Sandbox
         </div>
       </div>
-
-      {/* Bottom status line */}
-      <div className="border-t border-stone-800/80 pt-2 flex items-center justify-between text-[7px] font-mono text-stone-600">
-        <span>WALLPAPER: SUNSET</span>
-        <span>LATENCY: 1.2ms</span>
-      </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -694,7 +663,7 @@ export default function Portfolio() {
                 {/* Simulated Desktop Preview Column */}
                 <div className="flex-1 flex items-center justify-center min-h-[250px] lg:min-h-full">
                   <div className="w-full h-full max-w-[500px]">
-                    <VortexOSPreview />
+                    <VortexOSPreview onClick={() => setIsVortexOpen(true)} />
                   </div>
                 </div>
 
@@ -823,26 +792,28 @@ export default function Portfolio() {
             className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 overflow-hidden cursor-pointer"
             onClick={() => setIsVortexOpen(false)}
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 30 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full h-full max-w-[1280px] max-h-[85vh] bg-[#141212] rounded-[32px] border border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] overflow-y-auto no-scrollbar cursor-default relative"
-              style={{ transform: "translate3d(0,0,0)" }}
+            <div 
+              className="w-full h-full max-w-[1280px] max-h-[85vh] relative"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Floating Close Button pinned at top right corner of the modal window */}
+              <motion.div
+                layoutId="vortex-sandbox-card"
+                transition={{ type: "spring", stiffness: 180, damping: 25 }}
+                className="w-full h-full bg-[#141212] rounded-[32px] border border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] overflow-y-auto no-scrollbar cursor-default relative"
+                style={{ transform: "translate3d(0,0,0)" }}
+              >
+                <Vortex isPreview={true} startUnlocked={true} />
+              </motion.div>
+
+              {/* Floating Close Button pinned at top right corner of the modal window card */}
               <button
                 onClick={() => setIsVortexOpen(false)}
-                className="fixed top-6 right-6 z-[120] w-10 h-10 rounded-full bg-black/60 border border-white/10 hover:bg-white/10 hover:border-white/30 text-white flex items-center justify-center font-mono text-[10px] tracking-wider cursor-pointer transition-all duration-300 shadow-md"
+                className="absolute top-6 right-6 z-[120] w-10 h-10 rounded-full bg-black/60 border border-white/10 hover:bg-white/10 hover:border-white/30 text-white flex items-center justify-center font-mono text-[10px] tracking-wider cursor-pointer transition-all duration-300 shadow-md"
                 title="Close Preview (Esc)"
               >
                 ESC
               </button>
-
-              <Vortex isPreview={true} />
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

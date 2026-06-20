@@ -5,12 +5,22 @@ import { useNavigate } from "react-router-dom";
 interface VortexProps {
   isPreview?: boolean;
   onClose?: () => void;
+  startUnlocked?: boolean;
 }
 
-export default function Vortex({ isPreview = false, onClose }: VortexProps) {
+export default function Vortex({ isPreview = false, onClose, startUnlocked = false }: VortexProps) {
   const [isReady, setIsReady] = useState(false);
   const [isLocked, setIsLocked] = useState(true);
   const [isIslandExpanded, setIsIslandExpanded] = useState(false);
+
+  useEffect(() => {
+    if (startUnlocked) {
+      const timer = setTimeout(() => {
+        setIsLocked(false);
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [startUnlocked]);
   const [islandTab, setIslandTab] = useState<"music" | "system">("music");
   const [isPlaying, setIsPlaying] = useState(true);
   const [musicProgress, setMusicProgress] = useState(35);
@@ -151,8 +161,7 @@ export default function Vortex({ isPreview = false, onClose }: VortexProps) {
       <div className={`${isPreview ? 'absolute' : 'fixed'} inset-0 z-0 bg-[#141212] pointer-events-none`} />
 
       {/* 1. MOCKUP VORTEX HEADER (Fixed top edge-to-edge nav) */}
-      {!isPreview && (
-        <header className="fixed top-0 left-0 right-0 w-full flex items-center justify-between border-b border-[#FDFBF7]/5 bg-[#1C1917]/85 backdrop-blur-md px-4 py-4.5 shadow-md z-30">
+      <header className={`${isPreview ? 'absolute' : 'fixed'} top-0 left-0 right-0 w-full flex items-center justify-between border-b border-[#FDFBF7]/5 bg-[#1C1917]/85 backdrop-blur-md px-4 py-4.5 shadow-md z-30`}>
           {/* Logo element */}
           <div className="flex items-center cursor-pointer group" onClick={() => navigate("/")}>
             <div className="relative mr-3 w-8 h-8 rounded-lg border-2 border-[#FDFBF7] overflow-hidden flex items-center justify-center bg-stone-950">
@@ -215,10 +224,9 @@ export default function Vortex({ isPreview = false, onClose }: VortexProps) {
             </button>
           </div>
         </header>
-      )}
 
       {/* Outer wrapper max-w container */}
-      <div className={`w-full max-w-[1440px] px-6 sm:px-12 md:px-16 flex flex-col items-center gap-16 relative z-10 ${isPreview ? 'pt-12' : 'pt-40'}`}>
+      <div className={`w-full max-w-[1440px] px-6 sm:px-12 md:px-16 flex flex-col items-center gap-16 relative z-10 ${isPreview ? 'pt-28' : 'pt-40'}`}>
         {/* ========================================================= */}
         {/* 2. HERO TITLE SECTION WITH THE SVG HANDDRAWN LOOP          */}
         {/* ========================================================= */}
