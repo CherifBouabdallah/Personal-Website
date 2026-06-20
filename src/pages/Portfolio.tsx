@@ -1,6 +1,7 @@
-import { motion, useMotionValue, useSpring, useTransform, Variants } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, Variants, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import Vortex from "./Vortex";
 import { 
   ExternalLink, 
   Github, 
@@ -317,6 +318,7 @@ export default function Portfolio() {
   const [maxScroll, setMaxScroll] = useState(0);
   const maxScrollRef = useRef(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [isVortexOpen, setIsVortexOpen] = useState(false);
   
   const contentRef = useRef<HTMLDivElement>(null);
   const currentScrollY = useRef(0);
@@ -354,12 +356,32 @@ export default function Portfolio() {
     document.fonts.ready.then(() => setIsReady(true));
   }, []);
 
+  // Lock scroll bar on document mount/unmount
+  useEffect(() => {
+    document.documentElement.classList.add("no-scrollbar");
+    document.body.classList.add("no-scrollbar");
+    return () => {
+      document.documentElement.classList.remove("no-scrollbar");
+      document.body.classList.remove("no-scrollbar");
+    };
+  }, []);
+
+  // Listen to Escape key to close Vortex preview modal
+  useEffect(() => {
+    if (!isVortexOpen) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsVortexOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [isVortexOpen]);
+
   // Scroll and Resize Observer initialization
   useEffect(() => {
     if (!isReady) return;
-
-    document.documentElement.classList.add("no-scrollbar");
-    document.body.classList.add("no-scrollbar");
+    if (isVortexOpen) return;
 
     const updateMaxScroll = () => {
       if (contentRef.current) {
@@ -457,10 +479,8 @@ export default function Portfolio() {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("resize", updateMaxScroll);
       if (observer) observer.disconnect();
-      document.documentElement.classList.remove("no-scrollbar");
-      document.body.classList.remove("no-scrollbar");
     };
-  }, [isReady]);
+  }, [isReady, isVortexOpen]);
 
   const headerText = "Portfolio";
 
@@ -652,7 +672,7 @@ export default function Portfolio() {
                   {/* Dynamic Action Buttons */}
                   <div className="flex flex-col sm:flex-row gap-4">
                     <button
-                      onClick={() => navigate("/vortex")}
+                      onClick={() => setIsVortexOpen(true)}
                       className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#F6F0DF] text-[#223D27] font-mono text-[10px] font-bold tracking-widest hover:bg-[#F6F0DF]/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
                     >
                       ENTER SANDBOX
@@ -792,6 +812,40 @@ export default function Portfolio() {
 
         </motion.div>
       )}
+
+      {/* Vortex Sandbox Overlay Modal */}
+      <AnimatePresence>
+        {isVortexOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 overflow-hidden cursor-pointer"
+            onClick={() => setIsVortexOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 30 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full h-full max-w-[1280px] max-h-[85vh] bg-[#141212] rounded-[32px] border border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] overflow-y-auto no-scrollbar cursor-default relative"
+              style={{ transform: "translate3d(0,0,0)" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Floating Close Button pinned at top right corner of the modal window */}
+              <button
+                onClick={() => setIsVortexOpen(false)}
+                className="fixed top-6 right-6 z-[120] w-10 h-10 rounded-full bg-black/60 border border-white/10 hover:bg-white/10 hover:border-white/30 text-white flex items-center justify-center font-mono text-[10px] tracking-wider cursor-pointer transition-all duration-300 shadow-md"
+                title="Close Preview (Esc)"
+              >
+                ESC
+              </button>
+
+              <Vortex isPreview={true} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

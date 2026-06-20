@@ -2,7 +2,12 @@ import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Vortex() {
+interface VortexProps {
+  isPreview?: boolean;
+  onClose?: () => void;
+}
+
+export default function Vortex({ isPreview = false, onClose }: VortexProps) {
   const [isReady, setIsReady] = useState(false);
   const [isLocked, setIsLocked] = useState(true);
   const [isIslandExpanded, setIsIslandExpanded] = useState(false);
@@ -138,78 +143,82 @@ export default function Vortex() {
     return () => clearInterval(interval);
   }, [isPlaying, isLocked]);
 
+
+
   return (
     <div className="w-full relative flex flex-col items-center min-h-screen bg-[#141212] text-[#FDFBF7] vortex-font-sans overflow-x-hidden pb-24">
       {/* Background Override Overlay */}
-      <div className="fixed inset-0 z-0 bg-[#141212] pointer-events-none" />
+      <div className={`${isPreview ? 'absolute' : 'fixed'} inset-0 z-0 bg-[#141212] pointer-events-none`} />
 
       {/* 1. MOCKUP VORTEX HEADER (Fixed top edge-to-edge nav) */}
-      <header className="fixed top-0 left-0 right-0 w-full flex items-center justify-between border-b border-[#FDFBF7]/5 bg-[#1C1917]/85 backdrop-blur-md px-4 py-4.5 shadow-md z-30">
-        {/* Logo element */}
-        <div className="flex items-center cursor-pointer group" onClick={() => navigate("/")}>
-          <div className="relative mr-3 w-8 h-8 rounded-lg border-2 border-[#FDFBF7] overflow-hidden flex items-center justify-center bg-stone-950">
-            {/* Sliding cover gradient */}
-            <div className="absolute inset-[1.5px] rounded-[5px] bg-gradient-to-t from-orange-500/20 to-orange-500/90 transition-transform duration-500 ease-out group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-25" />
-            {/* Logo SVG symbol */}
-            <svg className="w-4 h-4 text-[#FDFBF7] z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-            </svg>
+      {!isPreview && (
+        <header className="fixed top-0 left-0 right-0 w-full flex items-center justify-between border-b border-[#FDFBF7]/5 bg-[#1C1917]/85 backdrop-blur-md px-4 py-4.5 shadow-md z-30">
+          {/* Logo element */}
+          <div className="flex items-center cursor-pointer group" onClick={() => navigate("/")}>
+            <div className="relative mr-3 w-8 h-8 rounded-lg border-2 border-[#FDFBF7] overflow-hidden flex items-center justify-center bg-stone-950">
+              {/* Sliding cover gradient */}
+              <div className="absolute inset-[1.5px] rounded-[5px] bg-gradient-to-t from-orange-500/20 to-orange-500/90 transition-transform duration-500 ease-out group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-25" />
+              {/* Logo SVG symbol */}
+              <svg className="w-4 h-4 text-[#FDFBF7] z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+            </div>
+            <span className="vortex-font-bricolage text-xl font-bold tracking-tight">Vortex</span>
           </div>
-          <span className="vortex-font-bricolage text-xl font-bold tracking-tight">Vortex</span>
-        </div>
 
-        {/* Nav links right */}
-        <div className="flex items-center gap-4 sm:gap-6">
-          {/* Portfolio link */}
-          <a href="/portfolio" onClick={(e) => { e.preventDefault(); navigate("/portfolio"); }} className="group flex items-center text-sm font-bold text-[#FDFBF7]/70 hover:text-[#FDFBF7] transition duration-300">
-            <svg className="w-4.5 h-4.5 mr-1.5 fill-current transition-transform duration-300 group-hover:-rotate-12" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z" />
-            </svg>
-            <span>Portfolio</span>
-          </a>
-
-          {/* GitHub Link Button with Arrow Slide */}
-          <a 
-            href="https://github.com/CherifBouabdallah"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 overflow-hidden pl-10 pr-4 select-none h-11 border border-[#FDFBF7]/5 text-[#FDFBF7] decoration-none"
-          >
-            {/* GitHub icon left */}
-            <div className="absolute left-3.5 transition-all duration-300 group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-0 group-hover:blur-xs">
-              <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
-                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          {/* Nav links right */}
+          <div className="flex items-center gap-4 sm:gap-6">
+            {/* Portfolio link */}
+            <a href="/portfolio" onClick={(e) => { e.preventDefault(); navigate("/portfolio"); }} className="group flex items-center text-sm font-bold text-[#FDFBF7]/70 hover:text-[#FDFBF7] transition duration-300">
+              <svg className="w-4.5 h-4.5 mr-1.5 fill-current transition-transform duration-300 group-hover:-rotate-12" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z" />
               </svg>
-            </div>
-            {/* Centered label */}
-            <div className="transition-transform duration-300 group-hover:-translate-x-3.5 whitespace-nowrap">
-              View GitHub
-            </div>
-            {/* Arrow right sliding in */}
-            <div className="absolute right-3.5 translate-x-full scale-x-50 opacity-0 blur-xs transition-all duration-300 group-hover:translate-x-0 group-hover:scale-x-100 group-hover:opacity-100 group-hover:blur-none text-[#F97316]">
-              <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </div>
-          </a>
+              <span>Portfolio</span>
+            </a>
 
-          {/* Hire Cherif Button */}
-          <button 
-            onClick={() => navigate("/contact")}
-            className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7] text-stone-900 hover:bg-[#FDFBF7]/90 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 h-11 border border-[#FDFBF7]/10 cursor-pointer"
-          >
-            {/* Gear/Star SVG badge */}
-            <svg className="mr-2 w-4 h-4 fill-current text-orange-500 animate-gear-spin-hover" viewBox="0 0 24 24">
-              <path className="animate-gear-spin-hover origin-center gear-icon" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.11-1.03-.41-2.01-.91-2.92l1.64-1.64c.39-.39.39-1.02 0-1.41l-1.41-1.41c-.39-.39-1.02-.39-1.41 0l-1.64 1.64c-.91-.5-1.89-.8-2.92-.91V3.5c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1V5.7c-1.03.11-2.01.41-2.92.91L5.03 4.97c-.39-.39-1.02-.39-1.41 0L2.21 6.38c-.39.39-.39 1.02 0 1.41l1.64 1.64c-.5.91-.8 1.89-.91 2.92H1.5c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1h1.44c.11 1.03.41 2.01.91 2.92l-1.64 1.64c-.39.39-.39 1.02 0 1.41l1.41 1.41c.39.39 1.02.39 1.41 0l1.64-1.64c.91.5 1.89.8 2.92.91v2.24c0 .55.45 1 1 1h2c.55 0 1-.45 1-1V18.3c1.03-.11 2.01-.41 2.92-.91l1.64 1.64c.39.39 1.02.39 1.41 0l1.41-1.41c.39-.39.39-1.02 0-1.41l-1.64-1.64c.5-.91.8-1.89.91-2.92h2.24c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2.24z"/>
-            </svg>
-            <span>Hire Cherif</span>
-            <span className="ml-2 rounded-md bg-stone-900 text-stone-100 text-[10px] px-1.5 py-0.5 tracking-wider uppercase font-bold">EPFL</span>
-          </button>
-        </div>
-      </header>
+            {/* GitHub Link Button with Arrow Slide */}
+            <a 
+              href="https://github.com/CherifBouabdallah"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 overflow-hidden pl-10 pr-4 select-none h-11 border border-[#FDFBF7]/5 text-[#FDFBF7] decoration-none"
+            >
+              {/* GitHub icon left */}
+              <div className="absolute left-3.5 transition-all duration-300 group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-0 group-hover:blur-xs">
+                <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+              </div>
+              {/* Centered label */}
+              <div className="transition-transform duration-300 group-hover:-translate-x-3.5 whitespace-nowrap">
+                View GitHub
+              </div>
+              {/* Arrow right sliding in */}
+              <div className="absolute right-3.5 translate-x-full scale-x-50 opacity-0 blur-xs transition-all duration-300 group-hover:translate-x-0 group-hover:scale-x-100 group-hover:opacity-100 group-hover:blur-none text-[#F97316]">
+                <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </div>
+            </a>
+
+            {/* Hire Cherif Button */}
+            <button 
+              onClick={() => navigate("/contact")}
+              className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7] text-stone-900 hover:bg-[#FDFBF7]/90 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 h-11 border border-[#FDFBF7]/10 cursor-pointer"
+            >
+              {/* Gear/Star SVG badge */}
+              <svg className="mr-2 w-4 h-4 fill-current text-orange-500 animate-gear-spin-hover" viewBox="0 0 24 24">
+                <path className="animate-gear-spin-hover origin-center gear-icon" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.11-1.03-.41-2.01-.91-2.92l1.64-1.64c.39-.39.39-1.02 0-1.41l-1.41-1.41c-.39-.39-1.02-.39-1.41 0l-1.64 1.64c-.91-.5-1.89-.8-2.92-.91V3.5c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1V5.7c-1.03.11-2.01.41-2.92.91L5.03 4.97c-.39-.39-1.02-.39-1.41 0L2.21 6.38c-.39.39-.39 1.02 0 1.41l1.64 1.64c-.5.91-.8 1.89-.91 2.92H1.5c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1h1.44c.11 1.03.41 2.01.91 2.92l-1.64 1.64c-.39.39-.39 1.02 0 1.41l1.41 1.41c.39.39 1.02.39 1.41 0l1.64-1.64c.91.5 1.89.8 2.92.91v2.24c0 .55.45 1 1 1h2c.55 0 1-.45 1-1V18.3c1.03-.11 2.01-.41 2.92-.91l1.64 1.64c.39.39(1.02.39 1.41 0l1.41-1.41c.39-.39.39-1.02 0-1.41l-1.64-1.64c.5-.91.8-1.89.91-2.92h2.24c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2.24z"/>
+              </svg>
+              <span>Hire Cherif</span>
+              <span className="ml-2 rounded-md bg-stone-900 text-stone-100 text-[10px] px-1.5 py-0.5 tracking-wider uppercase font-bold">EPFL</span>
+            </button>
+          </div>
+        </header>
+      )}
 
       {/* Outer wrapper max-w container */}
-      <div className="w-full max-w-[1440px] px-6 sm:px-12 md:px-16 flex flex-col items-center gap-16 relative z-10 pt-40">
+      <div className={`w-full max-w-[1440px] px-6 sm:px-12 md:px-16 flex flex-col items-center gap-16 relative z-10 ${isPreview ? 'pt-12' : 'pt-40'}`}>
         {/* ========================================================= */}
         {/* 2. HERO TITLE SECTION WITH THE SVG HANDDRAWN LOOP          */}
         {/* ========================================================= */}
