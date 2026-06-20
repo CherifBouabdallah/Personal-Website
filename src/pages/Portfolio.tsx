@@ -2,6 +2,7 @@ import { motion, useMotionValue, useSpring, useTransform, Variants, AnimatePrese
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Vortex from "./Vortex";
+import SoccerTeam from "./SoccerTeam";
 import { 
   ExternalLink, 
   Github, 
@@ -11,7 +12,8 @@ import {
   Sparkles,
   ArrowRight,
   Terminal,
-  Activity
+  Activity,
+  Shield
 } from "lucide-react";
 
 // Elegant self-drawing border divider rule
@@ -30,9 +32,14 @@ function SelfDrawingLine({ className = "" }: { className?: string }) {
 }
 
 // ----------------------------------------------------------------------
-// PROJECT 1 PREVIEW: VORTEX OS MINI MOCKUP
+// SHARED PREVIEW: Scaled page thumbnail with unified hover
 // ----------------------------------------------------------------------
-function VortexOSPreview({ onClick }: { onClick: () => void }) {
+function ProjectPreview({ onClick, layoutId, bgColor, children }: {
+  onClick: () => void;
+  layoutId: string;
+  bgColor: string;
+  children: React.ReactNode;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.35);
   const [isHovered, setIsHovered] = useState(false);
@@ -41,18 +48,13 @@ function VortexOSPreview({ onClick }: { onClick: () => void }) {
     const updateScale = () => {
       if (containerRef.current) {
         const width = containerRef.current.clientWidth;
-        // The component is designed for 1280px width
         setScale(width / 1280);
       }
     };
-    
     updateScale();
     window.addEventListener("resize", updateScale);
     const observer = new ResizeObserver(updateScale);
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
+    if (containerRef.current) observer.observe(containerRef.current);
     return () => {
       window.removeEventListener("resize", updateScale);
       observer.disconnect();
@@ -60,31 +62,31 @@ function VortexOSPreview({ onClick }: { onClick: () => void }) {
   }, []);
 
   return (
-    <motion.div 
+    <motion.div
       ref={containerRef}
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      layoutId="vortex-sandbox-card"
+      layoutId={layoutId}
       transition={{ type: "spring", stiffness: 180, damping: 25 }}
-      whileHover={{ scale: 1.02, y: -4 }}
-      className="w-full aspect-[16/10] bg-[#141212] rounded-2xl border border-white/10 overflow-hidden relative shadow-xl cursor-pointer select-none"
+      whileHover={{ scale: 1.015 }}
+      className="w-full aspect-[16/10] border border-[#F6F0DF]/10 cursor-pointer select-none"
+      style={{ background: bgColor, borderRadius: 20, overflow: "hidden", position: "relative", clipPath: "inset(0 round 20px)" }}
     >
-      <div 
+      <div
         className="absolute top-0 left-0 origin-top-left pointer-events-none"
-        style={{
-          width: "1280px",
-          height: "800px",
-          transform: `scale(${scale})`,
-        }}
+        style={{ width: 1280, height: 800, transform: `scale(${scale})` }}
       >
-        <Vortex isPreview={true} />
+        {children}
       </div>
-      
-      {/* Overlay to dim on hover or show an Enter Sandbox indicator */}
-      <div className={`absolute inset-0 transition-colors duration-300 flex items-center justify-center ${isHovered ? "bg-black/25" : "bg-black/0"}`}>
-        <div className={`transition-opacity duration-300 bg-black/75 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 text-[#F6F0DF] font-mono text-[9px] tracking-widest uppercase ${isHovered ? "opacity-100" : "opacity-0"}`}>
-          Open Sandbox
+      {/* Unified hover overlay */}
+      <div
+        className={`absolute inset-0 transition-all duration-300 flex items-center justify-center ${isHovered ? "bg-black/20" : "bg-transparent"}`}
+        style={{ borderRadius: 20 }}
+      >
+        <div className={`transition-all duration-300 bg-black/70 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/15 text-[#F6F0DF] font-mono text-[9px] tracking-[0.25em] uppercase flex items-center gap-2 ${isHovered ? "opacity-100 scale-100" : "opacity-0 scale-90"}`}>
+          <ArrowRight size={10} strokeWidth={2.5} />
+          Open Project
         </div>
       </div>
     </motion.div>
@@ -92,7 +94,7 @@ function VortexOSPreview({ onClick }: { onClick: () => void }) {
 }
 
 // ----------------------------------------------------------------------
-// PROJECT 2 PREVIEW: RAY TRACER PROCEDURAL DIAGRAM
+// PROJECT 3 PREVIEW: RAY TRACER PROCEDURAL DIAGRAM
 // ----------------------------------------------------------------------
 function RayTracerPreview() {
   return (
@@ -288,6 +290,7 @@ export default function Portfolio() {
   const maxScrollRef = useRef(0);
   const [isMobile, setIsMobile] = useState(false);
   const [isVortexOpen, setIsVortexOpen] = useState(false);
+  const [isSoccerOpen, setIsSoccerOpen] = useState(false);
   
   const contentRef = useRef<HTMLDivElement>(null);
   const currentScrollY = useRef(0);
@@ -335,22 +338,23 @@ export default function Portfolio() {
     };
   }, []);
 
-  // Listen to Escape key to close Vortex preview modal
+  // Listen to Escape key to close preview modals
   useEffect(() => {
-    if (!isVortexOpen) return;
+    if (!isVortexOpen && !isSoccerOpen) return;
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setIsVortexOpen(false);
+        setIsSoccerOpen(false);
       }
     };
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
-  }, [isVortexOpen]);
+  }, [isVortexOpen, isSoccerOpen]);
 
   // Scroll and Resize Observer initialization
   useEffect(() => {
     if (!isReady) return;
-    if (isVortexOpen) return;
+    if (isVortexOpen || isSoccerOpen) return;
 
     const updateMaxScroll = () => {
       if (contentRef.current) {
@@ -449,7 +453,7 @@ export default function Portfolio() {
       window.removeEventListener("resize", updateMaxScroll);
       if (observer) observer.disconnect();
     };
-  }, [isReady, isVortexOpen]);
+  }, [isReady, isVortexOpen, isSoccerOpen]);
 
   const headerText = "Portfolio";
 
@@ -594,7 +598,7 @@ export default function Portfolio() {
 
           <SelfDrawingLine className="mb-12 max-w-[1440px] mx-auto" />
 
-          {/* Exhibition Grid */}
+           {/* Exhibition Grid */}
           <div className="grid grid-cols-12 gap-8 md:gap-12 w-full max-w-[1440px] mx-auto items-stretch">
             
             {/* FEATURED PROJECT 1: Vortex OS Creative Sandbox */}
@@ -606,10 +610,10 @@ export default function Portfolio() {
               variants={cardRevealVariants}
               className="col-span-12"
             >
-              <div className={`glass-square ${getGlassClass()} p-6 md:p-10 flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch text-left overflow-hidden relative group`}>
+              <div className={`glass-square ${getGlassClass()} p-6 md:p-10 flex flex-col lg:flex-row gap-8 lg:gap-12 items-center text-left overflow-hidden relative group`}>
                 
                 {/* Text Description Column */}
-                <div className="flex-1 flex flex-col justify-between min-h-[300px]">
+                <div className="flex-1 flex flex-col justify-center min-h-[280px]">
                   <div>
                     {/* Metadata Header */}
                     <div className="flex justify-between items-center mb-6 border-b border-[#F6F0DF]/10 pb-4">
@@ -638,13 +642,13 @@ export default function Portfolio() {
                     </div>
                   </div>
 
-                  {/* Dynamic Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-4">
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <button
                       onClick={() => setIsVortexOpen(true)}
                       className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#F6F0DF] text-[#223D27] font-mono text-[10px] font-bold tracking-widest hover:bg-[#F6F0DF]/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
                     >
-                      ENTER SANDBOX
+                      OPEN PROJECT
                       <ArrowRight size={12} strokeWidth={2.5} />
                     </button>
                     
@@ -660,17 +664,94 @@ export default function Portfolio() {
                   </div>
                 </div>
 
-                {/* Simulated Desktop Preview Column */}
-                <div className="flex-1 flex items-center justify-center min-h-[250px] lg:min-h-full">
-                  <div className="w-full h-full max-w-[500px]">
-                    <VortexOSPreview onClick={() => setIsVortexOpen(true)} />
+                {/* Preview Column — vertically centered */}
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="w-full max-w-[520px]">
+                    <ProjectPreview onClick={() => setIsVortexOpen(true)} layoutId="vortex-sandbox-card" bgColor="#141212">
+                      <Vortex isPreview={true} />
+                    </ProjectPreview>
                   </div>
                 </div>
 
               </div>
             </motion.div>
 
-            {/* PROJECT 2: Physically Based Ray Tracer */}
+            {/* FEATURED PROJECT 2: Olympus FC Soccer Team Website */}
+            <motion.div
+              custom={2}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              variants={cardRevealVariants}
+              className="col-span-12"
+            >
+              <div className={`glass-square ${getGlassClass()} p-6 md:p-10 flex flex-col lg:flex-row-reverse gap-8 lg:gap-12 items-center text-left overflow-hidden relative group`}>
+                
+                {/* Text Description Column */}
+                <div className="flex-1 flex flex-col justify-center min-h-[280px]">
+                  <div>
+                    {/* Metadata Header */}
+                    <div className="flex justify-between items-center mb-6 border-b border-[#F6F0DF]/10 pb-4">
+                      <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">02 / Featured Project</span>
+                      <span className="font-mono text-[8px] tracking-wider text-[#F6F0DF]/40 uppercase px-2 py-0.5 rounded border border-[#F6F0DF]/10 bg-black/10 flex items-center gap-1.5">
+                        <Activity size={10} className="text-red-500 animate-pulse" />
+                        Web Design
+                      </span>
+                    </div>
+
+                    <h2 className="font-maghfirea text-[clamp(1.8rem,4vw,3rem)] text-[#F6F0DF] tracking-wide mb-4 leading-tight">
+                      Olympus FC
+                    </h2>
+
+                    <p className="font-mono text-[10px] md:text-[12px] leading-relaxed text-[#F6F0DF]/70 mb-6">
+                      A clean, modern one-page website designed for a professional soccer club. Features a light flat theme with bold sporty typography, animated stat counters, interactive squad & fixture tabs, horizontal scroll tickers, and SVG stadium illustrations with draw-on scroll animations.
+                    </p>
+
+                    {/* Tech stack badges */}
+                    <div className="flex flex-wrap gap-2 mb-8">
+                      {["REACT", "FRAMER MOTION", "RESPONSIVE", "SVG ANIMATION", "MODERN UI"].map((tech) => (
+                        <span key={tech} className="font-mono text-[8px] tracking-widest text-[#F6F0DF]/80 px-2 py-1 rounded bg-[#F6F0DF]/5 border border-[#F6F0DF]/15">
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button
+                      onClick={() => setIsSoccerOpen(true)}
+                      className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#F6F0DF] text-[#223D27] font-mono text-[10px] font-bold tracking-widest hover:bg-[#F6F0DF]/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                    >
+                      OPEN PROJECT
+                      <ArrowRight size={12} strokeWidth={2.5} />
+                    </button>
+                    
+                    <a
+                      href="https://github.com/CherifBouabdallah"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#F6F0DF]/5 hover:bg-[#F6F0DF]/10 text-[#F6F0DF] border border-[#F6F0DF]/15 font-mono text-[10px] font-bold tracking-widest active:scale-[0.98] transition-all duration-200"
+                    >
+                      <Github size={12} />
+                      SOURCE CODE
+                    </a>
+                  </div>
+                </div>
+
+                {/* Preview Column — vertically centered */}
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="w-full max-w-[520px]">
+                    <ProjectPreview onClick={() => setIsSoccerOpen(true)} layoutId="soccer-team-card" bgColor="#FAFAF8">
+                      <SoccerTeam isPreview={true} />
+                    </ProjectPreview>
+                  </div>
+                </div>
+
+              </div>
+            </motion.div>
+
+            {/* PROJECT 3: Physically Based Ray Tracer */}
             <motion.div
               custom={2}
               initial="hidden"
@@ -682,7 +763,7 @@ export default function Portfolio() {
               <div className={`glass-square ${getGlassClass()} p-6 md:p-8 flex flex-col justify-between h-full text-left overflow-hidden relative group`}>
                 <div>
                   <div className="flex justify-between items-center mb-6 border-b border-[#F6F0DF]/10 pb-4">
-                    <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">02 / Graphics</span>
+                    <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">03 / Graphics</span>
                     <Code2 size={13} className="text-[#F6F0DF]/60" />
                   </div>
 
@@ -733,7 +814,7 @@ export default function Portfolio() {
               <div className={`glass-square ${getGlassClass()} p-6 md:p-8 flex flex-col justify-between h-full text-left overflow-hidden relative group`}>
                 <div>
                   <div className="flex justify-between items-center mb-6 border-b border-[#F6F0DF]/10 pb-4">
-                    <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">03 / Systems</span>
+                    <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">04 / Systems</span>
                     <Terminal size={13} className="text-[#F6F0DF]/60" />
                   </div>
 
@@ -782,6 +863,42 @@ export default function Portfolio() {
         </motion.div>
       )}
 
+      {/* Soccer Team Preview Overlay Modal */}
+      <AnimatePresence>
+        {isSoccerOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 overflow-hidden cursor-pointer"
+            onClick={() => setIsSoccerOpen(false)}
+          >
+            <div 
+              className="w-full h-full max-w-[1280px] max-h-[85vh] relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <motion.div
+                layoutId="soccer-team-card"
+                transition={{ type: "spring", stiffness: 180, damping: 25 }}
+                className="w-full h-full bg-[#FAFAF8] border border-white/15 overflow-y-auto no-scrollbar cursor-default relative"
+                style={{ borderRadius: 28, transform: "translate3d(0,0,0)" }}
+              >
+                <SoccerTeam isPreview={true} />
+              </motion.div>
+
+              {/* Floating Close Button */}
+              <button
+                onClick={() => setIsSoccerOpen(false)}
+                className="absolute top-6 right-6 z-[120] w-10 h-10 rounded-full bg-black/60 border border-white/10 hover:bg-white/10 hover:border-white/30 text-white flex items-center justify-center font-mono text-[10px] tracking-wider cursor-pointer transition-all duration-300 shadow-md"
+                title="Close Preview (Esc)"
+              >
+                ESC
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Vortex Sandbox Overlay Modal */}
       <AnimatePresence>
         {isVortexOpen && (
@@ -799,8 +916,8 @@ export default function Portfolio() {
               <motion.div
                 layoutId="vortex-sandbox-card"
                 transition={{ type: "spring", stiffness: 180, damping: 25 }}
-                className="w-full h-full bg-[#141212] rounded-[32px] border border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] overflow-y-auto no-scrollbar cursor-default relative"
-                style={{ transform: "translate3d(0,0,0)" }}
+                className="w-full h-full bg-[#141212] border border-white/10 overflow-y-auto no-scrollbar cursor-default relative"
+                style={{ borderRadius: 28, transform: "translate3d(0,0,0)" }}
               >
                 <Vortex isPreview={true} startUnlocked={true} />
               </motion.div>

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, Suspense, lazy, ComponentType } from "react";
+import { useState, useEffect, useRef, Suspense, lazy, ComponentType } from "react";
 import { Routes, Route, useLocation, Link } from "react-router-dom";
 import Home from "./pages/Home";
 import LiquidNavbar from "./components/LiquidNavbar";
@@ -22,13 +22,26 @@ const Portfolio = lazyWithPreload(() => import("./pages/Portfolio"));
 const Contact = lazyWithPreload(() => import("./pages/Contact"));
 const About = lazyWithPreload(() => import("./pages/About"));
 const Vortex = lazyWithPreload(() => import("./pages/Vortex"));
+const SoccerTeam = lazyWithPreload(() => import("./pages/SoccerTeam"));
 const NotFound = lazyWithPreload(() => import("./pages/NotFound"));
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const isSiteReady = fontsLoaded && imageLoaded;
+  const [progress, setProgress] = useState(0);
+  const [isSiteReady, setIsSiteReady] = useState(false);
   const location = useLocation();
+
+  const fontsLoadedRef = useRef(fontsLoaded);
+  const imageLoadedRef = useRef(imageLoaded);
+
+  useEffect(() => {
+    fontsLoadedRef.current = fontsLoaded;
+  }, [fontsLoaded]);
+
+  useEffect(() => {
+    imageLoadedRef.current = imageLoaded;
+  }, [imageLoaded]);
 
   useEffect(() => {
     // Fonts load check
@@ -57,6 +70,7 @@ export default function App() {
       Contact.preload();
       About.preload();
       Vortex.preload();
+      SoccerTeam.preload();
       NotFound.preload();
     };
 
@@ -67,7 +81,38 @@ export default function App() {
     }
   }, []);
 
-  const isScrollable = location.pathname === "/" || location.pathname === "/about" || location.pathname === "/vortex" || location.pathname === "/portfolio";
+  // Smooth loading progress animation
+  useEffect(() => {
+    let animationFrameId: number;
+    let currentProgress = 0;
+
+    const updateProgress = () => {
+      const loaded = fontsLoadedRef.current && imageLoadedRef.current;
+      const target = loaded ? 100 : 90;
+      
+      if (currentProgress < target) {
+        const diff = target - currentProgress;
+        const speed = loaded ? 0.08 : 0.015; // Slow crawl up to 90%, fast sweep to 100%
+        const step = Math.max(0.08, diff * speed);
+        currentProgress = Math.min(target, currentProgress + step);
+        setProgress(currentProgress);
+      }
+
+      if (currentProgress >= 100) {
+        setTimeout(() => {
+          setIsSiteReady(true);
+        }, 300);
+        return;
+      }
+
+      animationFrameId = requestAnimationFrame(updateProgress);
+    };
+
+    animationFrameId = requestAnimationFrame(updateProgress);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, []);
+
+  const isScrollable = location.pathname === "/" || location.pathname === "/about" || location.pathname === "/vortex" || location.pathname === "/portfolio" || location.pathname === "/soccer-team";
 
   return (
     <div className={`relative flex min-h-screen bg-[#223D27] ${isScrollable ? "overflow-y-auto no-scrollbar overscroll-y-none items-stretch justify-stretch" : "items-center justify-center overflow-hidden"}`}>
@@ -86,10 +131,17 @@ export default function App() {
               transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
               className="font-mono text-xs md:text-sm tracking-[0.45em] uppercase text-[#F6F0DF]/80 text-center px-4"
             >
-              CHÉRIF BOUABDALLAH
+              CHERIF BOUABDALLAH
             </motion.div>
             <div className="mt-4 font-mono text-[9px] tracking-[0.2em] uppercase text-[#F6F0DF]/30 text-center px-4">
-              Loading creative systems...
+              loading cherif...
+            </div>
+            {/* Minimalist luxury loading status bar */}
+            <div className="mt-6 w-40 h-[1px] bg-[#F6F0DF]/10 relative overflow-hidden">
+              <div 
+                className="absolute top-0 left-0 h-full bg-[#F6F0DF]/70"
+                style={{ width: `${progress}%` }}
+              />
             </div>
           </motion.div>
         )}
@@ -121,6 +173,7 @@ export default function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/about" element={<About />} />
               <Route path="/vortex" element={<Vortex />} />
+              <Route path="/soccer-team" element={<SoccerTeam />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
