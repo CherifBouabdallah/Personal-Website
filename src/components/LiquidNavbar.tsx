@@ -2,7 +2,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-const PATHS = ["/", "/portfolio", "/contact", "/about", "/dev"];
+const PATHS = ["/", "/portfolio", "/contact", "/about"];
 
 interface LiquidNavbarProps {
   className?: string;
@@ -29,7 +29,6 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
           if (path === "/portfolio") label = "Portfolio";
           if (path === "/contact") label = "Contact";
           if (path === "/about") label = "About";
-          if (path === "/dev") label = "Dev";
 
           const active = location.pathname === path;
           return (

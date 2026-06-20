@@ -2,7 +2,7 @@ import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Dev() {
+export default function Vortex() {
   const [isReady, setIsReady] = useState(false);
   const [isLocked, setIsLocked] = useState(true);
   const [isIslandExpanded, setIsIslandExpanded] = useState(false);

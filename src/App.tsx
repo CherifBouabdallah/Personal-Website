@@ -21,7 +21,8 @@ function lazyWithPreload<T extends ComponentType<any>>(
 const Portfolio = lazyWithPreload(() => import("./pages/Portfolio"));
 const Contact = lazyWithPreload(() => import("./pages/Contact"));
 const About = lazyWithPreload(() => import("./pages/About"));
-const Dev = lazyWithPreload(() => import("./pages/Dev"));
+const Vortex = lazyWithPreload(() => import("./pages/Vortex"));
+const NotFound = lazyWithPreload(() => import("./pages/NotFound"));
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -55,7 +56,8 @@ export default function App() {
       Portfolio.preload();
       Contact.preload();
       About.preload();
-      Dev.preload();
+      Vortex.preload();
+      NotFound.preload();
     };
 
     if ("requestIdleCallback" in window) {
@@ -65,7 +67,7 @@ export default function App() {
     }
   }, []);
 
-  const isScrollable = location.pathname === "/" || location.pathname === "/about" || location.pathname === "/dev";
+  const isScrollable = location.pathname === "/" || location.pathname === "/about" || location.pathname === "/vortex" || location.pathname === "/portfolio";
 
   return (
     <div className={`relative flex min-h-screen bg-[#223D27] ${isScrollable ? "overflow-y-auto no-scrollbar overscroll-y-none items-stretch justify-stretch" : "items-center justify-center overflow-hidden"}`}>
@@ -118,7 +120,8 @@ export default function App() {
               <Route path="/portfolio" element={<Portfolio />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/about" element={<About />} />
-              <Route path="/dev" element={<Dev />} />
+              <Route path="/vortex" element={<Vortex />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </motion.div>
