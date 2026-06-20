@@ -1,28 +1,51 @@
 #!/bin/bash
 
-echo "📥 Pulling latest source code from GitHub..."
-git pull origin main
+# ==========================================
+# 🛑 FAIL-SAFE CONFIGURATION
+# ==========================================
+# Exit immediately if any command fails
+set -e
+# Treat unset variables as an error
+set -u
+# Ensure pipelines fail if any command within them fails
+set -o pipefail
 
-echo "📦 Installing project dependencies..."
-# npm ci is faster and cleaner for automated deployment scripts than npm install
+# ==========================================
+# 📂 VARIABLES (Customize these if needed)
+# ==========================================
+PROJECT_DIR="$HOME/Personal-Website"
+WEB_ROOT="/var/www/html"
+BRANCH="main"
+
+echo "🚀 Starting bulletproof deployment pipeline..."
+
+# Ensure we are in the right directory before doing anything
+cd "$PROJECT_DIR"
+
+echo "📥 Syncing state with GitHub (Forcing a strictly clean state)..."
+# Fetch the latest history without merging it yet
+git fetch origin
+# Hard reset to exactly match the remote branch, destroying local changes (fixes lockfile errors)
+git reset --hard "origin/$BRANCH"
+# Remove any untracked files or directories that might cause conflicts
+git clean -fd
+
+echo "📦 Installing project dependencies cleanly..."
 npm ci
 
 echo "🛠️ Compiling Vite into production-ready static HTML/CSS..."
 npm run build
 
 echo "⚙️ Configuring Nginx SPA routing fallback..."
-# Copy the custom Nginx config to sites-available
 sudo cp nginx-default.conf /etc/nginx/sites-available/default
 
-echo "🧹 Clearing old production files..."
-sudo rm -rf /var/www/html/*
+echo "🔄 Deploying files with zero-downtime synchronization..."
+# Using rsync instead of rm + cp prevents the website from going completely offline for a split second.
+# It only copies what changed and cleanly deletes old files.
+sudo rsync -a --delete dist/ "$WEB_ROOT/"
 
-echo "🚀 Copying compiled 'dist' folder to Nginx web root..."
-# We copy the CONTENTS of the dist folder (note the trailing slash)
-sudo cp -a dist/. /var/www/html/
-
-echo "🔄 Reloading Nginx server..."
-# Test config and reload nginx
-sudo nginx -t && sudo systemctl reload nginx
+echo "✅ Verifying Nginx configuration and reloading..."
+sudo nginx -t
+sudo systemctl reload nginx
 
 echo "✨ Deployment complete! Your optimized site is live."
