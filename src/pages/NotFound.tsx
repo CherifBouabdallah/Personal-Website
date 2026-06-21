@@ -2,10 +2,10 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Home, ArrowLeft } from "lucide-react";
+import { Home } from "lucide-react";
 
 export default function NotFound() {
   const navigate = useNavigate();

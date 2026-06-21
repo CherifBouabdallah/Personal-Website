@@ -30,6 +30,8 @@ body {
   -webkit-backdrop-filter: blur(2px);
   border: 1px solid rgba(246, 240, 223, 0.25);
   border-radius: 24px;
+  /* CSS containment: isolates layout recalculations during scroll/animation */
+  contain: layout style;
   box-shadow: 
     1px -1px 2px hsl(0 0% 100% / 0.5) inset,
     0px -1px 2px hsl(0 0% 100% / 0.5) inset,

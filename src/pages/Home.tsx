@@ -1,72 +1,72 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 // SVG Logos for Core Stack
-const JavaLogo = () => (
+const JavaLogo = memo(() => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
     <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
     <path d="M6 1v3M10 1v3M14 1v3" />
   </svg>
-);
+));
 
-const PythonLogo = () => (
+const PythonLogo = memo(() => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 2v8a2 2 0 0 1-2 2H3a1 1 0 0 1-1-1V7a5 5 0 0 1 5-5h5z" />
     <path d="M12 22v-8a2 2 0 0 1 2-2h7a1 1 0 0 1 1 1v4a5 5 0 0 1-5 5h-5z" />
     <circle cx="5" cy="5" r="0.75" fill="currentColor" />
     <circle cx="19" cy="19" r="0.75" fill="currentColor" />
   </svg>
-);
+));
 
-const RiscVLogo = () => (
+const RiscVLogo = memo(() => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <rect width="12" height="12" x="6" y="6" rx="2" />
     <path d="M9 6V2M15 6V2M9 22v-4M15 22v-4M6 9H2M6 15H2M22 9h-4M22 15h-4" />
   </svg>
-);
+));
 
-const VerilogLogo = () => (
+const VerilogLogo = memo(() => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M3 12h3l3-8 4 16 3-10 2 2h3" />
   </svg>
-);
+));
 
-const ArduinoLogo = () => (
+const ArduinoLogo = memo(() => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 12c-2.5-3.5-6-3.5-8-1.5s-2 5 0 7 5.5 2 8-1.5c2.5 3.5 6 3.5 8 1.5s2-5 0-7-5.5-2-8 1.5z" />
     <path d="M6 12h2M16 12h2M17 11v2" />
   </svg>
-);
+));
 
-const LatexLogo = () => (
+const LatexLogo = memo(() => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
     <path d="M14 2v6h6M9 15h4l-3-3 3-3H9" />
   </svg>
-);
+));
 
-const BlenderLogo = () => (
+const BlenderLogo = memo(() => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="4" />
     <circle cx="12" cy="12" r="1.5" />
     <path d="M12 5.5V2M16.5 7.5L19.5 5M17.5 12h4" />
   </svg>
-);
+));
 
-const PhotoshopLogo = () => (
+const PhotoshopLogo = memo(() => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <rect width="18" height="18" x="3" y="3" rx="2" />
     <path d="M7 8h2.5a1.5 1.5 0 0 1 0 3H7v4M13.5 11c0-.5.5-1 1-1h.5a1 1 0 0 1 1 1c0 1-2 1-2 2a1 1 0 0 0 1 1h.5a1 1 0 0 0 1-1" />
   </svg>
-);
+));
 
-const DesignLogo = () => (
+const DesignLogo = memo(() => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912-1.275-1.275L12 3Z" />
   </svg>
-);
+));
 
 const codeLanguages = [
   { name: "Java", logo: <JavaLogo /> },
@@ -246,11 +246,18 @@ export default function Home() {
                 01 / Portrait
               </div>
               <div className="w-4/5 md:w-full aspect-[4/5] max-h-[420px] border border-[#F6F0DF]/20 overflow-hidden bg-white/5 relative rounded-xl shadow-lg">
-                <img
-                  src="/IMG_2656.JPEG"
-                  alt="Portrait of Cherif Bouabdallah"
-                  className="w-full h-full object-cover"
-                />
+                <picture>
+                  <source srcSet="/IMG_2656.webp" type="image/webp" />
+                  <img
+                    src="/IMG_2656_opt.jpeg"
+                    alt="Portrait of Cherif Bouabdallah"
+                    width={480}
+                    height={600}
+                    loading="eager"
+                    decoding="async"
+                    className="w-full h-full object-cover"
+                  />
+                </picture>
               </div>
             </motion.div>
             
@@ -456,11 +463,18 @@ export default function Home() {
               01 / Portrait
             </div>
             <div className="w-1/2 aspect-[4/5] max-w-[200px] border border-[#F6F0DF]/20 overflow-hidden bg-white/5 relative rounded-xl shadow-lg">
-              <img
-                src="/IMG_2656.JPEG"
-                alt="Portrait of Cherif Bouabdallah"
-                className="w-full h-full object-cover"
-              />
+              <picture>
+                <source srcSet="/IMG_2656.webp" type="image/webp" />
+                <img
+                  src="/IMG_2656_opt.jpeg"
+                  alt="Portrait of Cherif Bouabdallah"
+                  width={480}
+                  height={600}
+                  loading="eager"
+                  decoding="async"
+                  className="w-full h-full object-cover"
+                />
+              </picture>
             </div>
           </motion.div>
 

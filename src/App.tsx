@@ -48,7 +48,7 @@ export default function App() {
     document.fonts.ready.then(() => setFontsLoaded(true));
 
     // Preload heavy images sitewide to prevent navigation and animation lag
-    const imagesToPreload = ["/IMG_2656.JPEG", "/OG2.PNG"];
+    const imagesToPreload = ["/IMG_2656.webp", "/OG2.webp"];
     let loadedCount = 0;
 
     imagesToPreload.forEach((src) => {

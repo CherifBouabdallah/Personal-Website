@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 // Inline SVGs to ensure cross-browser compatibility and consistent styling
 const GithubIcon = () => (
@@ -60,7 +60,7 @@ const popupVariants = {
 
 export default function Contact() {
   const [isReady, setIsReady] = useState(false);
-  const [year, setYear] = useState<string>(() => String(new Date().getFullYear()));
+  const year = String(new Date().getFullYear());
   const [activePopup, setActivePopup] = useState<"EMAIL" | "GITHUB" | "LINKEDIN" | null>(null);
   const [copiedType, setCopiedType] = useState<"EMAIL" | "GITHUB" | "LINKEDIN" | null>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -116,31 +116,7 @@ export default function Contact() {
     };
   }, []);
 
-  // Fetch the current year from the internet with a 3-second timeout fallback
-  useEffect(() => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-    const fetchYear = async () => {
-      try {
-        const res = await fetch("https://worldtimeapi.org/api/ip", { signal: controller.signal });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.datetime) {
-            const parsedYear = data.datetime.substring(0, 4);
-            if (/^\d{4}$/.test(parsedYear)) {
-              setYear(parsedYear);
-            }
-          }
-        }
-      } catch (err) {
-        console.warn("Failed to fetch year from internet, using local system clock:", err);
-      } finally {
-        clearTimeout(timeoutId);
-      }
-    };
-    fetchYear();
-  }, []);
 
   useEffect(() => {
     let current = 0;

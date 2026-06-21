@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useSpring, useTransform, Variants } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Type, 
@@ -592,11 +592,16 @@ export default function About() {
           transformOrigin: "center top",
         }}
       >
-        <img 
-          src="/OG2.PNG" 
-          alt="Atmospheric Background Artwork" 
-          className="w-full h-full object-cover"
-        />
+        <picture>
+          <source srcSet="/OG2.webp" type="image/webp" />
+          <img 
+            src="/OG2_opt.jpeg" 
+            alt="Atmospheric Background Artwork" 
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover"
+          />
+        </picture>
       </motion.div>
 
       {/* Big Centered Title */}
