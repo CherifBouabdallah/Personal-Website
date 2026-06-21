@@ -26,7 +26,7 @@ export default defineConfig(() => {
             'vendor-react': ['react', 'react-dom', 'react-router-dom'],
             'vendor-motion': ['framer-motion'],
             'vendor-icons': ['lucide-react'],
-          },
+          } as any,
         },
       },
       // Enable CSS code splitting so pages only load styles they need

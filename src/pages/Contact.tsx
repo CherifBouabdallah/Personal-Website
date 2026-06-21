@@ -1,5 +1,6 @@
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import Footer from "../components/Footer";
 
 // Inline SVGs to ensure cross-browser compatibility and consistent styling
 const GithubIcon = () => (
@@ -59,10 +60,9 @@ const popupVariants = {
 } as const;
 
 export default function Contact() {
-  const [isReady, setIsReady] = useState(false);
-  const year = String(new Date().getFullYear());
   const [activePopup, setActivePopup] = useState<"EMAIL" | "GITHUB" | "LINKEDIN" | null>(null);
   const [copiedType, setCopiedType] = useState<"EMAIL" | "GITHUB" | "LINKEDIN" | null>(null);
+  const [isReady, setIsReady] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -396,12 +396,10 @@ export default function Contact() {
       </motion.div>
 
       {/* Copyright Footer */}
-      <motion.footer
+      <Footer
         style={{ opacity: footerOpacity, y: footerY }}
-        className="absolute bottom-8 font-mono text-[9px] tracking-[0.2em] text-[#F6F0DF] pointer-events-none"
-      >
-        © {year} CHERIF BOUABDALLAH
-      </motion.footer>
+        className="absolute bottom-8 text-[#F6F0DF] pointer-events-none"
+      />
     </div>
   );
 }

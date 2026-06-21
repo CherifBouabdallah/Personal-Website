@@ -1,6 +1,7 @@
 import { useState, useEffect, memo } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
+import Footer from "../components/Footer";
 
 // SVG Logos for Core Stack
 const JavaLogo = memo(() => (
@@ -199,7 +200,7 @@ const mobileBgContainerVariants = {
   }
 };
 
-const wordVariants = {
+const wordVariants: Variants = {
   hidden: { 
     opacity: 0, 
     y: 8, 
@@ -604,9 +605,7 @@ export default function Home() {
       </div>
 
       {/* Copyright Footer */}
-      <footer className="w-full text-center font-mono text-[9px] tracking-[0.2em] text-[#F6F0DF]/30 select-none pt-4 border-t border-[#F6F0DF]/5 z-10">
-        © {new Date().getFullYear()} CHERIF BOUABDALLAH
-      </footer>
+      <Footer className="w-full text-center text-[#F6F0DF]/30 mt-auto pt-8 z-10" />
       
     </div>
   );

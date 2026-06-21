@@ -1,6 +1,7 @@
 import { motion, useMotionValue, useSpring, useTransform, Variants, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import Footer from "../components/Footer";
 import Vortex from "./Vortex";
 import SoccerTeam from "./SoccerTeam";
 import { 
@@ -578,7 +579,7 @@ export default function Portfolio() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute top-0 left-0 w-full px-6 md:px-16 lg:px-24 xl:px-36 pb-32 flex flex-col items-center z-20 select-text"
+          className="absolute top-0 left-0 w-full px-6 md:px-16 lg:px-24 xl:px-36 pb-8 flex flex-col items-center z-20 select-text"
           style={{ y: contentY }}
         >
           {/* Scroll fold spacer */}
@@ -856,9 +857,7 @@ export default function Portfolio() {
           </div>
 
           {/* Minimal Editorial Footer */}
-          <footer className="mt-32 w-full max-w-[1440px] pt-8 border-t border-[#F6F0DF]/10 flex items-center justify-center text-[9px] font-mono tracking-[0.2em] text-[#F6F0DF]/40 z-10 select-none">
-            © {new Date().getFullYear()} CHERIF BOUABDALLAH
-          </footer>
+          <Footer className="w-full text-center text-[#F6F0DF]/30 mt-10 z-10" />
 
         </motion.div>
       )}
