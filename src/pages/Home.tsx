@@ -83,6 +83,97 @@ const designSkills = [
   { name: "Creative Web Design", logo: <DesignLogo /> }
 ];
 
+const monologueWords = [
+  { text: "I", italic: false },
+  { text: "am", italic: false },
+  { text: "a", italic: false },
+  { text: "designer", italic: false },
+  { text: "and", italic: false },
+  { text: "full-stack", italic: false },
+  { text: "software", italic: false },
+  { text: "engineer", italic: false },
+  { text: "who", italic: false },
+  { text: "focuses", italic: false },
+  { text: "on", italic: false },
+  { text: "bridging", italic: false },
+  { text: "the", italic: false },
+  { text: "gap", italic: false },
+  { text: "between", italic: false },
+  { text: "aesthetics", italic: false },
+  { text: "and", italic: false },
+  { text: "clean", italic: false },
+  { text: "code.", italic: false },
+  { text: "I", italic: true },
+  { text: "build", italic: true },
+  { text: "performant", italic: true },
+  { text: "front-ends", italic: true },
+  { text: "and", italic: true },
+  { text: "interactive", italic: true },
+  { text: "experiences", italic: true },
+  { text: "that", italic: true },
+  { text: "are", italic: true },
+  { text: "highly", italic: true },
+  { text: "responsive", italic: true },
+  { text: "and", italic: true },
+  { text: "structured.", italic: true },
+  { text: "Driven", italic: false },
+  { text: "by", italic: false },
+  { text: "curiosity,", italic: false },
+  { text: "I", italic: false },
+  { text: "aim", italic: false },
+  { text: "to", italic: false },
+  { text: "craft", italic: false },
+  { text: "memorable", italic: false },
+  { text: "digital", italic: false },
+  { text: "products", italic: false },
+  { text: "that", italic: false },
+  { text: "look", italic: false },
+  { text: "beautiful", italic: false },
+  { text: "and", italic: false },
+  { text: "feel", italic: false },
+  { text: "extremely", italic: false },
+  { text: "premium.", italic: false }
+];
+
+const bgParagraphWords = "Currently pursuing software engineering at EPFL (École Polytechnique Fédérale de Lausanne), focusing on distributed architectures, interactive computer graphics, and engineering clean web environments.".split(" ");
+
+const monologueContainerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.025,
+      delayChildren: 0.35
+    }
+  }
+};
+
+const bgContainerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.025,
+      delayChildren: 1.7
+    }
+  }
+};
+
+const wordVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 8, 
+    filter: "blur(2px)" 
+  },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.4,
+      ease: [0.215, 0.610, 0.355, 1.000]
+    }
+  }
+};
+
 export default function Home() {
   const [isReady, setIsReady] = useState(false);
   const navigate = useNavigate();
@@ -96,9 +187,11 @@ export default function Home() {
   return (
     <div className="w-full min-h-screen flex flex-col pt-32 pb-8 px-6 md:px-16 lg:px-24 xl:px-32 relative bg-[#223D27] text-[#F6F0DF] overflow-y-auto select-text selection:bg-[#F6F0DF] selection:text-[#223D27]">
       
-      {/* Main Grid Content Area */}
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col w-full mx-auto py-8">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start w-full">
+        
+        {/* Desktop Layout (md and up) */}
+        <div className="hidden md:grid grid-cols-12 gap-8 md:gap-12 items-start w-full">
           
           {/* Column 1 (Left): Portrait & Metadata */}
           <div className="col-span-1 md:col-span-3 flex flex-col gap-6 md:border-r md:border-[#F6F0DF]/10 md:pr-8">
@@ -137,9 +230,9 @@ export default function Home() {
           </div>
 
           {/* Column 2 (Center): Core Title & Monologue */}
-          <div className="col-span-1 md:col-span-6 flex flex-col gap-8 md:gap-10 text-center md:text-left">
+          <div className="col-span-1 md:col-span-7 flex flex-col gap-8 md:gap-10 text-center md:text-left">
             {/* Unified Staggered Heading */}
-            <h1 className="font-maghfirea text-[clamp(2.5rem,7vw,110px)] text-[#F6F0DF] flex flex-wrap justify-center md:justify-start gap-x-[0.25em] text-center leading-[0.95] selection:bg-[#F6F0DF] selection:text-[#223D27] px-4 md:px-0 w-full">
+            <h1 className="font-maghfirea text-[clamp(1.6rem,7vw,110px)] text-[#F6F0DF] flex flex-row flex-nowrap justify-center md:justify-start gap-x-[0.25em] text-center leading-[0.95] selection:bg-[#F6F0DF] selection:text-[#223D27] px-4 md:px-0 w-full whitespace-nowrap overflow-visible">
               {(() => {
                 let charCounter = 0;
                 return text.split(" ").map((word, wordIndex) => (
@@ -175,28 +268,44 @@ export default function Home() {
             <div className="space-y-6 md:space-y-8 text-left max-w-xl">
               {/* Monologue */}
               <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
-                transition={{ duration: 1.0, delay: 0.5 }}
+                variants={monologueContainerVariants}
+                initial="hidden"
+                animate={isReady ? "visible" : "hidden"}
                 className="text-[15px] md:text-[18px] leading-relaxed text-[#F6F0DF]/90 font-medium"
               >
-                I am a designer and full-stack software engineer who focuses on bridging the gap between aesthetics and clean code. <span className="font-serif italic text-[#DEDBC8]">I build performant front-ends and interactive experiences that are highly responsive and structured.</span> Driven by curiosity, I aim to craft memorable digital products that look beautiful and feel extremely premium.
+                {monologueWords.map((word, idx) => (
+                  <motion.span
+                    key={idx}
+                    variants={wordVariants}
+                    className={`inline-block mr-1 ${word.italic ? "font-serif italic text-[#DEDBC8]" : ""}`}
+                  >
+                    {word.text}
+                  </motion.span>
+                ))}
               </motion.div>
 
               {/* Background Paragraph */}
-              <motion.p
-                initial={{ opacity: 0, y: 15 }}
-                animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
-                transition={{ duration: 1.0, delay: 0.6 }}
+              <motion.div
+                variants={bgContainerVariants}
+                initial="hidden"
+                animate={isReady ? "visible" : "hidden"}
                 className="text-[13px] md:text-[15px] leading-relaxed text-[#F6F0DF]/60"
               >
-                Currently pursuing software engineering at EPFL (École Polytechnique Fédérale de Lausanne), focusing on distributed architectures, interactive computer graphics, and engineering clean web environments.
-              </motion.p>
+                {bgParagraphWords.map((word, idx) => (
+                  <motion.span
+                    key={idx}
+                    variants={wordVariants}
+                    className="inline-block mr-1"
+                  >
+                    {word}
+                  </motion.span>
+                ))}
+              </motion.div>
             </div>
           </div>
 
           {/* Column 3 (Right): Capabilities & Gateway */}
-          <div className="col-span-1 md:col-span-3 flex flex-col gap-8 md:border-l md:border-[#F6F0DF]/10 md:pl-8">
+          <div className="col-span-1 md:col-span-2 md:col-start-11 flex flex-col gap-8 md:border-l md:border-[#F6F0DF]/10 md:pl-8">
             <div>
               <div className="font-mono text-[10px] md:text-[11px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
                 03 / Core Stack
@@ -237,15 +346,15 @@ export default function Home() {
                 transition={{ duration: 0.8, delay: 1.2 }}
               >
                 <div className="flex flex-col gap-0 py-2">
-                  <div onClick={() => navigate("/contact")} className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
+                  <div onClick={() => navigate("/contact")} id="desktop-gateway-contact" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
                     <span className="font-mono text-[11px] md:text-[12px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">CONTACT</span>
                     <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
                   </div>
-                  <div onClick={() => navigate("/portfolio")} className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
+                  <div onClick={() => navigate("/portfolio")} id="desktop-gateway-portfolio" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
                     <span className="font-mono text-[11px] md:text-[12px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">PORTFOLIO</span>
                     <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
                   </div>
-                  <div onClick={() => navigate("/about")} className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
+                  <div onClick={() => navigate("/about")} id="desktop-gateway-about" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
                     <span className="font-mono text-[11px] md:text-[12px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">ABOUT</span>
                     <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
                   </div>
@@ -255,6 +364,188 @@ export default function Home() {
           </div>
 
         </div>
+
+        {/* Smartphone Layout (below md) */}
+        <div className="flex md:hidden flex-col gap-10 w-full">
+          
+          {/* 1. Title (Hero at the top) */}
+          <h1 className="font-maghfirea text-[clamp(1.6rem,7vw,110px)] text-[#F6F0DF] flex flex-row flex-nowrap justify-center gap-x-[0.25em] text-center leading-[0.95] selection:bg-[#F6F0DF] selection:text-[#223D27] px-4 w-full whitespace-nowrap overflow-visible">
+            {(() => {
+              let charCounter = 0;
+              return text.split(" ").map((word, wordIndex) => (
+                <span key={wordIndex} className="inline-block whitespace-nowrap">
+                  {word.split("").map((char, charIndex) => {
+                    const globalIndex = charCounter++;
+                    return (
+                      <span
+                        key={charIndex}
+                        className="inline-block overflow-hidden"
+                        style={{ paddingBottom: "0.12em", marginBottom: "-0.12em" }}
+                      >
+                        <motion.span
+                          className="inline-block"
+                          initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+                          animate={isReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 50, filter: "blur(10px)" }}
+                          transition={{
+                            duration: 1.0,
+                            ease: [0.21, 1, 0.36, 1],
+                            delay: globalIndex * 0.04,
+                          }}
+                        >
+                          {char}
+                        </motion.span>
+                      </span>
+                    );
+                  })}
+                </span>
+              ));
+            })()}
+          </h1>
+
+          {/* 2. Portrait (Scroll Reveal) - Made smaller (w-1/2 max-w-[200px]) and appears later (delay: 0.6) */}
+          <motion.div
+            initial={{ opacity: 0, y: 35, filter: "blur(6px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.9, delay: 0.6, ease: [0.21, 1, 0.36, 1] }}
+            className="flex flex-col items-center w-full"
+          >
+            <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none self-start">
+              01 / Portrait
+            </div>
+            <div className="w-1/2 aspect-[4/5] max-w-[200px] border border-[#F6F0DF]/20 overflow-hidden bg-white/5 relative rounded-xl shadow-lg">
+              <img
+                src="/IMG_2656.JPEG"
+                alt="Portrait of Cherif Bouabdallah"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </motion.div>
+
+          {/* 3. Monologue (Scroll Reveal - Word by Word) */}
+          <div className="space-y-6 text-left w-full">
+            <motion.div
+              variants={monologueContainerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              className="text-[15px] leading-relaxed text-[#F6F0DF]/90 font-medium"
+            >
+              {monologueWords.map((word, idx) => (
+                <motion.span
+                  key={idx}
+                  variants={wordVariants}
+                  className={`inline-block mr-1 ${word.italic ? "font-serif italic text-[#DEDBC8]" : ""}`}
+                >
+                  {word.text}
+                </motion.span>
+              ))}
+            </motion.div>
+
+            <motion.div
+              variants={bgContainerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              className="text-[13px] leading-relaxed text-[#F6F0DF]/60"
+            >
+              {bgParagraphWords.map((word, idx) => (
+                <motion.span
+                  key={idx}
+                  variants={wordVariants}
+                  className="inline-block mr-1"
+                >
+                  {word}
+                </motion.span>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* 4. Info (Scroll Reveal) */}
+          <motion.div
+            initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
+            className="w-full text-left"
+          >
+            <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
+              02 / Info
+            </div>
+            <div className="font-mono text-[11px] leading-relaxed text-[#F6F0DF]/50 space-y-2 border border-[#F6F0DF]/10 rounded-xl p-4 bg-black/10">
+              <div><span className="text-[#F6F0DF] opacity-80 font-bold">CLIENT:</span> Cherif Bouabdallah</div>
+              <div><span className="text-[#F6F0DF] opacity-80 font-bold">ROLE:</span> EPFL CS Engineer</div>
+              <div><span className="text-[#F6F0DF] opacity-80 font-bold">GRID:</span> Modular Swiss 12-Col</div>
+              <div><span className="text-[#F6F0DF] opacity-80 font-bold">LOC:</span> Lausanne, CH</div>
+            </div>
+          </motion.div>
+
+          {/* 5. Core Stack (Scroll Reveal) */}
+          <motion.div
+            initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
+            className="w-full text-left"
+          >
+            <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
+              03 / Core Stack
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-[#F6F0DF]/10 pb-2">LANGUAGES</div>
+                <div className="flex flex-col gap-3">
+                  {codeLanguages.map((skill) => (
+                    <div key={skill.name} className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] hover:text-[#F6F0DF] transition-colors cursor-default">
+                      <span className="opacity-60">{skill.logo}</span> {skill.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-[#F6F0DF]/10 pb-2">SKILLS</div>
+                <div className="flex flex-col gap-3">
+                  {designSkills.map((skill) => (
+                    <div key={skill.name} className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] hover:text-[#F6F0DF] transition-colors cursor-default">
+                      <span className="opacity-60">{skill.logo}</span> {skill.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* 6. Gateway (Scroll Reveal) */}
+          <motion.div
+            initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
+            className="w-full text-left"
+          >
+            <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
+              04 / Gateway
+            </div>
+            
+            <div className="flex flex-col gap-0 py-2">
+              <div onClick={() => navigate("/contact")} id="mobile-gateway-contact" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
+                <span className="font-mono text-[11px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">CONTACT</span>
+                <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
+              </div>
+              <div onClick={() => navigate("/portfolio")} id="mobile-gateway-portfolio" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
+                <span className="font-mono text-[11px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">PORTFOLIO</span>
+                <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
+              </div>
+              <div onClick={() => navigate("/about")} id="mobile-gateway-about" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
+                <span className="font-mono text-[11px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">ABOUT</span>
+                <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
+              </div>
+            </div>
+          </motion.div>
+
+        </div>
+
       </div>
 
       {/* Copyright Footer */}

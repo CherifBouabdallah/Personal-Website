@@ -89,7 +89,7 @@ export default function App() {
     const updateProgress = () => {
       const loaded = fontsLoadedRef.current && imageLoadedRef.current;
       const target = loaded ? 100 : 90;
-      
+
       if (currentProgress < target) {
         const diff = target - currentProgress;
         const speed = loaded ? 0.08 : 0.015; // Slow crawl up to 90%, fast sweep to 100%
@@ -134,11 +134,11 @@ export default function App() {
               CHERIF BOUABDALLAH
             </motion.div>
             <div className="mt-4 font-mono text-[9px] tracking-[0.2em] uppercase text-[#F6F0DF]/30 text-center px-4">
-              loading cherif...
+              loading ...
             </div>
             {/* Minimalist luxury loading status bar */}
             <div className="mt-6 w-40 h-[1px] bg-[#F6F0DF]/10 relative overflow-hidden">
-              <div 
+              <div
                 className="absolute top-0 left-0 h-full bg-[#F6F0DF]/70"
                 style={{ width: `${progress}%` }}
               />
