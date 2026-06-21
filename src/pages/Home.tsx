@@ -137,12 +137,33 @@ const monologueWords = [
 
 const bgParagraphWords = "Currently pursuing software engineering at EPFL (École Polytechnique Fédérale de Lausanne), focusing on distributed architectures, interactive computer graphics, and engineering clean web environments.".split(" ");
 
+// --- Animation Timeline (Desktop) ---
+// Phase 1: Name heading — chars stagger at 0.04s each, 18 chars ≈ finishes ~0.7s
+// Phase 2: Monologue + Portrait — starts at 0.9s after name settles
+// Phase 3: Background paragraph — starts at 2.4s after monologue is mostly visible
+// Phase 4: Skills sidebar — starts at 2.5s
+// Phase 5: Gateway links — starts at 3.2s
+
+const TIMELINE = {
+  NAME_CHAR_STAGGER: 0.04,
+  NAME_CHAR_DURATION: 1.0,
+  MONOLOGUE_START: 0.9,
+  MONOLOGUE_WORD_STAGGER: 0.025,
+  PORTRAIT_START: 1.0,
+  INFO_START: 1.2,
+  BG_PARAGRAPH_START: 2.4,
+  BG_WORD_STAGGER: 0.025,
+  SKILLS_START: 2.5,
+  SKILLS_ITEM_STAGGER: 0.06,
+  GATEWAY_START: 3.2,
+};
+
 const monologueContainerVariants = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.025,
-      delayChildren: 0.35
+      staggerChildren: TIMELINE.MONOLOGUE_WORD_STAGGER,
+      delayChildren: TIMELINE.MONOLOGUE_START
     }
   }
 };
@@ -151,8 +172,29 @@ const bgContainerVariants = {
   hidden: {},
   visible: {
     transition: {
+      staggerChildren: TIMELINE.BG_WORD_STAGGER,
+      delayChildren: TIMELINE.BG_PARAGRAPH_START
+    }
+  }
+};
+
+// --- Mobile variants (scroll-triggered, short delays) ---
+const mobileMonologueContainerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
       staggerChildren: 0.025,
-      delayChildren: 1.7
+      delayChildren: 0.1
+    }
+  }
+};
+
+const mobileBgContainerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.025,
+      delayChildren: 0.1
     }
   }
 };
@@ -198,7 +240,7 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
-              transition={{ duration: 1.0, delay: 0.7 }}
+              transition={{ duration: 1.0, delay: TIMELINE.PORTRAIT_START }}
             >
               <div className="font-mono text-[10px] md:text-[11px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
                 01 / Portrait
@@ -215,7 +257,7 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
-              transition={{ duration: 1.0, delay: 0.8 }}
+              transition={{ duration: 1.0, delay: TIMELINE.INFO_START }}
             >
               <div className="font-mono text-[10px] md:text-[11px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
                 02 / Info
@@ -250,9 +292,9 @@ export default function Home() {
                             initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
                             animate={isReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 50, filter: "blur(10px)" }}
                             transition={{
-                              duration: 1.0,
+                              duration: TIMELINE.NAME_CHAR_DURATION,
                               ease: [0.21, 1, 0.36, 1],
-                              delay: globalIndex * 0.04,
+                              delay: globalIndex * TIMELINE.NAME_CHAR_STAGGER,
                             }}
                           >
                             {char}
@@ -316,7 +358,7 @@ export default function Home() {
                   <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-[#F6F0DF]/10 pb-2">LANGUAGES</div>
                   <div className="flex flex-col gap-3">
                     {codeLanguages.map((skill, index) => (
-                      <motion.div key={skill.name} initial={{ opacity: 0, x: -10 }} animate={isReady ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }} transition={{ duration: 0.5, delay: 0.9 + index * 0.05 }} className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] md:text-[11px] hover:text-[#F6F0DF] transition-colors cursor-default">
+                      <motion.div key={skill.name} initial={{ opacity: 0, x: -10 }} animate={isReady ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }} transition={{ duration: 0.5, delay: TIMELINE.SKILLS_START + index * TIMELINE.SKILLS_ITEM_STAGGER }} className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] md:text-[11px] hover:text-[#F6F0DF] transition-colors cursor-default">
                         <span className="opacity-60">{skill.logo}</span> {skill.name}
                       </motion.div>
                     ))}
@@ -326,7 +368,7 @@ export default function Home() {
                   <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-[#F6F0DF]/10 pb-2">SKILLS</div>
                   <div className="flex flex-col gap-3">
                     {designSkills.map((skill, index) => (
-                      <motion.div key={skill.name} initial={{ opacity: 0, x: -10 }} animate={isReady ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }} transition={{ duration: 0.5, delay: 1.0 + index * 0.05 }} className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] md:text-[11px] hover:text-[#F6F0DF] transition-colors cursor-default">
+                      <motion.div key={skill.name} initial={{ opacity: 0, x: -10 }} animate={isReady ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }} transition={{ duration: 0.5, delay: TIMELINE.SKILLS_START + 0.15 + index * TIMELINE.SKILLS_ITEM_STAGGER }} className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] md:text-[11px] hover:text-[#F6F0DF] transition-colors cursor-default">
                         <span className="opacity-60">{skill.logo}</span> {skill.name}
                       </motion.div>
                     ))}
@@ -343,7 +385,7 @@ export default function Home() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-                transition={{ duration: 0.8, delay: 1.2 }}
+                transition={{ duration: 0.8, delay: TIMELINE.GATEWAY_START }}
               >
                 <div className="flex flex-col gap-0 py-2">
                   <div onClick={() => navigate("/contact")} id="desktop-gateway-contact" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
@@ -387,9 +429,9 @@ export default function Home() {
                           initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
                           animate={isReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 50, filter: "blur(10px)" }}
                           transition={{
-                            duration: 1.0,
+                            duration: TIMELINE.NAME_CHAR_DURATION,
                             ease: [0.21, 1, 0.36, 1],
-                            delay: globalIndex * 0.04,
+                            delay: globalIndex * TIMELINE.NAME_CHAR_STAGGER,
                           }}
                         >
                           {char}
@@ -407,7 +449,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 35, filter: "blur(6px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.9, delay: 0.6, ease: [0.21, 1, 0.36, 1] }}
+            transition={{ duration: 0.9, delay: 0.85, ease: [0.21, 1, 0.36, 1] }}
             className="flex flex-col items-center w-full"
           >
             <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none self-start">
@@ -423,43 +465,42 @@ export default function Home() {
           </motion.div>
 
           {/* 3. Monologue (Scroll Reveal - Word by Word) */}
-          <div className="space-y-6 text-left w-full">
-            <motion.div
-              variants={monologueContainerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
-              className="text-[15px] leading-relaxed text-[#F6F0DF]/90 font-medium"
-            >
-              {monologueWords.map((word, idx) => (
-                <motion.span
-                  key={idx}
-                  variants={wordVariants}
-                  className={`inline-block mr-1 ${word.italic ? "font-serif italic text-[#DEDBC8]" : ""}`}
-                >
-                  {word.text}
-                </motion.span>
-              ))}
-            </motion.div>
+          <motion.div
+            variants={mobileMonologueContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            className="text-[15px] leading-relaxed text-[#F6F0DF]/90 font-medium text-left w-full"
+          >
+            {monologueWords.map((word, idx) => (
+              <motion.span
+                key={idx}
+                variants={wordVariants}
+                className={`inline-block mr-1 ${word.italic ? "font-serif italic text-[#DEDBC8]" : ""}`}
+              >
+                {word.text}
+              </motion.span>
+            ))}
+          </motion.div>
 
-            <motion.div
-              variants={bgContainerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
-              className="text-[13px] leading-relaxed text-[#F6F0DF]/60"
-            >
-              {bgParagraphWords.map((word, idx) => (
-                <motion.span
-                  key={idx}
-                  variants={wordVariants}
-                  className="inline-block mr-1"
-                >
-                  {word}
-                </motion.span>
-              ))}
-            </motion.div>
-          </div>
+          {/* 4. Background (Scroll Reveal - Word by Word) */}
+          <motion.div
+            variants={mobileBgContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            className="text-[13px] leading-relaxed text-[#F6F0DF]/60 text-left w-full"
+          >
+            {bgParagraphWords.map((word, idx) => (
+              <motion.span
+                key={idx}
+                variants={wordVariants}
+                className="inline-block mr-1"
+              >
+                {word}
+              </motion.span>
+            ))}
+          </motion.div>
 
           {/* 4. Info (Scroll Reveal) */}
           <motion.div
