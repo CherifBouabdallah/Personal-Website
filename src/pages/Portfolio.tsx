@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import Vortex from "./Vortex";
 import SoccerTeam from "./SoccerTeam";
-import { 
-  Github, 
+import {
+  Github,
   ArrowRight,
   Activity
 } from "lucide-react";
@@ -59,12 +59,20 @@ function ProjectPreview({ onClick, layoutId, bgColor, children }: {
     <motion.div
       ref={containerRef}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      tabIndex={0}
+      role="button"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       layoutId={layoutId}
       transition={{ type: "spring", stiffness: 180, damping: 25 }}
       whileHover={{ scale: 1.015 }}
-      className="w-full aspect-[16/10] border border-[#F6F0DF]/10 cursor-pointer select-none"
+      className="w-full aspect-[16/10] border border-theme-text/10 cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-text/40 focus-visible:ring-offset-2 focus-visible:ring-offset-theme-bg"
       style={{ background: bgColor, borderRadius: 20, overflow: "hidden", position: "relative", clipPath: "inset(0 round 20px)" }}
     >
       <div
@@ -78,7 +86,7 @@ function ProjectPreview({ onClick, layoutId, bgColor, children }: {
         className={`absolute inset-0 transition-all duration-300 flex items-center justify-center ${isHovered ? "bg-black/20" : "bg-transparent"}`}
         style={{ borderRadius: 20 }}
       >
-        <div className={`transition-all duration-300 bg-black/70 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/15 text-[#F6F0DF] font-mono text-[9px] tracking-[0.25em] uppercase flex items-center gap-2 ${isHovered ? "opacity-100 scale-100" : "opacity-0 scale-90"}`}>
+        <div className={`transition-all duration-300 bg-black/70 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/15 text-theme-text font-mono text-[9px] tracking-[0.25em] uppercase flex items-center gap-2 ${isHovered ? "opacity-100 scale-100" : "opacity-0 scale-90"}`}>
           <ArrowRight size={10} strokeWidth={2.5} />
           Open Project
         </div>
@@ -99,7 +107,7 @@ export default function Portfolio() {
   const [isMobile, setIsMobile] = useState(false);
   const [isVortexOpen, setIsVortexOpen] = useState(false);
   const [isSoccerOpen, setIsSoccerOpen] = useState(false);
-  
+
   const contentRef = useRef<HTMLDivElement>(null);
   const currentScrollY = useRef(0);
   const navigate = useNavigate();
@@ -115,7 +123,7 @@ export default function Portfolio() {
   });
 
   const contentY = useTransform(smoothScrollY, y => -y);
-  
+
   // Dynamic background parallax matching About page
   const bgY = useTransform(smoothScrollY, y => {
     const max = maxScrollRef.current;
@@ -296,9 +304,7 @@ export default function Portfolio() {
   };
 
   return (
-    <div className="w-full h-screen min-h-screen bg-[#223D27] text-[#F6F0DF] relative overflow-hidden touch-none selection:bg-[#F6F0DF] selection:text-[#223D27]">
-      
-
+    <div className="w-full h-screen min-h-screen bg-theme-bg text-theme-text relative overflow-hidden touch-none selection:bg-theme-text selection:text-theme-bg">
 
       {/* Large Centered Title */}
       <div className="fixed inset-0 w-full h-screen flex flex-col items-center justify-center pointer-events-none z-10">
@@ -309,7 +315,7 @@ export default function Portfolio() {
           <motion.h1
             initial="hidden"
             animate="visible"
-            className="font-maghfirea text-[clamp(2.3rem,12vw,200px)] text-[#F6F0DF] flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] px-4 w-full"
+            className="font-maghfirea text-[clamp(2.3rem,12vw,200px)] text-theme-text flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] px-4 w-full"
           >
             {(() => {
               let charCounter = 0;
@@ -358,10 +364,10 @@ export default function Portfolio() {
         className="fixed bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2.5 z-20 pointer-events-none"
       >
         <div className="flex flex-col items-center justify-center gap-2">
-          <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#F6F0DF]/60">
+          <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-theme-text/60">
             SCROLL
           </span>
-          <div className="w-[1.5px] h-[22px] bg-[#F6F0DF]/20 relative overflow-hidden">
+          <div className="w-[1.5px] h-[22px] bg-theme-text/20 relative overflow-hidden">
             <motion.div
               animate={{
                 y: ["-100%", "100%"],
@@ -371,7 +377,7 @@ export default function Portfolio() {
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
-              className="absolute inset-0 bg-[#F6F0DF]/80 h-full w-full"
+              className="absolute inset-0 bg-theme-text/80 h-full w-full"
               style={{ originY: 0 }}
             />
           </div>
@@ -398,7 +404,7 @@ export default function Portfolio() {
               initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 1.4, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="font-mono text-[9px] md:text-[11px] tracking-[0.25em] uppercase text-[#F6F0DF]/60 max-w-xl leading-relaxed mt-2"
+              className="font-mono text-[9px] md:text-[11px] tracking-[0.25em] uppercase text-theme-text/60 max-w-xl leading-relaxed mt-2"
             >
               My personnal projects along with client issued ones, mainly websites and school projects.
             </motion.p>
@@ -406,9 +412,9 @@ export default function Portfolio() {
 
           <SelfDrawingLine className="mb-12 max-w-[1440px] mx-auto" />
 
-           {/* Exhibition Grid */}
+          {/* Exhibition Grid */}
           <div className="grid grid-cols-12 gap-8 md:gap-12 w-full max-w-[1440px] mx-auto items-stretch">
-            
+
             {/* FEATURED PROJECT 1: Vortex OS Creative Sandbox */}
             <motion.div
               custom={1}
@@ -419,31 +425,31 @@ export default function Portfolio() {
               className="col-span-12"
             >
               <div className={`glass-square ${getGlassClass()} p-6 md:p-10 flex flex-col lg:flex-row gap-8 lg:gap-12 items-center text-left overflow-hidden relative group`}>
-                
+
                 {/* Text Description Column */}
                 <div className="flex-1 flex flex-col justify-center min-h-[280px]">
                   <div>
                     {/* Metadata Header */}
-                    <div className="flex justify-between items-center mb-6 border-b border-[#F6F0DF]/10 pb-4">
+                    <div className="flex justify-between items-center mb-6 border-b border-theme-text/10 pb-4">
                       <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">01 / Featured Project</span>
-                      <span className="font-mono text-[8px] tracking-wider text-[#F6F0DF]/40 uppercase px-2 py-0.5 rounded border border-[#F6F0DF]/10 bg-black/10 flex items-center gap-1.5">
+                      <span className="font-mono text-[8px] tracking-wider text-theme-text/40 uppercase px-2 py-0.5 rounded border border-theme-text/10 bg-black/10 flex items-center gap-1.5">
                         <Activity size={10} className="text-orange-500 animate-pulse" />
                         Interactive Sandbox
                       </span>
                     </div>
 
-                    <h2 className="font-maghfirea text-[clamp(1.8rem,4vw,3rem)] text-[#F6F0DF] tracking-wide mb-4 leading-tight">
+                    <h2 className="font-maghfirea text-[clamp(1.8rem,4vw,3rem)] text-theme-text tracking-wide mb-4 leading-tight">
                       Vortex Sandbox
                     </h2>
 
-                    <p className="font-mono text-[10px] md:text-[12px] leading-relaxed text-[#F6F0DF]/70 mb-6">
+                    <p className="font-mono text-[10px] md:text-[12px] leading-relaxed text-theme-text/70 mb-6">
                       An interactive digital gallery and OS mockup created to display high-performance frontend micro-interactions. Includes a ticking clock thread, custom responsive Dynamic Island widgets, parametric control docks, gooey physics morph filter elements, and custom Framer Motion spring sliders.
                     </p>
 
                     {/* Tech stack badges */}
                     <div className="flex flex-wrap gap-2 mb-8">
                       {["REACT", "FRAMER MOTION", "SVG FILTERS", "CSS KEYFRAMES", "MODULAR STATE"].map((tech) => (
-                        <span key={tech} className="font-mono text-[8px] tracking-widest text-[#F6F0DF]/80 px-2 py-1 rounded bg-[#F6F0DF]/5 border border-[#F6F0DF]/15">
+                        <span key={tech} className="font-mono text-[8px] tracking-widest text-theme-text/80 px-2 py-1 rounded bg-theme-text/5 border border-theme-text/15">
                           {tech}
                         </span>
                       ))}
@@ -454,17 +460,17 @@ export default function Portfolio() {
                   <div className="flex flex-col sm:flex-row gap-3">
                     <button
                       onClick={() => setIsVortexOpen(true)}
-                      className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#F6F0DF] text-[#223D27] font-mono text-[10px] font-bold tracking-widest hover:bg-[#F6F0DF]/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                      className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text text-theme-bg font-mono text-[10px] font-bold tracking-widest hover:bg-theme-text/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
                     >
                       OPEN PROJECT
                       <ArrowRight size={12} strokeWidth={2.5} />
                     </button>
-                    
+
                     <a
                       href="https://github.com/CherifBouabdallah"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#F6F0DF]/5 hover:bg-[#F6F0DF]/10 text-[#F6F0DF] border border-[#F6F0DF]/15 font-mono text-[10px] font-bold tracking-widest active:scale-[0.98] transition-all duration-200"
+                      className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text/5 hover:bg-theme-text/10 text-theme-text border border-theme-text/15 font-mono text-[10px] font-bold tracking-widest active:scale-[0.98] transition-all duration-200"
                     >
                       <Github size={12} />
                       SOURCE CODE
@@ -475,7 +481,11 @@ export default function Portfolio() {
                 {/* Preview Column — vertically centered */}
                 <div className="flex-1 flex items-center justify-center">
                   <div className="w-full max-w-[520px]">
-                    <ProjectPreview onClick={() => setIsVortexOpen(true)} layoutId="vortex-sandbox-card" bgColor="#141212">
+                    <ProjectPreview 
+                      onClick={() => setIsVortexOpen(true)} 
+                      layoutId="vortex-sandbox-card" 
+                      bgColor="#141212"
+                    >
                       <Vortex isPreview={true} />
                     </ProjectPreview>
                   </div>
@@ -494,31 +504,31 @@ export default function Portfolio() {
               className="col-span-12"
             >
               <div className={`glass-square ${getGlassClass()} p-6 md:p-10 flex flex-col lg:flex-row-reverse gap-8 lg:gap-12 items-center text-left overflow-hidden relative group`}>
-                
+
                 {/* Text Description Column */}
                 <div className="flex-1 flex flex-col justify-center min-h-[280px]">
                   <div>
                     {/* Metadata Header */}
-                    <div className="flex justify-between items-center mb-6 border-b border-[#F6F0DF]/10 pb-4">
+                    <div className="flex justify-between items-center mb-6 border-b border-theme-text/10 pb-4">
                       <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">02 / Featured Project</span>
-                      <span className="font-mono text-[8px] tracking-wider text-[#F6F0DF]/40 uppercase px-2 py-0.5 rounded border border-[#F6F0DF]/10 bg-black/10 flex items-center gap-1.5">
+                      <span className="font-mono text-[8px] tracking-wider text-theme-text/40 uppercase px-2 py-0.5 rounded border border-theme-text/10 bg-black/10 flex items-center gap-1.5">
                         <Activity size={10} className="text-red-500 animate-pulse" />
                         Web Design
                       </span>
                     </div>
 
-                    <h2 className="font-maghfirea text-[clamp(1.8rem,4vw,3rem)] text-[#F6F0DF] tracking-wide mb-4 leading-tight">
+                    <h2 className="font-maghfirea text-[clamp(1.8rem,4vw,3rem)] text-theme-text tracking-wide mb-4 leading-tight">
                       Olympus FC
                     </h2>
 
-                    <p className="font-mono text-[10px] md:text-[12px] leading-relaxed text-[#F6F0DF]/70 mb-6">
+                    <p className="font-mono text-[10px] md:text-[12px] leading-relaxed text-theme-text/70 mb-6">
                       A clean, modern one-page website designed for a professional soccer club. Features a light flat theme with bold sporty typography, animated stat counters, interactive squad & fixture tabs, horizontal scroll tickers, and SVG stadium illustrations with draw-on scroll animations.
                     </p>
 
                     {/* Tech stack badges */}
                     <div className="flex flex-wrap gap-2 mb-8">
                       {["REACT", "FRAMER MOTION", "RESPONSIVE", "SVG ANIMATION", "MODERN UI"].map((tech) => (
-                        <span key={tech} className="font-mono text-[8px] tracking-widest text-[#F6F0DF]/80 px-2 py-1 rounded bg-[#F6F0DF]/5 border border-[#F6F0DF]/15">
+                        <span key={tech} className="font-mono text-[8px] tracking-widest text-theme-text/80 px-2 py-1 rounded bg-theme-text/5 border border-theme-text/15">
                           {tech}
                         </span>
                       ))}
@@ -529,17 +539,17 @@ export default function Portfolio() {
                   <div className="flex flex-col sm:flex-row gap-3">
                     <button
                       onClick={() => setIsSoccerOpen(true)}
-                      className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#F6F0DF] text-[#223D27] font-mono text-[10px] font-bold tracking-widest hover:bg-[#F6F0DF]/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                      className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text text-theme-bg font-mono text-[10px] font-bold tracking-widest hover:bg-theme-text/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
                     >
                       OPEN PROJECT
                       <ArrowRight size={12} strokeWidth={2.5} />
                     </button>
-                    
+
                     <a
                       href="https://github.com/CherifBouabdallah"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#F6F0DF]/5 hover:bg-[#F6F0DF]/10 text-[#F6F0DF] border border-[#F6F0DF]/15 font-mono text-[10px] font-bold tracking-widest active:scale-[0.98] transition-all duration-200"
+                      className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text/5 hover:bg-theme-text/10 text-theme-text border border-theme-text/15 font-mono text-[10px] font-bold tracking-widest active:scale-[0.98] transition-all duration-200"
                     >
                       <Github size={12} />
                       SOURCE CODE
@@ -550,7 +560,11 @@ export default function Portfolio() {
                 {/* Preview Column — vertically centered */}
                 <div className="flex-1 flex items-center justify-center">
                   <div className="w-full max-w-[520px]">
-                    <ProjectPreview onClick={() => setIsSoccerOpen(true)} layoutId="soccer-team-card" bgColor="#FAFAF8">
+                    <ProjectPreview 
+                      onClick={() => setIsSoccerOpen(true)}
+                      layoutId="soccer-team-card" 
+                      bgColor="#FAFAF8"
+                    >
                       <SoccerTeam isPreview={true} />
                     </ProjectPreview>
                   </div>
@@ -558,13 +572,10 @@ export default function Portfolio() {
 
               </div>
             </motion.div>
-
-
-
           </div>
 
           {/* Minimal Editorial Footer */}
-          <Footer className="w-full text-center text-[#F6F0DF]/30 mt-10 z-10" />
+          <Footer className="w-full text-center text-theme-text/30 mt-10 z-10" />
 
         </motion.div>
       )}
@@ -572,14 +583,14 @@ export default function Portfolio() {
       {/* Soccer Team Preview Overlay Modal */}
       <AnimatePresence>
         {isSoccerOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 overflow-hidden cursor-pointer"
             onClick={() => setIsSoccerOpen(false)}
           >
-            <div 
+            <div
               className="w-full h-full max-w-[1280px] max-h-[85vh] relative"
               onClick={(e) => e.stopPropagation()}
             >
@@ -608,14 +619,14 @@ export default function Portfolio() {
       {/* Vortex Sandbox Overlay Modal */}
       <AnimatePresence>
         {isVortexOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 overflow-hidden cursor-pointer"
             onClick={() => setIsVortexOpen(false)}
           >
-            <div 
+            <div
               className="w-full h-full max-w-[1280px] max-h-[85vh] relative"
               onClick={(e) => e.stopPropagation()}
             >

@@ -20,15 +20,15 @@ export default function NotFound() {
   const subText = "Not Found";
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center relative bg-[#223D27] text-[#F6F0DF] overflow-hidden select-none px-6">
-      
+    <div className="w-full min-h-screen flex flex-col items-center justify-center relative bg-theme-bg text-theme-text overflow-hidden select-none px-6">
+
 
       {/* Main Content Card */}
       <div className="max-w-2xl text-center z-10 flex flex-col items-center justify-center gap-8">
-        
+
         {/* Massive Staggered 404 Heading */}
         <div className="relative">
-          <h1 className="font-maghfirea text-[clamp(6rem,18vw,260px)] text-[#F6F0DF] leading-[0.8] select-none flex justify-center gap-x-[0.05em]">
+          <h1 className="font-maghfirea text-[clamp(6rem,18vw,260px)] text-theme-text leading-[0.8] select-none flex justify-center gap-x-[0.05em]">
             {(() => {
               let charCounter = 0;
               return headingText.split("").map((char, charIndex) => {
@@ -52,7 +52,7 @@ export default function NotFound() {
               });
             })()}
           </h1>
-          
+
 
         </div>
 
@@ -61,7 +61,7 @@ export default function NotFound() {
           {/* Subtext: "Not Found" */}
           <h2 className="overflow-hidden">
             <motion.span
-              className="block font-serif italic text-2xl md:text-3xl text-[#DEDBC8]"
+              className="block font-serif italic text-2xl md:text-3xl text-theme-muted"
               initial={{ opacity: 0, y: 30 }}
               animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
@@ -75,9 +75,9 @@ export default function NotFound() {
             initial={{ opacity: 0, y: 20 }}
             animate={isReady ? { opacity: 0.65, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.6 }}
-            className="font-mono text-[11px] sm:text-xs leading-relaxed text-[#F6F0DF] tracking-wide"
+            className="font-mono text-[11px] sm:text-xs leading-relaxed text-theme-text tracking-wide"
           >
-            The page <code className="bg-black/20 px-2 py-0.5 rounded text-[#DEDBC8] text-[10px] sm:text-[11px] border border-white/5 font-semibold break-all">{location.pathname}</code> was not found on this server.
+            The page <code className="bg-black/20 px-2 py-0.5 rounded text-theme-muted text-[10px] sm:text-[11px] border border-white/5 font-semibold break-all">{location.pathname}</code> was not found on this server.
           </motion.p>
         </div>
 
@@ -90,7 +90,7 @@ export default function NotFound() {
         >
           <button
             onClick={() => navigate("/")}
-            className="group inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#F6F0DF]/5 hover:bg-[#F6F0DF]/10 text-[#F6F0DF] border border-[#F6F0DF]/15 font-mono text-[10px] font-bold tracking-widest active:scale-[0.98] transition-all duration-200 cursor-pointer"
+            className="group inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text/5 hover:bg-theme-text/10 text-theme-text border border-theme-text/15 font-mono text-[10px] font-bold tracking-widest active:scale-[0.98] transition-all duration-200 cursor-pointer"
           >
             <Home size={12} className="group-hover:-translate-y-0.5 transition-transform duration-300" />
             RETURN TO HOME PAGE

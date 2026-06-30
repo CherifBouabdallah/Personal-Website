@@ -1,5 +1,5 @@
 import { useState, useEffect, memo, Fragment } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion, Variants } from "framer-motion";
 import Footer from "../components/Footer";
 
@@ -215,15 +215,13 @@ export default function Home() {
   const nameText = "Cherif Bouabdallah";
 
   return (
-    <div className="w-full min-h-screen flex flex-col pt-24 md:pt-32 pb-8 px-6 md:px-16 lg:px-24 xl:px-32 relative bg-[#223D27] text-[#F6F0DF] select-text selection:bg-[#F6F0DF] selection:text-[#223D27]">
+    <div className="w-full min-h-screen flex flex-col pt-24 md:pt-32 pb-8 px-6 md:px-16 lg:px-24 xl:px-32 relative bg-theme-bg text-theme-text select-text selection:bg-theme-text selection:text-theme-bg">
 
       <div className="flex-1 flex flex-col w-full mx-auto max-w-7xl">
 
-        {/* Desktop Layout – A rhythmic, architectural composition */}
         <div className="hidden md:flex flex-col gap-16 w-full">
 
-          {/* 1. Name as a statement — full‑width, precise reveal */}
-          <h1 className="font-maghfirea text-[clamp(3.5rem,10vw,140px)] text-[#F6F0DF] leading-[0.9] tracking-[-0.02em] text-left w-full overflow-visible select-none">
+          <h1 className="font-maghfirea text-[clamp(3.5rem,10vw,140px)] text-theme-text leading-[0.9] tracking-[-0.02em] text-center w-full overflow-visible select-none">
             {(() => {
               let charCounter = 0;
               return nameText.split(" ").map((word, wordIndex, arr) => (
@@ -239,12 +237,12 @@ export default function Home() {
                         >
                           <motion.span
                             className="inline-block"
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                            initial={{ opacity: 0, y: 35, filter: "blur(10px)" }}
+                            animate={isReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 50, filter: "blur(10px)" }}
                             transition={{
-                              duration: TIMELINE.NAME_CHAR_DURATION,
+                              duration: 1.0,
                               ease: [0.21, 1, 0.36, 1],
-                              delay: globalIndex * TIMELINE.NAME_CHAR_STAGGER,
+                              delay: globalIndex * 0.05,
                             }}
                           >
                             {char}
@@ -259,35 +257,31 @@ export default function Home() {
             })()}
           </h1>
 
-          {/* 2. Content – asymmetric two‑column body */}
           <div className="grid grid-cols-12 gap-x-12 gap-y-16">
 
-            {/* Left: narrative */}
             <div className="col-span-7 flex flex-col gap-10">
-              {/* Monologue */}
               <motion.div
                 variants={monologueContainerVariants}
                 initial="hidden"
                 animate={isReady ? "visible" : "hidden"}
-                className="text-[16px] md:text-[19px] leading-relaxed text-[#F6F0DF]/90 font-medium"
+                className="text-[16px] md:text-[19px] leading-relaxed text-theme-text/90 font-medium"
               >
                 {monologueWords.map((word, idx) => (
                   <motion.span
                     key={idx}
                     variants={wordVariants}
-                    className={`inline-block mr-1.5 ${word.italic ? "font-serif italic text-[#DEDBC8]" : ""}`}
+                    className={`inline-block mr-1.5 ${word.italic ? "font-serif italic text-theme-muted" : ""}`}
                   >
                     {word.text}
                   </motion.span>
                 ))}
               </motion.div>
 
-              {/* Background paragraph */}
               <motion.div
                 variants={bgContainerVariants}
                 initial="hidden"
                 animate={isReady ? "visible" : "hidden"}
-                className="text-[14px] md:text-[16px] leading-relaxed text-[#F6F0DF]/50"
+                className="text-[14px] md:text-[16px] leading-relaxed text-theme-text/50"
               >
                 {bgParagraphWords.map((word, idx) => (
                   <motion.span
@@ -301,16 +295,14 @@ export default function Home() {
               </motion.div>
             </div>
 
-            {/* Right: capabilities + gateway */}
-            <div className="col-span-5 flex flex-col gap-12 border-l border-[#F6F0DF]/10 pl-10">
-              {/* Core Stack */}
+            <div className="col-span-5 flex flex-col gap-12 border-l border-theme-text/10 pl-10">
               <div>
                 <div className="font-mono text-[11px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none">
                   01 / Core Stack
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <div className="font-mono text-[9px] tracking-[0.2em] uppercase opacity-40 mb-4 select-none border-b border-[#F6F0DF]/10 pb-2">
+                    <div className="font-mono text-[9px] tracking-[0.2em] uppercase opacity-40 mb-4 select-none border-b border-theme-text/10 pb-2">
                       LANGUAGES
                     </div>
                     <div className="flex flex-col gap-3">
@@ -324,7 +316,7 @@ export default function Home() {
                             delay: TIMELINE.SKILLS_START + index * TIMELINE.SKILLS_ITEM_STAGGER,
                             ease: [0.25, 1, 0.5, 1]
                           }}
-                          className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[11px] hover:text-[#F6F0DF] transition-colors cursor-default"
+                          className="flex items-center gap-2 text-theme-text/80 font-mono text-[11px] hover:text-theme-text transition-colors cursor-default"
                         >
                           <span className="opacity-60">{skill.logo}</span> {skill.name}
                         </motion.div>
@@ -332,7 +324,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div>
-                    <div className="font-mono text-[9px] tracking-[0.2em] uppercase opacity-40 mb-4 select-none border-b border-[#F6F0DF]/10 pb-2">
+                    <div className="font-mono text-[9px] tracking-[0.2em] uppercase opacity-40 mb-4 select-none border-b border-theme-text/10 pb-2">
                       SKILLS
                     </div>
                     <div className="flex flex-col gap-3">
@@ -346,7 +338,7 @@ export default function Home() {
                             delay: TIMELINE.SKILLS_START + 0.15 + index * TIMELINE.SKILLS_ITEM_STAGGER,
                             ease: [0.25, 1, 0.5, 1]
                           }}
-                          className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[11px] hover:text-[#F6F0DF] transition-colors cursor-default"
+                          className="flex items-center gap-2 text-theme-text/80 font-mono text-[11px] hover:text-theme-text transition-colors cursor-default"
                         >
                           <span className="opacity-60">{skill.logo}</span> {skill.name}
                         </motion.div>
@@ -356,7 +348,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Gateway */}
               <div>
                 <div className="font-mono text-[11px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none">
                   02 / Gateway
@@ -371,30 +362,30 @@ export default function Home() {
                   }}
                 >
                   <div className="flex flex-col gap-0">
-                    <div
-                      onClick={() => navigate("/contact")}
+                    <Link
+                      to="/contact"
                       id="desktop-gateway-contact"
-                      className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500"
+                      className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
                     >
-                      <span className="font-mono text-[12px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">
+                      <span className="font-mono text-[12px] tracking-[0.4em] text-theme-text/60 group-hover:text-theme-text/100 group-hover:translate-x-1 transition-all duration-500">
                         CONTACT
                       </span>
-                      <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
+                      <span className="font-mono text-[10px] text-theme-text/0 group-hover:text-theme-text/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
                         →
                       </span>
-                    </div>
-                    <div
-                      onClick={() => navigate("/portfolio")}
+                    </Link>
+                    <Link
+                      to="/portfolio"
                       id="desktop-gateway-portfolio"
-                      className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500"
+                      className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
                     >
-                      <span className="font-mono text-[12px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">
+                      <span className="font-mono text-[12px] tracking-[0.4em] text-theme-text/60 group-hover:text-theme-text/100 group-hover:translate-x-1 transition-all duration-500">
                         PORTFOLIO
                       </span>
-                      <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
+                      <span className="font-mono text-[10px] text-theme-text/0 group-hover:text-theme-text/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
                         →
                       </span>
-                    </div>
+                    </Link>
                   </div>
                 </motion.div>
               </div>
@@ -421,12 +412,12 @@ export default function Home() {
                         >
                           <motion.span
                             className="inline-block"
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                            initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+                            animate={isReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 50, filter: "blur(10px)" }}
                             transition={{
-                              duration: TIMELINE.NAME_CHAR_DURATION,
+                              duration: 1.0,
                               ease: [0.21, 1, 0.36, 1],
-                              delay: globalIndex * TIMELINE.NAME_CHAR_STAGGER,
+                              delay: globalIndex * 0.05,
                             }}
                           >
                             {char}
@@ -488,14 +479,14 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-[#F6F0DF]/10 pb-2">
+                <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-theme-text/10 pb-2">
                   LANGUAGES
                 </div>
                 <div className="flex flex-col gap-3">
                   {codeLanguages.map((skill) => (
                     <div
                       key={skill.name}
-                      className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] hover:text-[#F6F0DF] transition-colors cursor-default"
+                      className="flex items-center gap-2 text-theme-text/80 font-mono text-[10px] hover:text-theme-text transition-colors cursor-default"
                     >
                       <span className="opacity-60">{skill.logo}</span> {skill.name}
                     </div>
@@ -503,14 +494,14 @@ export default function Home() {
                 </div>
               </div>
               <div>
-                <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-[#F6F0DF]/10 pb-2">
+                <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-theme-text/10 pb-2">
                   SKILLS
                 </div>
                 <div className="flex flex-col gap-3">
                   {designSkills.map((skill) => (
                     <div
                       key={skill.name}
-                      className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] hover:text-[#F6F0DF] transition-colors cursor-default"
+                      className="flex items-center gap-2 text-theme-text/80 font-mono text-[10px] hover:text-theme-text transition-colors cursor-default"
                     >
                       <span className="opacity-60">{skill.logo}</span> {skill.name}
                     </div>
@@ -532,36 +523,36 @@ export default function Home() {
               02 / Gateway
             </div>
             <div className="flex flex-col gap-0 py-2">
-              <div
-                onClick={() => navigate("/contact")}
+              <Link
+                to="/contact"
                 id="mobile-gateway-contact"
-                className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500"
+                className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
               >
-                <span className="font-mono text-[11px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">
+                <span className="font-mono text-[11px] tracking-[0.4em] text-theme-text/60 group-hover:text-theme-text group-hover:translate-x-1 transition-all duration-500">
                   CONTACT
                 </span>
-                <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
+                <span className="font-mono text-[10px] text-theme-text/0 group-hover:text-theme-text/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
                   →
                 </span>
-              </div>
-              <div
-                onClick={() => navigate("/portfolio")}
+              </Link>
+              <Link
+                to="/portfolio"
                 id="mobile-gateway-portfolio"
-                className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500"
+                className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
               >
-                <span className="font-mono text-[11px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">
+                <span className="font-mono text-[11px] tracking-[0.4em] text-theme-text/60 group-hover:text-theme-text group-hover:translate-x-1 transition-all duration-500">
                   PORTFOLIO
                 </span>
-                <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
+                <span className="font-mono text-[10px] text-theme-text/0 group-hover:text-theme-text/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
                   →
                 </span>
-              </div>
+              </Link>
             </div>
           </motion.div>
         </div>
       </div>
 
-      <Footer className="w-full text-center text-[#F6F0DF]/30 mt-auto pt-8 z-10" />
+      <Footer className="w-full text-center text-theme-text/30 mt-auto pt-8 z-10" />
     </div>
   );
 }

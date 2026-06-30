@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from "framer-motion";
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 interface VortexProps {
   isPreview?: boolean;
@@ -162,68 +162,68 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
 
       {/* 1. MOCKUP VORTEX HEADER (Fixed top edge-to-edge nav) */}
       <header className={`${isPreview ? 'absolute' : 'fixed'} top-0 left-0 right-0 w-full flex items-center justify-between border-b border-[#FDFBF7]/5 bg-[#1C1917]/85 backdrop-blur-md px-4 py-4.5 shadow-md z-30`}>
-          {/* Logo element */}
-          <div className="flex items-center cursor-pointer group" onClick={() => navigate("/")}>
-            <div className="relative mr-3 w-8 h-8 rounded-lg border-2 border-[#FDFBF7] overflow-hidden flex items-center justify-center bg-stone-950">
-              {/* Sliding cover gradient */}
-              <div className="absolute inset-[1.5px] rounded-[5px] bg-gradient-to-t from-orange-500/20 to-orange-500/90 transition-transform duration-500 ease-out group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-25" />
-              {/* Logo SVG symbol */}
-              <svg className="w-4 h-4 text-[#FDFBF7] z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        {/* Logo element */}
+        <Link to="/" className="flex items-center cursor-pointer group decoration-none text-inherit">
+          <div className="relative mr-3 w-8 h-8 rounded-lg border-2 border-[#FDFBF7] overflow-hidden flex items-center justify-center bg-stone-950">
+            {/* Sliding cover gradient */}
+            <div className="absolute inset-[1.5px] rounded-[5px] bg-gradient-to-t from-orange-500/20 to-orange-500/90 transition-transform duration-500 ease-out group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-25" />
+            {/* Logo SVG symbol */}
+            <svg className="w-4 h-4 text-[#FDFBF7] z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+          </div>
+          <span className="vortex-font-bricolage text-xl font-bold tracking-tight">Vortex</span>
+        </Link>
+
+        {/* Nav links right */}
+        <div className="flex items-center gap-4 sm:gap-6">
+          {/* Portfolio link */}
+          <a href="/portfolio" onClick={(e) => { e.preventDefault(); navigate("/portfolio"); }} className="group flex items-center text-sm font-bold text-[#FDFBF7]/70 hover:text-[#FDFBF7] transition duration-300">
+            <svg className="w-4.5 h-4.5 mr-1.5 fill-current transition-transform duration-300 group-hover:-rotate-12" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z" />
+            </svg>
+            <span className="hidden sm:inline">Portfolio</span>
+          </a>
+
+          {/* GitHub Link Button with Arrow Slide */}
+          <a
+            href="https://github.com/CherifBouabdallah"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-flex group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 overflow-hidden pl-10 pr-4 select-none h-11 border border-[#FDFBF7]/5 text-[#FDFBF7] decoration-none"
+          >
+            {/* GitHub icon left */}
+            <div className="absolute left-3.5 transition-all duration-300 group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-0 group-hover:blur-xs">
+              <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
               </svg>
             </div>
-            <span className="vortex-font-bricolage text-xl font-bold tracking-tight">Vortex</span>
-          </div>
-
-          {/* Nav links right */}
-          <div className="flex items-center gap-4 sm:gap-6">
-            {/* Portfolio link */}
-            <a href="/portfolio" onClick={(e) => { e.preventDefault(); navigate("/portfolio"); }} className="group flex items-center text-sm font-bold text-[#FDFBF7]/70 hover:text-[#FDFBF7] transition duration-300">
-              <svg className="w-4.5 h-4.5 mr-1.5 fill-current transition-transform duration-300 group-hover:-rotate-12" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z" />
+            {/* Centered label */}
+            <div className="transition-transform duration-300 group-hover:-translate-x-3.5 whitespace-nowrap">
+              View GitHub
+            </div>
+            {/* Arrow right sliding in */}
+            <div className="absolute right-3.5 translate-x-full scale-x-50 opacity-0 blur-xs transition-all duration-300 group-hover:translate-x-0 group-hover:scale-x-100 group-hover:opacity-100 group-hover:blur-none text-[#F97316]">
+              <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-              <span className="hidden sm:inline">Portfolio</span>
-            </a>
+            </div>
+          </a>
 
-            {/* GitHub Link Button with Arrow Slide */}
-            <a 
-              href="https://github.com/CherifBouabdallah"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden sm:inline-flex group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 overflow-hidden pl-10 pr-4 select-none h-11 border border-[#FDFBF7]/5 text-[#FDFBF7] decoration-none"
-            >
-              {/* GitHub icon left */}
-              <div className="absolute left-3.5 transition-all duration-300 group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-0 group-hover:blur-xs">
-                <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-              </div>
-              {/* Centered label */}
-              <div className="transition-transform duration-300 group-hover:-translate-x-3.5 whitespace-nowrap">
-                View GitHub
-              </div>
-              {/* Arrow right sliding in */}
-              <div className="absolute right-3.5 translate-x-full scale-x-50 opacity-0 blur-xs transition-all duration-300 group-hover:translate-x-0 group-hover:scale-x-100 group-hover:opacity-100 group-hover:blur-none text-[#F97316]">
-                <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </div>
-            </a>
-
-            {/* Hire Cherif Button */}
-            <button 
-              onClick={() => navigate("/contact")}
-              className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7] text-stone-900 hover:bg-[#FDFBF7]/90 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 h-11 border border-[#FDFBF7]/10 cursor-pointer"
-            >
-              {/* Gear/Star SVG badge */}
-              <svg className="mr-2 w-4 h-4 fill-current text-orange-500 animate-gear-spin-hover" viewBox="0 0 24 24">
-                <path className="animate-gear-spin-hover origin-center gear-icon" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.11-1.03-.41-2.01-.91-2.92l1.64-1.64c.39-.39.39-1.02 0-1.41l-1.41-1.41c-.39-.39-1.02-.39-1.41 0l-1.64 1.64c-.91-.5-1.89-.8-2.92-.91V3.5c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1V5.7c-1.03.11-2.01.41-2.92.91L5.03 4.97c-.39-.39-1.02-.39-1.41 0L2.21 6.38c-.39.39-.39 1.02 0 1.41l1.64 1.64c-.5.91-.8 1.89-.91 2.92H1.5c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1h1.44c.11 1.03.41 2.01.91 2.92l-1.64 1.64c-.39.39-.39 1.02 0 1.41l1.41 1.41c.39.39 1.02.39 1.41 0l1.64-1.64c.91.5 1.89.8 2.92.91v2.24c0 .55.45 1 1 1h2c.55 0 1-.45 1-1V18.3c1.03-.11 2.01-.41 2.92-.91l1.64 1.64c.39.39(1.02.39 1.41 0l1.41-1.41c.39-.39.39-1.02 0-1.41l-1.64-1.64c.5-.91.8-1.89.91-2.92h2.24c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2.24z"/>
-              </svg>
-              <span>Hire Cherif</span>
-              <span className="ml-2 rounded-md bg-stone-900 text-stone-100 text-[10px] px-1.5 py-0.5 tracking-wider uppercase font-bold">EPFL</span>
-            </button>
-          </div>
-        </header>
+          {/* Hire Cherif Button */}
+          <button
+            onClick={() => navigate("/contact")}
+            className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7] text-stone-900 hover:bg-[#FDFBF7]/90 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 h-11 border border-[#FDFBF7]/10 cursor-pointer"
+          >
+            {/* Gear/Star SVG badge */}
+            <svg className="mr-2 w-4 h-4 fill-current text-orange-500 animate-gear-spin-hover" viewBox="0 0 24 24">
+              <path className="animate-gear-spin-hover origin-center gear-icon" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.11-1.03-.41-2.01-.91-2.92l1.64-1.64c.39-.39.39-1.02 0-1.41l-1.41-1.41c-.39-.39-1.02-.39-1.41 0l-1.64 1.64c-.91-.5-1.89-.8-2.92-.91V3.5c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1V5.7c-1.03.11-2.01.41-2.92.91L5.03 4.97c-.39-.39-1.02-.39-1.41 0L2.21 6.38c-.39.39-.39 1.02 0 1.41l1.64 1.64c-.5.91-.8 1.89-.91 2.92H1.5c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1h1.44c.11 1.03.41 2.01.91 2.92l-1.64 1.64c-.39.39-.39 1.02 0 1.41l1.41 1.41c.39.39 1.02.39 1.41 0l1.64-1.64c.91.5 1.89.8 2.92.91v2.24c0 .55.45 1 1 1h2c.55 0 1-.45 1-1V18.3c1.03-.11 2.01-.41 2.92-.91l1.64 1.64c.39.39(1.02.39 1.41 0l1.41-1.41c.39-.39.39-1.02 0-1.41l-1.64-1.64c.5-.91.8-1.89.91-2.92h2.24c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2.24z" />
+            </svg>
+            <span>Hire Cherif</span>
+            <span className="ml-2 rounded-md bg-stone-900 text-stone-100 text-[10px] px-1.5 py-0.5 tracking-wider uppercase font-bold">EPFL</span>
+          </button>
+        </div>
+      </header>
 
       {/* Outer wrapper max-w container */}
       <div className={`w-full max-w-[1440px] px-6 sm:px-12 md:px-16 flex flex-col items-center gap-16 relative z-10 ${isPreview ? 'pt-28' : 'pt-40'}`}>
@@ -239,10 +239,10 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
               <span className="relative z-10">Devs</span>
               {/* Elegant hand-drawn highlighter loop circling 'Devs' */}
               <svg className="absolute -inset-1 sm:-inset-2 w-full h-full text-orange-500 overflow-visible" viewBox="0 0 100 40" preserveAspectRatio="none" fill="none">
-                <motion.path 
-                  d="M10,25 C15,10 40,5 85,12 C95,14 98,22 80,32 C60,40 25,38 12,30 C3,22 8,12 55,6 C75,3 90,8 96,12" 
-                  stroke="currentColor" 
-                  strokeWidth="2.5" 
+                <motion.path
+                  d="M10,25 C15,10 40,5 85,12 C95,14 98,22 80,32 C60,40 25,38 12,30 C3,22 8,12 55,6 C75,3 90,8 96,12"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
                   strokeLinecap="round"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
@@ -251,7 +251,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
               </svg>
             </mark>
           </h1>
-          
+
           <p className="max-w-xl mx-auto text-base sm:text-lg text-[#FDFBF7]/60 leading-relaxed font-medium">
             An interactive creative tech sandbox showcasing high-performance web engineering. Test custom spring models, gooey filters, keyframe physics, and dynamic HUD widgets.
           </p>
@@ -272,10 +272,10 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
                 </svg>
               </div>
             </button>
-            
+
             <button onClick={() => navigate("/contact")} className="group relative inline-flex items-center justify-center rounded-2xl bg-[#FDFBF7]/10 text-[#FDFBF7] font-bold px-6 py-4 text-base transition duration-300 border border-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 cursor-pointer">
               <svg className="mr-2.5 w-5 h-5 fill-current text-orange-500 group-hover:rotate-180 transition-transform duration-500" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
               </svg>
               <span>Get In Touch</span>
               <span className="ml-2 rounded-lg bg-stone-950 px-2 py-0.5 text-xs text-[#FDFBF7]/80">EPFL</span>
@@ -308,7 +308,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
             {/* Lock Screen View overlay */}
             <AnimatePresence>
               {isLocked && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 1 }}
                   exit={{ opacity: 0, scale: 1.05 }}
                   transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -318,7 +318,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
                   {/* Status header */}
                   <div className="w-full flex items-center justify-between text-xs font-semibold text-[#FDFBF7]/60">
                     <div className="flex items-center gap-1.5">
-                      <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.17 19.58 10.53 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+                      <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.17 19.58 10.53 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" /></svg>
                       <span>Vortex LAN</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -333,11 +333,11 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
                   <div className="flex flex-col items-center text-center gap-4">
                     <span className="text-stone-300/80 text-sm font-semibold tracking-wider uppercase select-none">{dateStr}</span>
                     <h2 className="text-6xl sm:text-8xl font-bold tracking-tight text-[#FDFBF7]/90 select-none tabular-nums">{timeStr}</h2>
-                    
+
                     {/* Weather dock widget */}
                     <div className="flex items-center gap-3 bg-stone-900/60 border border-[#FDFBF7]/10 rounded-2xl px-4 py-2 mt-2 backdrop-blur-md">
                       <svg className="w-5 h-5 text-orange-400" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5c.55 0 1-.45 1-1V1c0-.55-.45-1-1-1s-1 .45-1 1v1c0 .55.45 1 1 1zm0 20c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1s1-.45 1-1v-1c0-.55-.45-1-1-1zm10-10c0-.55-.45-1-1-1h-1c-.55 0-1 .45-1 1s.45 1 1 1h1c.55 0 1-.45 1-1zM4 12c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1h1c.55 0 1-.45 1-1zm14.36-6.95c-.39-.39-1.02-.39-1.41 0s-.39 1.02 0 1.41l.71.71c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41l-.71-.71zm-12.02 12c-.39-.39-1.02-.39-1.41 0s-.39 1.02 0 1.41l.71.71c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41l-.71-.71z"/>
+                        <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5c.55 0 1-.45 1-1V1c0-.55-.45-1-1-1s-1 .45-1 1v1c0 .55.45 1 1 1zm0 20c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1s1-.45 1-1v-1c0-.55-.45-1-1-1zm10-10c0-.55-.45-1-1-1h-1c-.55 0-1 .45-1 1s.45 1 1 1h1c.55 0 1-.45 1-1zM4 12c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1h1c.55 0 1-.45 1-1zm14.36-6.95c-.39-.39-1.02-.39-1.41 0s-.39 1.02 0 1.41l.71.71c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41l-.71-.71zm-12.02 12c-.39-.39-1.02-.39-1.41 0s-.39 1.02 0 1.41l.71.71c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41l-.71-.71z" />
                       </svg>
                       <span className="text-xs font-bold text-[#FDFBF7]/80">Paris</span>
                       <span className="w-[1px] h-3 bg-[#FDFBF7]/20" />
@@ -355,7 +355,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
 
             {/* Unlocked Desktop View */}
             <div className="absolute inset-0 flex flex-col justify-between">
-              
+
               {/* macOS Menu bar */}
               <div className="w-full h-8 bg-black/40 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 text-[11px] font-medium text-stone-200 select-none z-10">
                 <div className="flex items-center gap-4">
@@ -378,34 +378,44 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
 
               {/* Dynamic Island Notch Component */}
               <div className="flex-1 flex flex-col items-center justify-start pt-8 relative">
-                
+
                 {/* Simulated Dynamic Island notch */}
                 <div className="relative z-30">
-                  <motion.div 
+                  <motion.div
                     layout
                     id="dev-dynamic-island"
-                    className="bg-black/95 text-stone-100 border border-white/10 shadow-2xl flex flex-col overflow-hidden rounded-[24px] cursor-pointer"
+                    className="bg-black/95 text-stone-100 border border-white/10 shadow-2xl flex flex-col overflow-hidden rounded-[24px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                    tabIndex={0}
+                    role="button"
+                    aria-expanded={isIslandExpanded}
+                    aria-label="Toggle dynamic island expansion panel"
                     style={{ transformOrigin: "top center" }}
                     initial={{ width: 130, height: 28 }}
                     animate={isIslandExpanded ? { width: 320, height: 168, borderRadius: 28 } : { width: 130, height: 28, borderRadius: 18 }}
                     onClick={() => setIsIslandExpanded(!isIslandExpanded)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setIsIslandExpanded(!isIslandExpanded);
+                      }
+                    }}
                     transition={{ type: "spring", stiffness: 200, damping: 18 }}
                   >
                     <AnimatePresence mode="wait">
                       {!isIslandExpanded ? (
-                        <motion.div 
-                           key="island-collapsed"
-                           initial={{ opacity: 0 }}
-                           animate={{ opacity: 1 }}
-                           exit={{ opacity: 0 }}
-                           transition={{ duration: 0.15 }}
-                           className="w-full h-full flex items-center justify-between px-3 text-[9px]"
+                        <motion.div
+                          key="island-collapsed"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.15 }}
+                          className="w-full h-full flex items-center justify-between px-3 text-[9px]"
                         >
                           <div className="flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-orange-500 pulse-breathe" />
                             <span className="font-mono tracking-widest text-orange-500 font-bold">VORTEX</span>
                           </div>
-                          
+
                           <div className="flex items-center gap-1 text-[#FDFBF7]/40 font-mono">
                             {isPlaying && (
                               <span className="flex items-end gap-[1px] h-2">
@@ -418,7 +428,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
                           </div>
                         </motion.div>
                       ) : (
-                        <motion.div 
+                        <motion.div
                           key="island-expanded"
                           initial={{ opacity: 0, y: 4 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -430,21 +440,21 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
                           {/* Expanded Header Tab Selector */}
                           <div className="flex justify-between items-center pb-2 border-b border-white/5 select-none">
                             <div className="flex gap-2">
-                              <button 
+                              <button
                                 onClick={() => setIslandTab("music")}
                                 className={`text-[9px] font-mono tracking-wider px-2 py-0.5 rounded transition-colors ${islandTab === "music" ? "bg-white/10 text-white font-bold" : "text-white/40 hover:text-white/70"}`}
                               >
                                 🎵 PLAYER
                               </button>
-                              <button 
+                              <button
                                 onClick={() => setIslandTab("system")}
                                 className={`text-[9px] font-mono tracking-wider px-2 py-0.5 rounded transition-colors ${islandTab === "system" ? "bg-white/10 text-white font-bold" : "text-white/40 hover:text-white/70"}`}
                               >
                                 📊 SYSTEM
                               </button>
                             </div>
-                            <button 
-                              onClick={() => setIsIslandExpanded(false)} 
+                            <button
+                              onClick={() => setIsIslandExpanded(false)}
                               className="text-white/30 hover:text-white text-[9px] font-mono"
                             >
                               [close]
@@ -465,7 +475,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
                                 {islandTab === "music" ? (
                                   <div className="w-full flex items-center justify-between gap-4 text-left">
                                     {/* Album Art rotates if music is playing */}
-                                    <motion.div 
+                                    <motion.div
                                       animate={isPlaying ? { rotate: 360 } : {}}
                                       transition={{ duration: 8, ease: "linear", repeat: Infinity }}
                                       className="w-12 h-12 rounded-full bg-stone-900 border border-white/10 flex items-center justify-center relative shadow-inner overflow-hidden"
@@ -476,15 +486,15 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
                                       </div>
                                       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.8)_90%)]" />
                                     </motion.div>
-                                    
+
                                     <div className="flex-1 flex flex-col gap-1.5">
                                       <div className="flex justify-between items-baseline select-none">
                                         <span className="text-[10px] font-bold text-[#FDFBF7]">Calm Horizons</span>
                                         <span className="text-[8px] font-mono text-[#FDFBF7]/40">Vortex</span>
                                       </div>
-                                      
+
                                       {/* Interactive Progress timeline bar */}
-                                      <div 
+                                      <div
                                         className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden relative cursor-pointer"
                                         onClick={(e) => {
                                           const rect = e.currentTarget.getBoundingClientRect();
@@ -496,8 +506,8 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
                                         <div className="h-full bg-orange-500 rounded-full" style={{ width: `${musicProgress}%` }} />
                                       </div>
                                     </div>
-                                    
-                                    <button 
+
+                                    <button
                                       onClick={() => setIsPlaying(!isPlaying)}
                                       className="w-8 h-8 rounded-full bg-[#FDFBF7]/5 hover:bg-[#FDFBF7]/15 border border-white/10 flex items-center justify-center text-[10px] transition active:scale-90 cursor-pointer"
                                     >
@@ -514,9 +524,9 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
                                       </div>
                                       {/* Line graph line representation */}
                                       <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden relative">
-                                        <motion.div 
-                                          animate={{ width: `${cpuLoad * 4}%` }} 
-                                          className="h-full bg-orange-500 rounded-full" 
+                                        <motion.div
+                                          animate={{ width: `${cpuLoad * 4}%` }}
+                                          className="h-full bg-orange-500 rounded-full"
                                           transition={{ duration: 0.5 }}
                                         />
                                       </div>
@@ -528,9 +538,9 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
                                         <span className="text-[8px] text-[#FDFBF7]/30 font-semibold">RAM USED</span>
                                       </div>
                                       <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden relative">
-                                        <motion.div 
-                                          animate={{ width: `${(memLoad / 16) * 100}%` }} 
-                                          className="h-full bg-[#FDFBF7]/40 rounded-full" 
+                                        <motion.div
+                                          animate={{ width: `${(memLoad / 16) * 100}%` }}
+                                          className="h-full bg-[#FDFBF7]/40 rounded-full"
                                           transition={{ duration: 0.5 }}
                                         />
                                       </div>
@@ -592,7 +602,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
         {/* 4. THE 8 FEATURE CARDS GRID WITH SIGNATURE HOVER EFFECTS   */}
         {/* ========================================================= */}
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-[1440px] text-center">
-          
+
           {/* Card 1: Fluid Transitions (Gooey Circles) */}
           <div className="group relative flex flex-col items-center justify-center p-6 bg-stone-900/40 border border-stone-800 rounded-3xl min-h-[220px] transition-all duration-300 hover:bg-stone-900/60 hover:border-orange-500/30 shadow-lg cursor-pointer">
             <span className="font-mono text-[8px] uppercase tracking-wider text-orange-500 mb-2 font-bold px-2 py-0.5 rounded bg-orange-950/20 border border-orange-500/10">framer-motion / svg filter</span>
@@ -600,7 +610,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
               <div className="flex items-center justify-center space-x-3.5 gooey-filter-container relative w-24 h-16">
                 <div className="w-9 h-9 rounded-full bg-[#FDFBF7] transition-all duration-500 ease-out group-hover:translate-x-7" />
                 <div className="w-6 h-6 rounded-full bg-[#FDFBF7] transition-all duration-500 ease-out group-hover:-translate-x-7" />
-                
+
                 {/* SVG Gooey filter */}
                 <svg className="absolute w-0 h-0">
                   <defs>
@@ -626,10 +636,10 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
               <div className="relative">
                 {/* Notification Badge dot */}
                 <div className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-orange-500 border border-stone-950 transition-transform duration-300 group-hover:scale-125 z-10" />
-                
+
                 {/* Bell SVG */}
                 <svg className="w-12 h-12 fill-current text-[#FDFBF7] bell-animate origin-top" viewBox="0 0 24 24">
-                  <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                  <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
                 </svg>
               </div>
             </div>
@@ -661,7 +671,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
           <div className="group relative flex flex-col items-center justify-center p-6 bg-stone-900/40 border border-stone-800 rounded-3xl min-h-[220px] transition-all duration-300 hover:bg-stone-900/60 hover:border-orange-500/30 shadow-lg cursor-pointer">
             <span className="font-mono text-[8px] uppercase tracking-wider text-orange-500 mb-2 font-bold px-2 py-0.5 rounded bg-orange-950/20 border border-orange-500/10">touch api / event handlers</span>
             <div className="h-20 flex items-center justify-center mb-2 overflow-visible relative">
-              
+
               {/* Ripple curves fading in and scaling */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <svg className="w-16 h-16 text-orange-500/40 fill-none stroke-current stroke-2 overflow-visible" viewBox="0 0 24 24">
@@ -673,7 +683,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
 
               {/* Hand cursor icon */}
               <svg className="w-10 h-10 fill-current text-[#FDFBF7] transition-all duration-300 origin-bottom group-hover:-rotate-12 group-hover:translate-x-1.5 group-hover:-translate-y-1.5" viewBox="0 0 24 24">
-                <path d="M12 24c6.63 0 12-5.37 12-12S18.63 0 12 0 0 5.37 0 12s5.37 12 12 12zm-1-19.4c0-.33.27-.6.6-.6s.6.27.6.6v7.3h-1.2V4.6zm-2.4 1.7c0-.33.27-.6.6-.6s.6.27.6.6v5.6H8.6V6.3zm4.8.8c0-.33.27-.6.6-.6s.6.27.6.6v4.8h-1.2V7.1zm2.4 1.7c0-.33.27-.6.6-.6s.6.27.6.6v3.2h-1.2V8.8z"/>
+                <path d="M12 24c6.63 0 12-5.37 12-12S18.63 0 12 0 0 5.37 0 12s5.37 12 12 12zm-1-19.4c0-.33.27-.6.6-.6s.6.27.6.6v7.3h-1.2V4.6zm-2.4 1.7c0-.33.27-.6.6-.6s.6.27.6.6v5.6H8.6V6.3zm4.8.8c0-.33.27-.6.6-.6s.6.27.6.6v4.8h-1.2V7.1zm2.4 1.7c0-.33.27-.6.6-.6s.6.27.6.6v3.2h-1.2V8.8z" />
               </svg>
             </div>
             <h3 className="text-base font-bold text-[#FDFBF7] tracking-tight">Gesture Interaction</h3>
@@ -688,7 +698,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
             <div className="h-20 flex flex-col items-center justify-center mb-2 overflow-visible relative">
               {/* Sparkle star pops up */}
               <svg className="absolute w-4 h-4 fill-current text-orange-500 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-[-24px] group-hover:scale-125 transition-all duration-500" viewBox="0 0 24 24">
-                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
               </svg>
 
               {/* Present Lid */}
@@ -699,7 +709,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
               {/* Present Box base */}
               <svg className="w-10 h-8 fill-current text-[#FDFBF7]/80 mt-[-1px]" viewBox="0 0 20 16">
                 <rect x="1" y="0" width="18" height="15" rx="1" />
-                <path d="M8 0h4v15H8z" className="text-[#FDFBF7]"/>
+                <path d="M8 0h4v15H8z" className="text-[#FDFBF7]" />
               </svg>
             </div>
             <h3 className="text-base font-bold text-[#FDFBF7] tracking-tight">Vector Animations</h3>
@@ -756,7 +766,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
             <span className="font-mono text-[8px] uppercase tracking-wider text-orange-500 mb-2 font-bold px-2 py-0.5 rounded bg-orange-950/20 border border-orange-500/10">svg line drawing</span>
             <div className="h-20 flex items-center justify-center mb-2 overflow-visible">
               <svg className="w-12 h-12 text-[#FDFBF7] group-hover:text-orange-500 transition-colors duration-300 overflow-visible" viewBox="0 0 24 24">
-                <motion.path 
+                <motion.path
                   d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
                   fill="none"
                   stroke="currentColor"
@@ -788,7 +798,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
         {/* 5. CALL TO ACTION SECTION (Zen Browser style button)       */}
         {/* ========================================================= */}
         <section className="w-full max-w-2xl flex justify-center mt-6">
-          <div 
+          <div
             onClick={() => navigate("/contact")}
             className="w-full border-2 border-stone-800 hover:border-orange-500/40 rounded-[32px] p-8 flex flex-col items-center justify-center gap-5 cursor-pointer group transition-all duration-500 bg-stone-900/30 relative overflow-hidden text-center shadow-2xl"
           >
@@ -801,7 +811,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
             <span className="vortex-font-mono text-[9px] tracking-[0.3em] uppercase text-orange-500 font-bold">
               03 / INVITATION GATEWAY
             </span>
-            
+
             <h3 className="vortex-font-bricolage text-3xl sm:text-4xl text-[#FDFBF7] tracking-tight block relative">
               Start A Project With Cherif
               <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-orange-500 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />

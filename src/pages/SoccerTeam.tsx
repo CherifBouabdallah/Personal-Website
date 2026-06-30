@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform, useInView, useSpring, Variants, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 interface SoccerTeamProps {
   isPreview?: boolean;
@@ -251,23 +251,24 @@ export default function SoccerTeam({ isPreview = false }: SoccerTeamProps) {
           className="py-3 px-4 md:px-6"
         >
           {/* Logo */}
-          <div
-            style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
-            onClick={() => !isPreview && navigate("/portfolio")}
+          <Link
+            to={isPreview ? "#" : "/portfolio"}
+            style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", textDecoration: "none", color: "inherit" }}
+            onClick={(e) => isPreview && e.preventDefault()}
           >
             <div style={{
               width: 36, height: 36, borderRadius: 8,
               background: C.accent, display: "flex", alignItems: "center", justifyContent: "center",
             }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
               </svg>
             </div>
             <div>
               <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "1.1rem", lineHeight: 1, letterSpacing: "-0.01em", color: C.text }}>OLYMPUS FC</div>
               <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 500, fontSize: "0.55rem", letterSpacing: "0.2em", color: C.light, textTransform: "uppercase" }}>EST. 2019</div>
             </div>
-          </div>
+          </Link>
 
           {/* Nav links */}
           <nav style={{ display: "flex", alignItems: "center", gap: "1.5rem" }} className="gap-3 sm:gap-6">
@@ -337,7 +338,7 @@ export default function SoccerTeam({ isPreview = false }: SoccerTeamProps) {
             border: `1px solid ${C.border}`,
           }}>
             <svg width="36" height="36" viewBox="0 0 24 24" fill={C.accent}>
-              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
             </svg>
           </div>
         </motion.div>
@@ -570,7 +571,7 @@ export default function SoccerTeam({ isPreview = false }: SoccerTeamProps) {
           <div style={{ flex: "1 1 320px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: "1rem" }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill={C.accent}>
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
               </svg>
               <span style={{
                 fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700,
@@ -624,20 +625,20 @@ export default function SoccerTeam({ isPreview = false }: SoccerTeamProps) {
                 initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }}
                 viewport={{ once: true }} transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
               />
-              <rect x="55" y="95" width="130" height="55" rx="3" fill={C.accentLight} stroke={C.accent} strokeWidth="0.5" strokeOpacity="0.2"/>
-              <circle cx="120" cy="122" r="12" stroke={C.accent} strokeWidth="0.5" fill="none" strokeOpacity="0.25"/>
-              <circle cx="120" cy="122" r="1.5" fill={C.accent} fillOpacity="0.3"/>
-              <line x1="120" y1="95" x2="120" y2="150" stroke={C.accent} strokeWidth="0.5" strokeOpacity="0.15"/>
-              <rect x="85" y="95" width="70" height="18" rx="1" fill="none" stroke={C.accent} strokeWidth="0.5" strokeOpacity="0.12"/>
-              <rect x="85" y="132" width="70" height="18" rx="1" fill="none" stroke={C.accent} strokeWidth="0.5" strokeOpacity="0.12"/>
+              <rect x="55" y="95" width="130" height="55" rx="3" fill={C.accentLight} stroke={C.accent} strokeWidth="0.5" strokeOpacity="0.2" />
+              <circle cx="120" cy="122" r="12" stroke={C.accent} strokeWidth="0.5" fill="none" strokeOpacity="0.25" />
+              <circle cx="120" cy="122" r="1.5" fill={C.accent} fillOpacity="0.3" />
+              <line x1="120" y1="95" x2="120" y2="150" stroke={C.accent} strokeWidth="0.5" strokeOpacity="0.15" />
+              <rect x="85" y="95" width="70" height="18" rx="1" fill="none" stroke={C.accent} strokeWidth="0.5" strokeOpacity="0.12" />
+              <rect x="85" y="132" width="70" height="18" rx="1" fill="none" stroke={C.accent} strokeWidth="0.5" strokeOpacity="0.12" />
               {[30, 210].map(x => (
                 <g key={x}>
-                  <line x1={x} y1="120" x2={x} y2="35" stroke={C.accent} strokeWidth="1.5" strokeOpacity="0.2"/>
-                  <circle cx={x} cy="35" r="3" fill={C.accent} fillOpacity="0.15"/>
-                  <circle cx={x} cy="35" r="1.5" fill={C.accent} fillOpacity="0.4"/>
+                  <line x1={x} y1="120" x2={x} y2="35" stroke={C.accent} strokeWidth="1.5" strokeOpacity="0.2" />
+                  <circle cx={x} cy="35" r="3" fill={C.accent} fillOpacity="0.15" />
+                  <circle cx={x} cy="35" r="1.5" fill={C.accent} fillOpacity="0.4" />
                 </g>
               ))}
-              <line x1="10" y1="135" x2="230" y2="135" stroke={C.border} strokeWidth="0.5"/>
+              <line x1="10" y1="135" x2="230" y2="135" stroke={C.border} strokeWidth="0.5" />
             </svg>
           </div>
         </motion.div>
@@ -661,7 +662,7 @@ export default function SoccerTeam({ isPreview = false }: SoccerTeamProps) {
                 background: C.accentLight, display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill={C.accent}>
-                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
                 </svg>
               </div>
               <span style={{

@@ -1,9 +1,16 @@
 @import "tailwindcss";
 
+:root {
+  --theme-bg: #223D27;
+  --theme-text: #F6F0DF;
+  --theme-muted: #DEDBC8;
+}
+
 html,
 body {
   overscroll-behavior: none;
-  background-color: #223D27;
+  background-color: var(--theme-bg);
+  color: var(--theme-text);
 }
 
 @font-face {
@@ -19,6 +26,7 @@ body {
   --font-maghfirea: "Maghfirea", serif;
   --color-theme-text: var(--theme-text, #F6F0DF);
   --color-theme-bg: var(--theme-bg, #223D27);
+  --color-theme-muted: var(--theme-muted, #DEDBC8);
 }
 
 
@@ -32,23 +40,23 @@ body {
   border-radius: 24px;
   /* CSS containment: isolates layout recalculations during scroll/animation */
   contain: layout style;
-  box-shadow: 
+  box-shadow:
     1px -1px 2px hsl(0 0% 100% / 0.5) inset,
     0px -1px 2px hsl(0 0% 100% / 0.5) inset,
     -1px -1px 2px hsl(0 0% 100% / 0.5) inset,
     1px 1px 2px hsl(0 0% 30% / 0.5) inset,
     -8px 4px 10px -6px hsl(0 0% 30% / 0.25) inset,
     -1px 1px 6px hsl(0 0% 30% / 0.25) inset,
-    -1px -1px 8px rgba(0, 0, 0, 0.1), 
+    -1px -1px 8px rgba(0, 0, 0, 0.1),
     1px 1px 2px rgba(0, 0, 0, 0.1),
     2px 2px 6px rgba(0, 0, 0, 0.15),
     -2px -1px 2px hsl(0 0% 100% / 0.25) inset,
     3px 6px 16px -6px rgba(0, 0, 0, 0.3);
-  transition: 
-    border-color 0.4s ease, 
-    background-color 0.4s ease, 
+  transition:
+    border-color 0.4s ease,
+    background-color 0.4s ease,
     background-image 0.4s ease,
-    box-shadow 0.4s ease, 
+    box-shadow 0.4s ease,
     backdrop-filter 0.4s ease,
     border-radius 0.4s ease,
     transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -67,6 +75,7 @@ body {
   border: 1px solid rgba(246, 240, 223, 0.08);
   box-shadow: none !important;
 }
+
 .glass-square.glass-deep-blur:hover {
   background: rgba(246, 240, 223, 0.05);
   border-color: rgba(246, 240, 223, 0.15);
@@ -81,18 +90,19 @@ body {
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
   border: 1px solid rgba(246, 240, 223, 0.22);
-  background-image: 
+  background-image:
     radial-gradient(rgba(246, 240, 223, 0.08) 1px, transparent 0),
     radial-gradient(rgba(246, 240, 223, 0.04) 1px, transparent 0);
   background-size: 8px 8px;
   background-position: 0 0, 4px 4px;
-  box-shadow: 
+  box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.05),
     0 15px 30px rgba(0, 0, 0, 0.15);
 }
+
 .glass-square.glass-frosted-blur:hover {
   background: rgba(246, 240, 223, 0.1);
-  background-image: 
+  background-image:
     radial-gradient(rgba(246, 240, 223, 0.12) 1px, transparent 0),
     radial-gradient(rgba(246, 240, 223, 0.06) 1px, transparent 0);
   border-color: rgba(246, 240, 223, 0.3);
@@ -106,11 +116,12 @@ body {
   backdrop-filter: blur(35px);
   -webkit-backdrop-filter: blur(35px);
   border: 1px solid rgba(246, 240, 223, 0.12);
-  box-shadow: 
+  box-shadow:
     inset 0 10px 20px rgba(246, 240, 223, 0.03),
     inset 0 -5px 15px rgba(0, 0, 0, 0.15),
     0 20px 40px rgba(0, 0, 0, 0.2);
 }
+
 .glass-square.glass-emerald-blur:hover {
   background: rgba(34, 61, 39, 0.32);
   border-color: rgba(246, 240, 223, 0.22);
@@ -124,15 +135,17 @@ body {
 }
 
 .no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 /* Stable active text weight switch trick */
 a[data-text]::after {
   content: attr(data-text);
-  content: attr(data-text) / "";
   height: 0;
+  display: block;
   visibility: hidden;
   overflow: hidden;
   user-select: none;
@@ -144,9 +157,17 @@ a[data-text]::after {
 .pulse-breathe {
   animation: pulse-breathe 2.8s ease-in-out infinite;
 }
+
 @keyframes pulse-breathe {
-  0%, 100% { opacity: 0.35; transform: scale(0.96); }
-  50% { opacity: 1; transform: scale(1.04); }
+
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.96);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
 }
-
-
