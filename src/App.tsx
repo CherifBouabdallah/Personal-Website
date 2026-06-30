@@ -154,17 +154,21 @@ export default function App() {
           className={`w-full min-h-screen relative ${isScrollable ? "flex flex-col items-stretch justify-start" : "flex items-center justify-center"}`}
         >
           {/* Liquid Navbar at top middle */}
-          {!["/vortex", "/soccer-team"].includes(location.pathname) && (
-            <div className="absolute top-6 md:top-8 left-1/2 -translate-x-1/2 z-50">
+          <AnimatePresence>
+            {!["/vortex", "/soccer-team"].includes(location.pathname) && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
+                key="navbar-wrapper"
+                initial={{ opacity: 0, y: -15, x: "-50%" }}
+                animate={{ opacity: 1, y: 0, x: "-50%" }}
+                exit={{ opacity: 0, y: -15, x: "-50%" }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute top-6 md:top-8 left-1/2 z-50"
               >
                 <LiquidNavbar />
               </motion.div>
-            </div>
-          )}
+            )}
+          </AnimatePresence>
+
 
           {/* Main Content */}
           <Suspense fallback={null}>

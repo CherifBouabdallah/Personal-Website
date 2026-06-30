@@ -35,9 +35,10 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
               key={path}
               href={path}
               onClick={(e) => handleNavClick(path, e)}
-              className={`relative font-mono text-[9px] sm:text-[10px] tracking-[0.25em] uppercase transition-all duration-300 py-1.5 cursor-pointer decoration-none ${
+              className={`relative font-mono text-[9px] sm:text-[10px] tracking-[0.25em] uppercase transition-all duration-300 py-1.5 cursor-pointer decoration-none inline-flex flex-col items-center justify-center ${
                 active ? "text-[#F6F0DF] font-bold" : "text-[#F6F0DF]/55 hover:text-[#F6F0DF]/90"
               }`}
+              data-text={label}
             >
               {label}
               {active && (

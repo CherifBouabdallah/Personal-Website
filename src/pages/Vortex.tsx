@@ -301,8 +301,8 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
 
             {/* Aurora blur radial overlays for custom desktop feels */}
             <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
-              <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full blur-[100px] animate-pulse" />
-              <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-500 rounded-full blur-[100px] animate-pulse" />
+              <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full blur-[100px] pulse-breathe" />
+              <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-500 rounded-full blur-[100px] pulse-breathe" />
             </div>
 
             {/* Lock Screen View overlay */}
@@ -402,7 +402,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
                            className="w-full h-full flex items-center justify-between px-3 text-[9px]"
                         >
                           <div className="flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-orange-500 pulse-breathe" />
                             <span className="font-mono tracking-widest text-orange-500 font-bold">VORTEX</span>
                           </div>
                           
@@ -452,82 +452,93 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
                           </div>
 
                           {/* Expanded Body Content */}
-                          <div className="flex-1 flex items-center mt-2.5">
-                            {islandTab === "music" ? (
-                              <div className="w-full flex items-center justify-between gap-4 text-left">
-                                {/* Album Art rotates if music is playing */}
-                                <motion.div 
-                                  animate={isPlaying ? { rotate: 360 } : {}}
-                                  transition={{ duration: 8, ease: "linear", repeat: Infinity }}
-                                  className="w-12 h-12 rounded-full bg-stone-900 border border-white/10 flex items-center justify-center relative shadow-inner overflow-hidden"
-                                >
-                                  {/* Vinyl labels */}
-                                  <div className="absolute w-4 h-4 rounded-full bg-orange-500 border border-black z-10 flex items-center justify-center">
-                                    <div className="w-1 h-1 rounded-full bg-black" />
-                                  </div>
-                                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.8)_90%)]" />
-                                </motion.div>
-                                
-                                <div className="flex-1 flex flex-col gap-1.5">
-                                  <div className="flex justify-between items-baseline select-none">
-                                    <span className="text-[10px] font-bold text-[#FDFBF7]">Calm Horizons</span>
-                                    <span className="text-[8px] font-mono text-[#FDFBF7]/40">Vortex</span>
-                                  </div>
-                                  
-                                  {/* Interactive Progress timeline bar */}
-                                  <div 
-                                    className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden relative cursor-pointer"
-                                    onClick={(e) => {
-                                      const rect = e.currentTarget.getBoundingClientRect();
-                                      const clickX = e.clientX - rect.left;
-                                      const percentage = Math.round((clickX / rect.width) * 100);
-                                      setMusicProgress(percentage);
-                                    }}
-                                  >
-                                    <div className="h-full bg-orange-500 rounded-full" style={{ width: `${musicProgress}%` }} />
-                                  </div>
-                                </div>
-                                
-                                <button 
-                                  onClick={() => setIsPlaying(!isPlaying)}
-                                  className="w-8 h-8 rounded-full bg-[#FDFBF7]/5 hover:bg-[#FDFBF7]/15 border border-white/10 flex items-center justify-center text-[10px] transition active:scale-90 cursor-pointer"
-                                >
-                                  {isPlaying ? "⏸" : "▶"}
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="w-full grid grid-cols-2 gap-4 text-left">
-                                <div className="flex flex-col justify-center gap-1">
-                                  <span className="text-[7.5px] font-mono text-[#FDFBF7]/40 tracking-wider uppercase">VORTEX PROCESS</span>
-                                  <div className="flex items-baseline gap-1.5">
-                                    <span className="text-sm font-mono font-bold text-orange-500">{cpuLoad}%</span>
-                                    <span className="text-[8px] text-[#FDFBF7]/30 font-semibold">CPU LOAD</span>
-                                  </div>
-                                  {/* Line graph line representation */}
-                                  <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden relative">
+                          <div className="flex-1 flex items-stretch mt-2.5 min-h-[50px]">
+                            <AnimatePresence mode="wait">
+                              <motion.div
+                                key={islandTab}
+                                initial={{ opacity: 0, scale: 0.98, filter: "blur(2px)" }}
+                                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                                exit={{ opacity: 0, scale: 0.98, filter: "blur(2px)" }}
+                                transition={{ duration: 0.18, ease: "easeOut" }}
+                                className="w-full flex items-center"
+                              >
+                                {islandTab === "music" ? (
+                                  <div className="w-full flex items-center justify-between gap-4 text-left">
+                                    {/* Album Art rotates if music is playing */}
                                     <motion.div 
-                                      animate={{ width: `${cpuLoad * 4}%` }} 
-                                      className="h-full bg-orange-500 rounded-full" 
-                                      transition={{ duration: 0.5 }}
-                                    />
+                                      animate={isPlaying ? { rotate: 360 } : {}}
+                                      transition={{ duration: 8, ease: "linear", repeat: Infinity }}
+                                      className="w-12 h-12 rounded-full bg-stone-900 border border-white/10 flex items-center justify-center relative shadow-inner overflow-hidden"
+                                    >
+                                      {/* Vinyl labels */}
+                                      <div className="absolute w-4 h-4 rounded-full bg-orange-500 border border-black z-10 flex items-center justify-center">
+                                        <div className="w-1 h-1 rounded-full bg-black" />
+                                      </div>
+                                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.8)_90%)]" />
+                                    </motion.div>
+                                    
+                                    <div className="flex-1 flex flex-col gap-1.5">
+                                      <div className="flex justify-between items-baseline select-none">
+                                        <span className="text-[10px] font-bold text-[#FDFBF7]">Calm Horizons</span>
+                                        <span className="text-[8px] font-mono text-[#FDFBF7]/40">Vortex</span>
+                                      </div>
+                                      
+                                      {/* Interactive Progress timeline bar */}
+                                      <div 
+                                        className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden relative cursor-pointer"
+                                        onClick={(e) => {
+                                          const rect = e.currentTarget.getBoundingClientRect();
+                                          const clickX = e.clientX - rect.left;
+                                          const percentage = Math.round((clickX / rect.width) * 100);
+                                          setMusicProgress(percentage);
+                                        }}
+                                      >
+                                        <div className="h-full bg-orange-500 rounded-full" style={{ width: `${musicProgress}%` }} />
+                                      </div>
+                                    </div>
+                                    
+                                    <button 
+                                      onClick={() => setIsPlaying(!isPlaying)}
+                                      className="w-8 h-8 rounded-full bg-[#FDFBF7]/5 hover:bg-[#FDFBF7]/15 border border-white/10 flex items-center justify-center text-[10px] transition active:scale-90 cursor-pointer"
+                                    >
+                                      {isPlaying ? "⏸" : "▶"}
+                                    </button>
                                   </div>
-                                </div>
-                                <div className="flex flex-col justify-center gap-1 border-l border-white/5 pl-4">
-                                  <span className="text-[7.5px] font-mono text-[#FDFBF7]/40 tracking-wider uppercase">MEMORY ALLOC</span>
-                                  <div className="flex items-baseline gap-1.5">
-                                    <span className="text-sm font-mono font-bold text-[#FDFBF7]/90">{memLoad} GB</span>
-                                    <span className="text-[8px] text-[#FDFBF7]/30 font-semibold">RAM USED</span>
+                                ) : (
+                                  <div className="w-full grid grid-cols-2 gap-4 text-left">
+                                    <div className="flex flex-col justify-center gap-1">
+                                      <span className="text-[7.5px] font-mono text-[#FDFBF7]/40 tracking-wider uppercase">VORTEX PROCESS</span>
+                                      <div className="flex items-baseline gap-1.5">
+                                        <span className="text-sm font-mono font-bold text-orange-500">{cpuLoad}%</span>
+                                        <span className="text-[8px] text-[#FDFBF7]/30 font-semibold">CPU LOAD</span>
+                                      </div>
+                                      {/* Line graph line representation */}
+                                      <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden relative">
+                                        <motion.div 
+                                          animate={{ width: `${cpuLoad * 4}%` }} 
+                                          className="h-full bg-orange-500 rounded-full" 
+                                          transition={{ duration: 0.5 }}
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="flex flex-col justify-center gap-1 border-l border-white/5 pl-4">
+                                      <span className="text-[7.5px] font-mono text-[#FDFBF7]/40 tracking-wider uppercase">MEMORY ALLOC</span>
+                                      <div className="flex items-baseline gap-1.5">
+                                        <span className="text-sm font-mono font-bold text-[#FDFBF7]/90">{memLoad} GB</span>
+                                        <span className="text-[8px] text-[#FDFBF7]/30 font-semibold">RAM USED</span>
+                                      </div>
+                                      <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden relative">
+                                        <motion.div 
+                                          animate={{ width: `${(memLoad / 16) * 100}%` }} 
+                                          className="h-full bg-[#FDFBF7]/40 rounded-full" 
+                                          transition={{ duration: 0.5 }}
+                                        />
+                                      </div>
+                                    </div>
                                   </div>
-                                  <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden relative">
-                                    <motion.div 
-                                      animate={{ width: `${(memLoad / 16) * 100}%` }} 
-                                      className="h-full bg-[#FDFBF7]/40 rounded-full" 
-                                      transition={{ duration: 0.5 }}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            )}
+                                )}
+                              </motion.div>
+                            </AnimatePresence>
                           </div>
                         </motion.div>
                       )}

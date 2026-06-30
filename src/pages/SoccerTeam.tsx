@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, useInView, useSpring, Variants } from "framer-motion";
+import { motion, useScroll, useTransform, useInView, useSpring, Variants, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -493,49 +493,59 @@ export default function SoccerTeam({ isPreview = false }: SoccerTeamProps) {
         </motion.div>
 
         {/* Tab content */}
-        {activeTab === "squad" ? (
-          <div>
-            {(Object.entries(players) as [string, typeof players.goalkeepers][]).map(([group, list]) => (
-              <div key={group} style={{ marginBottom: "2rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "0.75rem" }}>
-                  <div style={{ width: 3, height: 16, borderRadius: 2, background: C.accent }} />
-                  <span style={{
-                    fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700,
-                    fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: C.muted,
-                  }}>
-                    {group}
-                  </span>
-                  <span style={{
-                    fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 600,
-                    fontSize: "0.6rem", color: C.light,
-                  }}>
-                    {list.length}
-                  </span>
-                </div>
-                <motion.div
-                  variants={stagger}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true, margin: "-40px" }}
-                  style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "0.75rem" }}
-                >
-                  {list.map(p => <PlayerCard key={p.number} {...p} />)}
-                </motion.div>
-              </div>
-            ))}
-          </div>
-        ) : (
+        <AnimatePresence mode="wait">
           <motion.div
-            id="fixtures"
-            variants={stagger}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: "-40px" }}
-            style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+            key={activeTab}
+            initial={{ opacity: 0, y: 8, filter: "blur(2px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -8, filter: "blur(2px)" }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
           >
-            {matches.map((m, i) => <MatchRow key={i} {...m} />)}
+            {activeTab === "squad" ? (
+              <div>
+                {(Object.entries(players) as [string, typeof players.goalkeepers][]).map(([group, list]) => (
+                  <div key={group} style={{ marginBottom: "2rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "0.75rem" }}>
+                      <div style={{ width: 3, height: 16, borderRadius: 2, background: C.accent }} />
+                      <span style={{
+                        fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700,
+                        fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: C.muted,
+                      }}>
+                        {group}
+                      </span>
+                      <span style={{
+                        fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 600,
+                        fontSize: "0.6rem", color: C.light,
+                      }}>
+                        {list.length}
+                      </span>
+                    </div>
+                    <motion.div
+                      variants={stagger}
+                      initial="hidden"
+                      whileInView="show"
+                      viewport={{ once: true, margin: "-40px" }}
+                      style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "0.75rem" }}
+                    >
+                      {list.map(p => <PlayerCard key={p.number} {...p} />)}
+                    </motion.div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <motion.div
+                id="fixtures"
+                variants={stagger}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: "-40px" }}
+                style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+              >
+                {matches.map((m, i) => <MatchRow key={i} {...m} />)}
+              </motion.div>
+            )}
           </motion.div>
-        )}
+        </AnimatePresence>
       </section>
 
       {/* ── DIVIDER ── */}

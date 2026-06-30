@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-30T22:32:00Z",
+  "title": "Design System: Cherif Bouabdallah",
+  "extensions": {
+    "colorMeta": {
+      "primary-bg": {
+        "role": "neutral",
+        "displayName": "Forest Green",
+        "canonical": "oklch(33.5% 0.076 138.5)",
+        "tonalRamp": [
+          "oklch(15% 0.03 138)",
+          "oklch(20% 0.04 138)",
+          "oklch(25% 0.05 138)",
+          "oklch(30% 0.06 138)",
+          "oklch(33.5% 0.076 138.5)",
+          "oklch(45% 0.06 138)",
+          "oklch(60% 0.05 138)",
+          "oklch(80% 0.03 138)",
+          "oklch(95% 0.01 138)"
+        ]
+      },
+      "primary-text": {
+        "role": "primary",
+        "displayName": "Warm Alabaster",
+        "canonical": "oklch(95.4% 0.021 86)",
+        "tonalRamp": [
+          "oklch(30% 0.01 86)",
+          "oklch(45% 0.015 86)",
+          "oklch(60% 0.02 86)",
+          "oklch(75% 0.021 86)",
+          "oklch(85% 0.021 86)",
+          "oklch(90% 0.021 86)",
+          "oklch(93% 0.021 86)",
+          "oklch(95.4% 0.021 86)",
+          "oklch(98% 0.01 86)"
+        ]
+      },
+      "secondary-text": {
+        "role": "secondary",
+        "displayName": "Muted Stone",
+        "canonical": "oklch(88.3% 0.022 88)",
+        "tonalRamp": [
+          "oklch(30% 0.01 88)",
+          "oklch(45% 0.015 88)",
+          "oklch(60% 0.02 88)",
+          "oklch(75% 0.022 88)",
+          "oklch(80% 0.022 88)",
+          "oklch(85% 0.022 88)",
+          "oklch(88.3% 0.022 88)",
+          "oklch(92% 0.02 88)",
+          "oklch(96% 0.01 88)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display Heading",
+        "purpose": "Hero statements and page titles."
+      },
+      "body": {
+        "displayName": "Body Text",
+        "purpose": "Passages of text and summaries."
+      },
+      "label": {
+        "displayName": "Label / Monospace",
+        "purpose": "Bespoke navigation elements and secondary metadata."
+      }
+    },
+    "shadows": [
+      {
+        "name": "Tactile Glass Glow",
+        "value": "1px -1px 2px hsl(0 0% 100% / 0.5) inset, 0 -1px 2px hsl(0 0% 100% / 0.5) inset, -1px -1px 2px hsl(0 0% 100% / 0.5) inset, 1px 1px 2px hsl(0 0% 30% / 0.5) inset, -8px 4px 10px -6px hsl(0 0% 30% / 0.25) inset, -1px 1px 6px hsl(0 0% 30% / 0.25) inset, -1px -1px 8px rgba(0, 0, 0, 0.1), 1px 1px 2px rgba(0, 0, 0, 0.1), 2px 2px 6px rgba(0, 0, 0, 0.15), -2px -1px 2px hsl(0 0% 100% / 0.25) inset, 3px 6px 16px -6px rgba(0, 0, 0, 0.3)",
+        "purpose": "Simulates glass thickness and physical shadows on cards."
+      }
+    ],
+    "motion": [
+      {
+        "name": "Standard Spring",
+        "value": "stiffness: 320, damping: 30",
+        "purpose": "Used for fluid active indicator navigation bars."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile-min",
+        "value": "320px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Bold solid button for primary calls to action.",
+      "html": "<button class=\"ds-btn-primary\">GET IN TOUCH</button>",
+      "css": ".ds-btn-primary { background: #F6F0DF; color: #223D27; font-family: monospace; font-size: 10px; font-weight: bold; letter-spacing: 0.25em; padding: 12px 24px; border: none; border-radius: 12px; cursor: pointer; transition: background 0.2s, transform 0.2s; } .ds-btn-primary:hover { background: rgba(246, 240, 223, 0.9); } .ds-btn-primary:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outline button for lower priority actions or secondary paths.",
+      "html": "<button class=\"ds-btn-secondary\">VIEW WORK</button>",
+      "css": ".ds-btn-secondary { background: rgba(246, 240, 223, 0.05); color: #F6F0DF; border: 1px solid rgba(246, 240, 223, 0.15); font-family: monospace; font-size: 10px; font-weight: bold; letter-spacing: 0.25em; padding: 12px 24px; border-radius: 12px; cursor: pointer; transition: background 0.2s, border-color 0.2s, transform 0.2s; } .ds-btn-secondary:hover { background: rgba(246, 240, 223, 0.1); border-color: rgba(246, 240, 223, 0.3); } .ds-btn-secondary:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "Glass Container Card",
+      "kind": "card",
+      "refersTo": "card-glass",
+      "description": "Tactile curved glass layout container for sandbox widgets.",
+      "html": "<div class=\"ds-card-glass\"><h3 class=\"ds-card-title\">VORTEX SANDBOX</h3><p class=\"ds-card-body\">Physics controls and OS layout simulations.</p></div>",
+      "css": ".ds-card-glass { background: rgba(34, 61, 39, 0.35); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); border: 1px solid rgba(246, 240, 223, 0.25); border-radius: 24px; padding: 24px; box-shadow: 1px -1px 2px hsl(0 0% 100% / 0.5) inset, 0px -1px 2px hsl(0 0% 100% / 0.5) inset, -1px -1px 2px hsl(0 0% 100% / 0.5) inset, 1px 1px 2px hsl(0 0% 30% / 0.5) inset, -8px 4px 10px -6px hsl(0 0% 30% / 0.25) inset, -1px 1px 6px hsl(0 0% 30% / 0.25) inset, -1px -1px 8px rgba(0, 0, 0, 0.1), 1px 1px 2px rgba(0, 0, 0, 0.1), 2px 2px 6px rgba(0, 0, 0, 0.15), -2px -1px 2px hsl(0 0% 100% / 0.25) inset, 3px 6px 16px -6px rgba(0, 0, 0, 0.3); transition: border-color 0.4s, background-color 0.4s, box-shadow 0.4s; } .ds-card-glass:hover { background: rgba(34, 61, 39, 0.45); border-color: rgba(246, 240, 223, 0.4); } .ds-card-title { font-family: monospace; font-size: 11px; letter-spacing: 0.25em; color: #F6F0DF; margin: 0 0 8px 0; } .ds-card-body { font-family: sans-serif; font-size: 13px; color: #DEDBC8; margin: 0; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Forest Sanctuary",
+    "overview": "The Forest Sanctuary is an editorial, print-inspired design aesthetic tailored for a high-fidelity software engineering showcase. The visual landscape is defined by a deep, atmospheric Forest Green background contrasted against a warm, literary Alabaster font. Large, structural serif headings create a rhythmic hierarchy, while negative space is treated as an active design element rather than a default empty container.",
+    "keyCharacteristics": [
+      "Atmospheric Depth",
+      "Editorial Contrast",
+      "Tactile Kinematics"
+    ],
+    "rules": [
+      {
+        "name": "The Forest Canopy Rule",
+        "body": "The global page background must always remain Forest Green (#223D27). High-contrast white (#FAFAF8) or pitch black (#141212) backgrounds are strictly restricted to isolated pop-up overlay panels (e.g., preview modals).",
+        "section": "colors"
+      },
+      {
+        "name": "The Maghfirea Statement Rule",
+        "body": "The display font Maghfirea is reserved exclusively for single-line statements and page titles. It must never be used for multi-line paragraphs or UI labels.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ambient Response Rule",
+        "body": "Card surfaces are flat and flush at rest. Shadows, deep blurs, and hover scale transforms appear only in response to direct user interaction.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do maintain a strict 4.5:1 contrast ratio for body text by using Warm Alabaster (#F6F0DF) on Forest Green (#223D27).",
+      "Do restrict card rounding to a maximum of 24px to preserve a premium structured aesthetic.",
+      "Do implement standard spring-based easing for active transitions to support tactile responsive feels."
+    ],
+    "donts": [
+      "Don't use standard SaaS card grids featuring a generic top icon, bold heading, and small body text.",
+      "Don't mix solid borders with large, heavy drop-shadows on cards (the ghost-card look).",
+      "Don't implement purple/blue neon gradients or standard glassmorphism as a default decoration.",
+      "Don't display sketchy SVG illustrations or hand-drawn graphics."
+    ]
+  }
+}

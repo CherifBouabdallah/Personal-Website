@@ -127,3 +127,26 @@ body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Stable active text weight switch trick */
+a[data-text]::after {
+  content: attr(data-text);
+  content: attr(data-text) / "";
+  height: 0;
+  visibility: hidden;
+  overflow: hidden;
+  user-select: none;
+  pointer-events: none;
+  font-weight: bold;
+}
+
+/* Calm Breathing status/ambient pulse animation */
+.pulse-breathe {
+  animation: pulse-breathe 2.8s ease-in-out infinite;
+}
+@keyframes pulse-breathe {
+  0%, 100% { opacity: 0.35; transform: scale(0.96); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+
