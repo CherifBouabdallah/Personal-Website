@@ -90,10 +90,10 @@ export default function NotFound() {
         >
           <button
             onClick={() => navigate("/")}
-            className="group flex items-center gap-3 px-8 py-3.5 bg-transparent border border-[#F6F0DF]/20 hover:border-[#F6F0DF]/60 text-[#F6F0DF] hover:bg-[#F6F0DF]/5 font-mono text-[10px] tracking-[0.25em] uppercase rounded-full transition-all duration-500 hover:scale-[1.02] cursor-pointer"
+            className="group inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#F6F0DF]/5 hover:bg-[#F6F0DF]/10 text-[#F6F0DF] border border-[#F6F0DF]/15 font-mono text-[10px] font-bold tracking-widest active:scale-[0.98] transition-all duration-200 cursor-pointer"
           >
             <Home size={12} className="group-hover:-translate-y-0.5 transition-transform duration-300" />
-            Return to Home Page
+            RETURN TO HOME PAGE
           </button>
         </motion.div>
 
