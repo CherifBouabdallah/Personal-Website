@@ -5,6 +5,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef, Suspense, lazy, ComponentType } from "react";
 import { Routes, Route, useLocation, Link } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import Home from "./pages/Home";
 import LiquidNavbar from "./components/LiquidNavbar";
 
@@ -176,6 +177,7 @@ export default function App() {
           </Suspense>
         </motion.div>
       )}
+      <Analytics />
     </div>
   );
 }
