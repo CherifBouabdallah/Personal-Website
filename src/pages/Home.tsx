@@ -404,10 +404,6 @@ export default function Home() {
                     <span className="font-mono text-[11px] md:text-[12px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">PORTFOLIO</span>
                     <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
                   </div>
-                  <div onClick={() => navigate("/about")} id="desktop-gateway-about" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
-                    <span className="font-mono text-[11px] md:text-[12px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">ABOUT</span>
-                    <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
-                  </div>
                 </div>
               </motion.div>
             </div>
@@ -591,10 +587,6 @@ export default function Home() {
               </div>
               <div onClick={() => navigate("/portfolio")} id="mobile-gateway-portfolio" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
                 <span className="font-mono text-[11px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">PORTFOLIO</span>
-                <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
-              </div>
-              <div onClick={() => navigate("/about")} id="mobile-gateway-about" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
-                <span className="font-mono text-[11px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">ABOUT</span>
                 <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
               </div>
             </div>

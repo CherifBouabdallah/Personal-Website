@@ -20,7 +20,6 @@ function lazyWithPreload<T extends ComponentType<any>>(
 // Lazy load pages with preload hooks
 const Portfolio = lazyWithPreload(() => import("./pages/Portfolio"));
 const Contact = lazyWithPreload(() => import("./pages/Contact"));
-const About = lazyWithPreload(() => import("./pages/About"));
 const Vortex = lazyWithPreload(() => import("./pages/Vortex"));
 const SoccerTeam = lazyWithPreload(() => import("./pages/SoccerTeam"));
 const NotFound = lazyWithPreload(() => import("./pages/NotFound"));
@@ -68,7 +67,6 @@ export default function App() {
     const preloadPages = () => {
       Portfolio.preload();
       Contact.preload();
-      About.preload();
       Vortex.preload();
       SoccerTeam.preload();
       NotFound.preload();
@@ -112,7 +110,7 @@ export default function App() {
     return () => cancelAnimationFrame(animationFrameId);
   }, []);
 
-  const isScrollable = location.pathname === "/" || location.pathname === "/about" || location.pathname === "/vortex" || location.pathname === "/portfolio" || location.pathname === "/soccer-team";
+  const isScrollable = location.pathname === "/" || location.pathname === "/vortex" || location.pathname === "/portfolio" || location.pathname === "/soccer-team";
 
   return (
     <div className={`relative flex min-h-screen bg-[#223D27] ${isScrollable ? "overflow-y-auto no-scrollbar overscroll-y-none items-stretch justify-stretch" : "items-center justify-center overflow-hidden"}`}>
@@ -171,7 +169,6 @@ export default function App() {
               <Route path="/" element={<Home />} />
               <Route path="/portfolio" element={<Portfolio />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/about" element={<About />} />
               <Route path="/vortex" element={<Vortex />} />
               <Route path="/soccer-team" element={<SoccerTeam />} />
               <Route path="*" element={<NotFound />} />

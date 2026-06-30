@@ -5,16 +5,9 @@ import Footer from "../components/Footer";
 import Vortex from "./Vortex";
 import SoccerTeam from "./SoccerTeam";
 import { 
-  ExternalLink, 
   Github, 
-  Cpu, 
-  Globe, 
-  Code2, 
-  Sparkles,
   ArrowRight,
-  Terminal,
-  Activity,
-  Shield
+  Activity
 } from "lucide-react";
 
 // Elegant self-drawing border divider rule
@@ -94,193 +87,7 @@ function ProjectPreview({ onClick, layoutId, bgColor, children }: {
   );
 }
 
-// ----------------------------------------------------------------------
-// PROJECT 3 PREVIEW: RAY TRACER PROCEDURAL DIAGRAM
-// ----------------------------------------------------------------------
-function RayTracerPreview() {
-  return (
-    <div className="w-full h-full min-h-[220px] bg-black/20 rounded-2xl border border-[#F6F0DF]/10 overflow-hidden flex items-center justify-center p-4 select-none relative shadow-xl">
-      <svg className="w-full h-full max-w-[280px] aspect-[4/3] overflow-visible" viewBox="0 0 200 150" fill="none">
-        {/* Camera block */}
-        <rect x="15" y="65" width="25" height="20" rx="3" stroke="#F6F0DF" strokeWidth="1.5" strokeOpacity="0.4" />
-        <polygon points="40,70 47,65 47,85 40,80" stroke="#F6F0DF" strokeWidth="1.5" strokeOpacity="0.4" />
-        
-        {/* Sphere grid representation */}
-        <circle cx="130" cy="75" r="30" stroke="#F6F0DF" strokeWidth="1" strokeOpacity="0.2" />
-        <ellipse cx="130" cy="75" rx="30" ry="12" stroke="#F6F0DF" strokeWidth="1" strokeOpacity="0.1" />
-        <ellipse cx="130" cy="75" rx="10" ry="30" stroke="#F6F0DF" strokeWidth="1" strokeOpacity="0.1" />
-        <circle cx="130" cy="75" r="2" fill="#F6F0DF" fillOpacity="0.6" />
 
-        {/* Light source star */}
-        <g transform="translate(140, 20)">
-          <path d="M0 -8 L0 8 M-8 0 L8 0 M-5 -5 L5 5 M-5 5 L5 -5" stroke="#F6F0DF" strokeWidth="1.2" strokeOpacity="0.5" />
-          <circle cx="0" cy="0" r="3" fill="#F6F0DF" fillOpacity="0.8" />
-        </g>
-
-        {/* Camera Ray (Primary) */}
-        <motion.path 
-          d="M47,75 L102,70" 
-          stroke="#F6F0DF" 
-          strokeWidth="1.5" 
-          strokeDasharray="4 3"
-          initial={{ pathLength: 0 }}
-          whileInView={{ pathLength: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-        />
-        <text x="55" y="65" className="font-mono text-[7px] fill-[#F6F0DF]/40">PRIMARY_RAY</text>
-
-        {/* Bounced Ray to Light Source */}
-        <motion.path 
-          d="M102,70 L140,20" 
-          stroke="#F6F0DF" 
-          strokeWidth="1.2" 
-          strokeDasharray="3 3"
-          initial={{ pathLength: 0 }}
-          whileInView={{ pathLength: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.2, delay: 1.0, ease: "easeOut" }}
-        />
-        <text x="125" y="50" className="font-mono text-[6px] fill-[#F6F0DF]/30">SHADOW_RAY</text>
-
-        {/* Reflected Ray (Specular) */}
-        <motion.path 
-          d="M102,70 L60,120" 
-          stroke="#F6F0DF" 
-          strokeWidth="1" 
-          strokeDasharray="3 3"
-          initial={{ pathLength: 0 }}
-          whileInView={{ pathLength: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.4, delay: 1.3, ease: "easeOut" }}
-        />
-        
-        {/* Intersection Point Ring */}
-        <motion.circle 
-          cx="102" 
-          cy="70" 
-          r="4" 
-          stroke="#F6F0DF" 
-          strokeWidth="1" 
-          initial={{ scale: 0, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 0.8 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.9 }}
-        />
-      </svg>
-      
-      {/* Background wire grid overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(246,240,223,0.02)_1px,transparent_0),linear-gradient(90deg,rgba(246,240,223,0.02)_1px,transparent_0)] bg-[size:16px_16px] pointer-events-none" />
-    </div>
-  );
-}
-
-// ----------------------------------------------------------------------
-// PROJECT 3 PREVIEW: DISTRIBUTED NODES SIMULATION
-// ----------------------------------------------------------------------
-function DistributedSyncPreview() {
-  return (
-    <div className="w-full h-full min-h-[220px] bg-black/20 rounded-2xl border border-[#F6F0DF]/10 overflow-hidden flex items-center justify-center p-4 select-none relative shadow-xl">
-      <svg className="w-full h-full max-w-[280px] aspect-[4/3] overflow-visible" viewBox="0 0 200 150" fill="none">
-        
-        {/* Three nodes layout */}
-        {/* Node A (Leader / Consensus) */}
-        <g transform="translate(100, 35)">
-          <motion.circle 
-            r="16" 
-            stroke="#F6F0DF" 
-            strokeWidth="1.5" 
-            strokeOpacity="0.4"
-            animate={{ scale: [1, 1.05, 1], strokeOpacity: [0.4, 0.7, 0.4] }}
-            transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-          />
-          <circle r="6" fill="#F6F0DF" fillOpacity="0.2" />
-          <text y="3" className="font-mono text-[7px] text-center fill-[#F6F0DF]/60" textAnchor="middle">NODE_A</text>
-        </g>
-
-        {/* Node B */}
-        <g transform="translate(45, 110)">
-          <motion.circle 
-            r="16" 
-            stroke="#F6F0DF" 
-            strokeWidth="1.5" 
-            strokeOpacity="0.4"
-            animate={{ scale: [1, 1.03, 1], strokeOpacity: [0.4, 0.6, 0.4] }}
-            transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut", delay: 0.5 }}
-          />
-          <circle r="6" fill="#F6F0DF" fillOpacity="0.2" />
-          <text y="3" className="font-mono text-[7px] text-center fill-[#F6F0DF]/60" textAnchor="middle">NODE_B</text>
-        </g>
-
-        {/* Node C */}
-        <g transform="translate(155, 110)">
-          <motion.circle 
-            r="16" 
-            stroke="#F6F0DF" 
-            strokeWidth="1.5" 
-            strokeOpacity="0.4"
-            animate={{ scale: [1, 1.04, 1], strokeOpacity: [0.4, 0.6, 0.4] }}
-            transition={{ repeat: Infinity, duration: 2.8, ease: "easeInOut", delay: 0.2 }}
-          />
-          <circle r="6" fill="#F6F0DF" fillOpacity="0.2" />
-          <text y="3" className="font-mono text-[7px] text-center fill-[#F6F0DF]/60" textAnchor="middle">NODE_C</text>
-        </g>
-
-        {/* Communication channels */}
-        {/* Node A to B */}
-        <path d="M85,47 L60,98" stroke="#F6F0DF" strokeWidth="1" strokeOpacity="0.1" />
-        <motion.path 
-          d="M85,47 L60,98" 
-          stroke="#F6F0DF" 
-          strokeWidth="1.2" 
-          strokeDasharray="4 12"
-          strokeOpacity="0.6"
-          animate={{ strokeDashoffset: [0, -32] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-        />
-
-        {/* Node A to C */}
-        <path d="M115,47 L140,98" stroke="#F6F0DF" strokeWidth="1" strokeOpacity="0.1" />
-        <motion.path 
-          d="M115,47 L140,98" 
-          stroke="#F6F0DF" 
-          strokeWidth="1.2" 
-          strokeDasharray="4 12"
-          strokeOpacity="0.6"
-          animate={{ strokeDashoffset: [0, 32] }}
-          transition={{ repeat: Infinity, duration: 2.2, ease: "linear" }}
-        />
-
-        {/* Node B to C */}
-        <path d="M61,110 L139,110" stroke="#F6F0DF" strokeWidth="1" strokeOpacity="0.1" />
-        <motion.path 
-          d="M61,110 L139,110" 
-          stroke="#F6F0DF" 
-          strokeWidth="1.2" 
-          strokeDasharray="3 10"
-          strokeOpacity="0.5"
-          animate={{ strokeDashoffset: [0, -26] }}
-          transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }}
-        />
-
-        {/* Small synchronization pulse wave */}
-        <motion.circle 
-          cx="100" 
-          cy="35" 
-          r="26" 
-          stroke="#F6F0DF" 
-          strokeWidth="1"
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={{ scale: [0.6, 1.8], opacity: [0.6, 0] }}
-          transition={{ repeat: Infinity, duration: 3, ease: "easeOut" }}
-        />
-      </svg>
-
-      {/* Grid overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(rgba(246,240,223,0.015)_1px,transparent_0)] bg-[size:12px_12px] pointer-events-none" />
-    </div>
-  );
-}
 
 // ----------------------------------------------------------------------
 // MAIN PORTFOLIO COMPONENT
@@ -593,7 +400,7 @@ export default function Portfolio() {
               transition={{ duration: 1.4, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="font-mono text-[9px] md:text-[11px] tracking-[0.25em] uppercase text-[#F6F0DF]/60 max-w-xl leading-relaxed mt-2"
             >
-              A showcase of interactive software development, graphics physics, and distributed systems built at the intersection of aesthetic design and clean engineering.
+              My personnal projects along with client issued ones, mainly websites and school projects.
             </motion.p>
           </div>
 
@@ -752,107 +559,7 @@ export default function Portfolio() {
               </div>
             </motion.div>
 
-            {/* PROJECT 3: Physically Based Ray Tracer */}
-            <motion.div
-              custom={2}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-40px" }}
-              variants={cardRevealVariants}
-              className="col-span-12 md:col-span-6"
-            >
-              <div className={`glass-square ${getGlassClass()} p-6 md:p-8 flex flex-col justify-between h-full text-left overflow-hidden relative group`}>
-                <div>
-                  <div className="flex justify-between items-center mb-6 border-b border-[#F6F0DF]/10 pb-4">
-                    <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">03 / Graphics</span>
-                    <Code2 size={13} className="text-[#F6F0DF]/60" />
-                  </div>
 
-                  <h3 className="font-maghfirea text-[clamp(1.5rem,3vw,2rem)] text-[#F6F0DF] tracking-wide mb-3 leading-tight">
-                    Physically Based Renderer
-                  </h3>
-
-                  <p className="font-mono text-[10px] md:text-[11px] leading-relaxed text-[#F6F0DF]/60 mb-6">
-                    A photorealistic, CPU global illumination path tracer written from scratch in C++. Features a high-speed Bounding Volume Hierarchy (BVH) spatial accelerator, microfacet specular BRDF reflections (GGX model), and Next Event Estimation (NEE) for direct lighting sampling under complex geometries.
-                  </p>
-
-                  <div className="flex flex-wrap gap-1.5 mb-8">
-                    {["C++20", "CUDA", "EMBREE", "RAY CASTING", "GGX BRDF"].map((tech) => (
-                      <span key={tech} className="font-mono text-[7px] tracking-widest text-[#F6F0DF]/60 px-1.5 py-0.5 rounded bg-black/10 border border-[#F6F0DF]/10">
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-6">
-                  {/* Procedural Visual Representation */}
-                  <RayTracerPreview />
-                  
-                  {/* Footer Link */}
-                  <a 
-                    href="https://github.com/CherifBouabdallah"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-[8px] tracking-[0.25em] uppercase text-[#F6F0DF]/50 hover:text-[#F6F0DF] transition-colors flex items-center justify-between group/link py-1"
-                  >
-                    <span>View Repository Specs</span>
-                    <span className="group-hover/link:translate-x-1.5 transition-transform duration-300">→</span>
-                  </a>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* PROJECT 3: Distributed State Sync Protocol */}
-            <motion.div
-              custom={3}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-40px" }}
-              variants={cardRevealVariants}
-              className="col-span-12 md:col-span-6"
-            >
-              <div className={`glass-square ${getGlassClass()} p-6 md:p-8 flex flex-col justify-between h-full text-left overflow-hidden relative group`}>
-                <div>
-                  <div className="flex justify-between items-center mb-6 border-b border-[#F6F0DF]/10 pb-4">
-                    <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">04 / Systems</span>
-                    <Terminal size={13} className="text-[#F6F0DF]/60" />
-                  </div>
-
-                  <h3 className="font-maghfirea text-[clamp(1.5rem,3vw,2rem)] text-[#F6F0DF] tracking-wide mb-3 leading-tight">
-                    Distributed Sync Protocol
-                  </h3>
-
-                  <p className="font-mono text-[10px] md:text-[11px] leading-relaxed text-[#F6F0DF]/60 mb-6">
-                    A peer-to-peer real-time consensus and state-sync engine built on Conflict-free Replicated Data Types (CRDTs). Utilizes custom hybrid logical clocks, delta state compression, and WebSocket transport channels to synchronise state across highly partitioned networks with microsecond reconciliation steps.
-                  </p>
-
-                  <div className="flex flex-wrap gap-1.5 mb-8">
-                    {["GO", "WEBSOCKETS", "CRDTS", "PROTOBUF", "CONSENSUS"].map((tech) => (
-                      <span key={tech} className="font-mono text-[7px] tracking-widest text-[#F6F0DF]/60 px-1.5 py-0.5 rounded bg-black/10 border border-[#F6F0DF]/10">
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-6">
-                  {/* Procedural Visual Representation */}
-                  <DistributedSyncPreview />
-                  
-                  {/* Footer Link */}
-                  <a 
-                    href="https://github.com/CherifBouabdallah"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-[8px] tracking-[0.25em] uppercase text-[#F6F0DF]/50 hover:text-[#F6F0DF] transition-colors flex items-center justify-between group/link py-1"
-                  >
-                    <span>View Protocol Docs</span>
-                    <span className="group-hover/link:translate-x-1.5 transition-transform duration-300">→</span>
-                  </a>
-                </div>
-              </div>
-            </motion.div>
 
           </div>
 
