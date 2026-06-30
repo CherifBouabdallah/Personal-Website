@@ -182,7 +182,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
               <svg className="w-4.5 h-4.5 mr-1.5 fill-current transition-transform duration-300 group-hover:-rotate-12" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z" />
               </svg>
-              <span>Portfolio</span>
+              <span className="hidden sm:inline">Portfolio</span>
             </a>
 
             {/* GitHub Link Button with Arrow Slide */}
@@ -190,7 +190,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
               href="https://github.com/CherifBouabdallah"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 overflow-hidden pl-10 pr-4 select-none h-11 border border-[#FDFBF7]/5 text-[#FDFBF7] decoration-none"
+              className="hidden sm:inline-flex group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 overflow-hidden pl-10 pr-4 select-none h-11 border border-[#FDFBF7]/5 text-[#FDFBF7] decoration-none"
             >
               {/* GitHub icon left */}
               <div className="absolute left-3.5 transition-all duration-300 group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-0 group-hover:blur-xs">

@@ -247,8 +247,9 @@ export default function SoccerTeam({ isPreview = false }: SoccerTeamProps) {
         <div style={{
           maxWidth: 1200, margin: "0 auto",
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "0.75rem 1.5rem",
-        }}>
+        }}
+          className="py-3 px-4 md:px-6"
+        >
           {/* Logo */}
           <div
             style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
@@ -269,13 +270,14 @@ export default function SoccerTeam({ isPreview = false }: SoccerTeamProps) {
           </div>
 
           {/* Nav links */}
-          <nav style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+          <nav style={{ display: "flex", alignItems: "center", gap: "1.5rem" }} className="gap-3 sm:gap-6">
             {["Squad", "Fixtures", "Stadium"].map((item) => (
               <a key={item} href={`#${item.toLowerCase()}`} style={{
                 fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 600,
                 fontSize: "0.75rem", letterSpacing: "0.12em", textTransform: "uppercase",
                 color: C.muted, textDecoration: "none", transition: "color 0.2s",
               }}
+                className="hidden sm:inline"
                 onMouseEnter={e => (e.currentTarget.style.color = C.accent)}
                 onMouseLeave={e => (e.currentTarget.style.color = C.muted)}
               >
@@ -414,7 +416,8 @@ export default function SoccerTeam({ isPreview = false }: SoccerTeamProps) {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-60px" }}
-          style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem" }}
+          style={{ gap: "1rem" }}
+          className="grid grid-cols-2 md:grid-cols-4"
         >
           {stats.map((s, i) => (
             <motion.div key={i} variants={fadeUp} style={{
@@ -548,11 +551,10 @@ export default function SoccerTeam({ isPreview = false }: SoccerTeamProps) {
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.7, ease: [0.25, 1, 0.5, 1] }}
           style={{
-            display: "flex", flexWrap: "wrap", gap: "3rem",
             alignItems: "center", background: C.white,
             border: `1px solid ${C.border}`, borderRadius: 20,
-            padding: "2.5rem",
           }}
+          className="flex flex-wrap gap-6 md:gap-12 p-6 md:p-10"
         >
           {/* Text */}
           <div style={{ flex: "1 1 320px" }}>

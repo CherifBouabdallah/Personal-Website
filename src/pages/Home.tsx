@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect, memo, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, Variants } from "framer-motion";
 import Footer from "../components/Footer";
@@ -138,25 +138,17 @@ const monologueWords = [
 
 const bgParagraphWords = "Currently pursuing software engineering at EPFL (École Polytechnique Fédérale de Lausanne), focusing on distributed architectures, interactive computer graphics, and engineering clean web environments.".split(" ");
 
-// --- Animation Timeline (Desktop) ---
-// Phase 1: Name heading — chars stagger at 0.04s each, 18 chars ≈ finishes ~0.7s
-// Phase 2: Monologue + Portrait — starts at 0.9s after name settles
-// Phase 3: Background paragraph — starts at 2.4s after monologue is mostly visible
-// Phase 4: Skills sidebar — starts at 2.5s
-// Phase 5: Gateway links — starts at 3.2s
-
+// --- Polished Animation Timeline (portrait removed, all elements breathe) ---
 const TIMELINE = {
-  NAME_CHAR_STAGGER: 0.04,
-  NAME_CHAR_DURATION: 1.0,
-  MONOLOGUE_START: 0.9,
-  MONOLOGUE_WORD_STAGGER: 0.025,
-  PORTRAIT_START: 1.0,
-  INFO_START: 1.2,
-  BG_PARAGRAPH_START: 2.4,
-  BG_WORD_STAGGER: 0.025,
-  SKILLS_START: 2.5,
+  NAME_CHAR_STAGGER: 0.035,
+  NAME_CHAR_DURATION: 0.85,
+  MONOLOGUE_START: 0.6,
+  MONOLOGUE_WORD_STAGGER: 0.022,
+  BG_PARAGRAPH_START: 1.6,
+  BG_WORD_STAGGER: 0.02,
+  SKILLS_START: 2.0,
   SKILLS_ITEM_STAGGER: 0.06,
-  GATEWAY_START: 3.2,
+  GATEWAY_START: 2.8,
 };
 
 const monologueContainerVariants = {
@@ -179,7 +171,7 @@ const bgContainerVariants = {
   }
 };
 
-// --- Mobile variants (scroll-triggered, short delays) ---
+// Mobile variants (scroll‑triggered)
 const mobileMonologueContainerVariants = {
   hidden: {},
   visible: {
@@ -201,17 +193,12 @@ const mobileBgContainerVariants = {
 };
 
 const wordVariants: Variants = {
-  hidden: { 
-    opacity: 0, 
-    y: 8, 
-    filter: "blur(2px)" 
-  },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    filter: "blur(0px)",
+  hidden: { opacity: 0, y: 6 },
+  visible: {
+    opacity: 1,
+    y: 0,
     transition: {
-      duration: 0.4,
+      duration: 0.45,
       ease: [0.215, 0.610, 0.355, 1.000]
     }
   }
@@ -225,80 +212,35 @@ export default function Home() {
     document.fonts.ready.then(() => setIsReady(true));
   }, []);
 
-  const text = "Cherif Bouabdallah";
+  const nameText = "Cherif Bouabdallah";
 
   return (
-    <div className="w-full min-h-screen flex flex-col pt-32 pb-8 px-6 md:px-16 lg:px-24 xl:px-32 relative bg-[#223D27] text-[#F6F0DF] overflow-y-auto select-text selection:bg-[#F6F0DF] selection:text-[#223D27]">
-      
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col w-full mx-auto py-8">
-        
-        {/* Desktop Layout (md and up) */}
-        <div className="hidden md:grid grid-cols-12 gap-8 md:gap-12 items-start w-full">
-          
-          {/* Column 1 (Left): Portrait & Metadata */}
-          <div className="col-span-1 md:col-span-3 flex flex-col gap-6 md:border-r md:border-[#F6F0DF]/10 md:pr-8">
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
-              transition={{ duration: 1.0, delay: TIMELINE.PORTRAIT_START }}
-            >
-              <div className="font-mono text-[10px] md:text-[11px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
-                01 / Portrait
-              </div>
-              <div className="w-4/5 md:w-full aspect-[4/5] max-h-[420px] border border-[#F6F0DF]/20 overflow-hidden bg-white/5 relative rounded-xl shadow-lg">
-                <picture>
-                  <source srcSet="/IMG_2656.webp" type="image/webp" />
-                  <img
-                    src="/IMG_2656_opt.jpeg"
-                    alt="Portrait of Cherif Bouabdallah"
-                    width={480}
-                    height={600}
-                    loading="eager"
-                    decoding="async"
-                    className="w-full h-full object-cover"
-                  />
-                </picture>
-              </div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
-              transition={{ duration: 1.0, delay: TIMELINE.INFO_START }}
-            >
-              <div className="font-mono text-[10px] md:text-[11px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
-                02 / Info
-              </div>
-              <div className="font-mono text-[10px] md:text-[12px] leading-relaxed text-[#F6F0DF]/50 space-y-2 border border-[#F6F0DF]/10 rounded-xl p-4 md:p-5 bg-black/10">
-                <div><span className="text-[#F6F0DF] opacity-80 font-bold">CLIENT:</span> Cherif Bouabdallah</div>
-                <div><span className="text-[#F6F0DF] opacity-80 font-bold">ROLE:</span> EPFL CS Engineer</div>
-                <div><span className="text-[#F6F0DF] opacity-80 font-bold">GRID:</span> Modular Swiss 12-Col</div>
-                <div><span className="text-[#F6F0DF] opacity-80 font-bold">LOC:</span> Lausanne, CH</div>
-              </div>
-            </motion.div>
-          </div>
+    <div className="w-full min-h-screen flex flex-col pt-24 md:pt-32 pb-8 px-6 md:px-16 lg:px-24 xl:px-32 relative bg-[#223D27] text-[#F6F0DF] select-text selection:bg-[#F6F0DF] selection:text-[#223D27]">
 
-          {/* Column 2 (Center): Core Title & Monologue */}
-          <div className="col-span-1 md:col-span-7 flex flex-col gap-8 md:gap-10 text-center md:text-left">
-            {/* Unified Staggered Heading */}
-            <h1 className="font-maghfirea text-[clamp(1.6rem,7vw,110px)] text-[#F6F0DF] flex flex-row flex-nowrap justify-center md:justify-start gap-x-[0.25em] text-center leading-[0.95] selection:bg-[#F6F0DF] selection:text-[#223D27] px-4 md:px-0 w-full whitespace-nowrap overflow-visible">
-              {(() => {
-                let charCounter = 0;
-                return text.split(" ").map((word, wordIndex) => (
-                  <span key={wordIndex} className="inline-block whitespace-nowrap">
+      <div className="flex-1 flex flex-col w-full mx-auto max-w-7xl">
+
+        {/* Desktop Layout – A rhythmic, architectural composition */}
+        <div className="hidden md:flex flex-col gap-16 w-full">
+
+          {/* 1. Name as a statement — full‑width, precise reveal */}
+          <h1 className="font-maghfirea text-[clamp(3.5rem,10vw,140px)] text-[#F6F0DF] leading-[0.9] tracking-[-0.02em] text-left w-full overflow-visible select-none">
+            {(() => {
+              let charCounter = 0;
+              return nameText.split(" ").map((word, wordIndex, arr) => (
+                <Fragment key={wordIndex}>
+                  <span className="inline-block whitespace-nowrap">
                     {word.split("").map((char, charIndex) => {
                       const globalIndex = charCounter++;
                       return (
                         <span
                           key={charIndex}
                           className="inline-block overflow-hidden"
-                          style={{ paddingBottom: "0.12em", marginBottom: "-0.12em" }}
+                          style={{ paddingBottom: "0.08em", marginBottom: "-0.08em" }}
                         >
                           <motion.span
                             className="inline-block"
-                            initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
-                            animate={isReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 50, filter: "blur(10px)" }}
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                             transition={{
                               duration: TIMELINE.NAME_CHAR_DURATION,
                               ease: [0.21, 1, 0.36, 1],
@@ -311,255 +253,265 @@ export default function Home() {
                       );
                     })}
                   </span>
-                ));
-              })()}
-            </h1>
+                  {wordIndex < arr.length - 1 && " "}
+                </Fragment>
+              ));
+            })()}
+          </h1>
 
-            <div className="space-y-6 md:space-y-8 text-left max-w-xl">
+          {/* 2. Content – asymmetric two‑column body */}
+          <div className="grid grid-cols-12 gap-x-12 gap-y-16">
+
+            {/* Left: narrative */}
+            <div className="col-span-7 flex flex-col gap-10">
               {/* Monologue */}
               <motion.div
                 variants={monologueContainerVariants}
                 initial="hidden"
                 animate={isReady ? "visible" : "hidden"}
-                className="text-[15px] md:text-[18px] leading-relaxed text-[#F6F0DF]/90 font-medium"
+                className="text-[16px] md:text-[19px] leading-relaxed text-[#F6F0DF]/90 font-medium"
               >
                 {monologueWords.map((word, idx) => (
                   <motion.span
                     key={idx}
                     variants={wordVariants}
-                    className={`inline-block mr-1 ${word.italic ? "font-serif italic text-[#DEDBC8]" : ""}`}
+                    className={`inline-block mr-1.5 ${word.italic ? "font-serif italic text-[#DEDBC8]" : ""}`}
                   >
                     {word.text}
                   </motion.span>
                 ))}
               </motion.div>
 
-              {/* Background Paragraph */}
+              {/* Background paragraph */}
               <motion.div
                 variants={bgContainerVariants}
                 initial="hidden"
                 animate={isReady ? "visible" : "hidden"}
-                className="text-[13px] md:text-[15px] leading-relaxed text-[#F6F0DF]/60"
+                className="text-[14px] md:text-[16px] leading-relaxed text-[#F6F0DF]/50"
               >
                 {bgParagraphWords.map((word, idx) => (
                   <motion.span
                     key={idx}
                     variants={wordVariants}
-                    className="inline-block mr-1"
+                    className="inline-block mr-1.5"
                   >
                     {word}
                   </motion.span>
                 ))}
               </motion.div>
             </div>
-          </div>
 
-          {/* Column 3 (Right): Capabilities & Gateway */}
-          <div className="col-span-1 md:col-span-2 md:col-start-11 flex flex-col gap-8 md:border-l md:border-[#F6F0DF]/10 md:pl-8">
-            <div>
-              <div className="font-mono text-[10px] md:text-[11px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
-                03 / Core Stack
+            {/* Right: capabilities + gateway */}
+            <div className="col-span-5 flex flex-col gap-12 border-l border-[#F6F0DF]/10 pl-10">
+              {/* Core Stack */}
+              <div>
+                <div className="font-mono text-[11px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none">
+                  01 / Core Stack
+                </div>
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <div className="font-mono text-[9px] tracking-[0.2em] uppercase opacity-40 mb-4 select-none border-b border-[#F6F0DF]/10 pb-2">
+                      LANGUAGES
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      {codeLanguages.map((skill, index) => (
+                        <motion.div
+                          key={skill.name}
+                          initial={{ opacity: 0, x: -5 }}
+                          animate={isReady ? { opacity: 1, x: 0 } : { opacity: 0, x: -5 }}
+                          transition={{
+                            duration: 0.5,
+                            delay: TIMELINE.SKILLS_START + index * TIMELINE.SKILLS_ITEM_STAGGER,
+                            ease: [0.25, 1, 0.5, 1]
+                          }}
+                          className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[11px] hover:text-[#F6F0DF] transition-colors cursor-default"
+                        >
+                          <span className="opacity-60">{skill.logo}</span> {skill.name}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-mono text-[9px] tracking-[0.2em] uppercase opacity-40 mb-4 select-none border-b border-[#F6F0DF]/10 pb-2">
+                      SKILLS
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      {designSkills.map((skill, index) => (
+                        <motion.div
+                          key={skill.name}
+                          initial={{ opacity: 0, x: -5 }}
+                          animate={isReady ? { opacity: 1, x: 0 } : { opacity: 0, x: -5 }}
+                          transition={{
+                            duration: 0.5,
+                            delay: TIMELINE.SKILLS_START + 0.15 + index * TIMELINE.SKILLS_ITEM_STAGGER,
+                            ease: [0.25, 1, 0.5, 1]
+                          }}
+                          className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[11px] hover:text-[#F6F0DF] transition-colors cursor-default"
+                        >
+                          <span className="opacity-60">{skill.logo}</span> {skill.name}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-[#F6F0DF]/10 pb-2">LANGUAGES</div>
-                  <div className="flex flex-col gap-3">
-                    {codeLanguages.map((skill, index) => (
-                      <motion.div key={skill.name} initial={{ opacity: 0, x: -10 }} animate={isReady ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }} transition={{ duration: 0.5, delay: TIMELINE.SKILLS_START + index * TIMELINE.SKILLS_ITEM_STAGGER }} className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] md:text-[11px] hover:text-[#F6F0DF] transition-colors cursor-default">
-                        <span className="opacity-60">{skill.logo}</span> {skill.name}
-                      </motion.div>
-                    ))}
-                  </div>
+
+              {/* Gateway */}
+              <div>
+                <div className="font-mono text-[11px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none">
+                  02 / Gateway
                 </div>
-                <div>
-                  <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-[#F6F0DF]/10 pb-2">SKILLS</div>
-                  <div className="flex flex-col gap-3">
-                    {designSkills.map((skill, index) => (
-                      <motion.div key={skill.name} initial={{ opacity: 0, x: -10 }} animate={isReady ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }} transition={{ duration: 0.5, delay: TIMELINE.SKILLS_START + 0.15 + index * TIMELINE.SKILLS_ITEM_STAGGER }} className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] md:text-[11px] hover:text-[#F6F0DF] transition-colors cursor-default">
-                        <span className="opacity-60">{skill.logo}</span> {skill.name}
-                      </motion.div>
-                    ))}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                  transition={{
+                    duration: 0.8,
+                    delay: TIMELINE.GATEWAY_START,
+                    ease: [0.25, 1, 0.5, 1]
+                  }}
+                >
+                  <div className="flex flex-col gap-0">
+                    <div
+                      onClick={() => navigate("/contact")}
+                      id="desktop-gateway-contact"
+                      className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500"
+                    >
+                      <span className="font-mono text-[12px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">
+                        CONTACT
+                      </span>
+                      <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
+                        →
+                      </span>
+                    </div>
+                    <div
+                      onClick={() => navigate("/portfolio")}
+                      id="desktop-gateway-portfolio"
+                      className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500"
+                    >
+                      <span className="font-mono text-[12px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">
+                        PORTFOLIO
+                      </span>
+                      <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
+                        →
+                      </span>
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </div>
-
-            <div>
-              <div className="font-mono text-[10px] md:text-[11px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
-                04 / Gateway
-              </div>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-                transition={{ duration: 0.8, delay: TIMELINE.GATEWAY_START }}
-              >
-                <div className="flex flex-col gap-0 py-2">
-                  <div onClick={() => navigate("/contact")} id="desktop-gateway-contact" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
-                    <span className="font-mono text-[11px] md:text-[12px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">CONTACT</span>
-                    <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
-                  </div>
-                  <div onClick={() => navigate("/portfolio")} id="desktop-gateway-portfolio" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
-                    <span className="font-mono text-[11px] md:text-[12px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">PORTFOLIO</span>
-                    <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
           </div>
-
         </div>
 
-        {/* Smartphone Layout (below md) */}
+        {/* Mobile Layout – Elegant vertical rhythm */}
         <div className="flex md:hidden flex-col gap-10 w-full">
-          
-          {/* 1. Title (Hero at the top) */}
-          <h1 className="font-maghfirea text-[clamp(1.6rem,7vw,110px)] text-[#F6F0DF] flex flex-row flex-nowrap justify-center gap-x-[0.25em] text-center leading-[0.95] selection:bg-[#F6F0DF] selection:text-[#223D27] px-4 w-full whitespace-nowrap overflow-visible">
+          {/* Name */}
+          <h1 className="font-maghfirea text-[clamp(2.2rem,9vw,4rem)] text-[#F6F0DF] leading-[0.95] text-center w-full overflow-visible">
             {(() => {
               let charCounter = 0;
-              return text.split(" ").map((word, wordIndex) => (
-                <span key={wordIndex} className="inline-block whitespace-nowrap">
-                  {word.split("").map((char, charIndex) => {
-                    const globalIndex = charCounter++;
-                    return (
-                      <span
-                        key={charIndex}
-                        className="inline-block overflow-hidden"
-                        style={{ paddingBottom: "0.12em", marginBottom: "-0.12em" }}
-                      >
-                        <motion.span
-                          className="inline-block"
-                          initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
-                          animate={isReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 50, filter: "blur(10px)" }}
-                          transition={{
-                            duration: TIMELINE.NAME_CHAR_DURATION,
-                            ease: [0.21, 1, 0.36, 1],
-                            delay: globalIndex * TIMELINE.NAME_CHAR_STAGGER,
-                          }}
+              return nameText.split(" ").map((word, wordIndex, arr) => (
+                <Fragment key={wordIndex}>
+                  <span className="inline-block whitespace-nowrap">
+                    {word.split("").map((char, charIndex) => {
+                      const globalIndex = charCounter++;
+                      return (
+                        <span
+                          key={charIndex}
+                          className="inline-block overflow-hidden"
+                          style={{ paddingBottom: "0.08em", marginBottom: "-0.08em" }}
                         >
-                          {char}
-                        </motion.span>
-                      </span>
-                    );
-                  })}
-                </span>
+                          <motion.span
+                            className="inline-block"
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                            transition={{
+                              duration: TIMELINE.NAME_CHAR_DURATION,
+                              ease: [0.21, 1, 0.36, 1],
+                              delay: globalIndex * TIMELINE.NAME_CHAR_STAGGER,
+                            }}
+                          >
+                            {char}
+                          </motion.span>
+                        </span>
+                      );
+                    })}
+                  </span>
+                  {wordIndex < arr.length - 1 && " "}
+                </Fragment>
               ));
             })()}
           </h1>
 
-          {/* 2. Portrait (Scroll Reveal) - Made smaller (w-1/2 max-w-[200px]) and appears later (delay: 0.6) */}
-          <motion.div
-            initial={{ opacity: 0, y: 35, filter: "blur(6px)" }}
-            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.9, delay: 0.85, ease: [0.21, 1, 0.36, 1] }}
-            className="flex flex-col items-center w-full"
-          >
-            <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none self-start">
-              01 / Portrait
-            </div>
-            <div className="w-1/2 aspect-[4/5] max-w-[200px] border border-[#F6F0DF]/20 overflow-hidden bg-white/5 relative rounded-xl shadow-lg">
-              <picture>
-                <source srcSet="/IMG_2656.webp" type="image/webp" />
-                <img
-                  src="/IMG_2656_opt.jpeg"
-                  alt="Portrait of Cherif Bouabdallah"
-                  width={480}
-                  height={600}
-                  loading="eager"
-                  decoding="async"
-                  className="w-full h-full object-cover"
-                />
-              </picture>
-            </div>
-          </motion.div>
-
-          {/* 3. Monologue (Scroll Reveal - Word by Word) */}
+          {/* Monologue (scroll reveal) */}
           <motion.div
             variants={mobileMonologueContainerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-40px" }}
-            className="text-[15px] leading-relaxed text-[#F6F0DF]/90 font-medium text-left w-full"
+            className="text-[16px] leading-relaxed text-[#F6F0DF]/90 font-medium text-left w-full"
           >
             {monologueWords.map((word, idx) => (
               <motion.span
                 key={idx}
                 variants={wordVariants}
-                className={`inline-block mr-1 ${word.italic ? "font-serif italic text-[#DEDBC8]" : ""}`}
+                className={`inline-block mr-1.5 ${word.italic ? "font-serif italic text-[#DEDBC8]" : ""}`}
               >
                 {word.text}
               </motion.span>
             ))}
           </motion.div>
 
-          {/* 4. Background (Scroll Reveal - Word by Word) */}
+          {/* Background paragraph */}
           <motion.div
             variants={mobileBgContainerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-40px" }}
-            className="text-[13px] leading-relaxed text-[#F6F0DF]/60 text-left w-full"
+            className="text-[14px] leading-relaxed text-[#F6F0DF]/50 text-left w-full"
           >
             {bgParagraphWords.map((word, idx) => (
-              <motion.span
-                key={idx}
-                variants={wordVariants}
-                className="inline-block mr-1"
-              >
+              <motion.span key={idx} variants={wordVariants} className="inline-block mr-1.5">
                 {word}
               </motion.span>
             ))}
           </motion.div>
 
-          {/* 4. Info (Scroll Reveal) */}
+          {/* Core Stack */}
           <motion.div
-            initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
-            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
+            transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
             className="w-full text-left"
           >
             <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
-              02 / Info
+              01 / Core Stack
             </div>
-            <div className="font-mono text-[11px] leading-relaxed text-[#F6F0DF]/50 space-y-2 border border-[#F6F0DF]/10 rounded-xl p-4 bg-black/10">
-              <div><span className="text-[#F6F0DF] opacity-80 font-bold">CLIENT:</span> Cherif Bouabdallah</div>
-              <div><span className="text-[#F6F0DF] opacity-80 font-bold">ROLE:</span> EPFL CS Engineer</div>
-              <div><span className="text-[#F6F0DF] opacity-80 font-bold">GRID:</span> Modular Swiss 12-Col</div>
-              <div><span className="text-[#F6F0DF] opacity-80 font-bold">LOC:</span> Lausanne, CH</div>
-            </div>
-          </motion.div>
-
-          {/* 5. Core Stack (Scroll Reveal) */}
-          <motion.div
-            initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
-            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
-            className="w-full text-left"
-          >
-            <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
-              03 / Core Stack
-            </div>
-            
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-[#F6F0DF]/10 pb-2">LANGUAGES</div>
+                <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-[#F6F0DF]/10 pb-2">
+                  LANGUAGES
+                </div>
                 <div className="flex flex-col gap-3">
                   {codeLanguages.map((skill) => (
-                    <div key={skill.name} className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] hover:text-[#F6F0DF] transition-colors cursor-default">
+                    <div
+                      key={skill.name}
+                      className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] hover:text-[#F6F0DF] transition-colors cursor-default"
+                    >
                       <span className="opacity-60">{skill.logo}</span> {skill.name}
                     </div>
                   ))}
                 </div>
               </div>
               <div>
-                <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-[#F6F0DF]/10 pb-2">SKILLS</div>
+                <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-[#F6F0DF]/10 pb-2">
+                  SKILLS
+                </div>
                 <div className="flex flex-col gap-3">
                   {designSkills.map((skill) => (
-                    <div key={skill.name} className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] hover:text-[#F6F0DF] transition-colors cursor-default">
+                    <div
+                      key={skill.name}
+                      className="flex items-center gap-2 text-[#F6F0DF]/80 font-mono text-[10px] hover:text-[#F6F0DF] transition-colors cursor-default"
+                    >
                       <span className="opacity-60">{skill.logo}</span> {skill.name}
                     </div>
                   ))}
@@ -568,37 +520,48 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* 6. Gateway (Scroll Reveal) */}
+          {/* Gateway */}
           <motion.div
-            initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
-            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
+            transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
             className="w-full text-left"
           >
             <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
-              04 / Gateway
+              02 / Gateway
             </div>
-            
             <div className="flex flex-col gap-0 py-2">
-              <div onClick={() => navigate("/contact")} id="mobile-gateway-contact" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
-                <span className="font-mono text-[11px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">CONTACT</span>
-                <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
+              <div
+                onClick={() => navigate("/contact")}
+                id="mobile-gateway-contact"
+                className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500"
+              >
+                <span className="font-mono text-[11px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">
+                  CONTACT
+                </span>
+                <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
+                  →
+                </span>
               </div>
-              <div onClick={() => navigate("/portfolio")} id="mobile-gateway-portfolio" className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500">
-                <span className="font-mono text-[11px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">PORTFOLIO</span>
-                <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">→</span>
+              <div
+                onClick={() => navigate("/portfolio")}
+                id="mobile-gateway-portfolio"
+                className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-[#F6F0DF]/10 transition-all duration-500"
+              >
+                <span className="font-mono text-[11px] tracking-[0.4em] text-[#F6F0DF]/60 group-hover:text-[#F6F0DF]/100 group-hover:translate-x-1 transition-all duration-500">
+                  PORTFOLIO
+                </span>
+                <span className="font-mono text-[10px] text-[#F6F0DF]/0 group-hover:text-[#F6F0DF]/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
+                  →
+                </span>
               </div>
             </div>
           </motion.div>
-
         </div>
-
       </div>
 
-      {/* Copyright Footer */}
       <Footer className="w-full text-center text-[#F6F0DF]/30 mt-auto pt-8 z-10" />
-      
     </div>
   );
 }
