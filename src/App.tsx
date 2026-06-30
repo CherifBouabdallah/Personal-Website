@@ -23,6 +23,7 @@ const Portfolio = lazyWithPreload(() => import("./pages/Portfolio"));
 const Contact = lazyWithPreload(() => import("./pages/Contact"));
 const Vortex = lazyWithPreload(() => import("./pages/Vortex"));
 const SoccerTeam = lazyWithPreload(() => import("./pages/SoccerTeam"));
+const NoodlePlace = lazyWithPreload(() => import("./pages/NoodlePlace"));
 const NotFound = lazyWithPreload(() => import("./pages/NotFound"));
 
 export default function App() {
@@ -70,6 +71,7 @@ export default function App() {
       Contact.preload();
       Vortex.preload();
       SoccerTeam.preload();
+      NoodlePlace.preload();
       NotFound.preload();
     };
 
@@ -111,7 +113,7 @@ export default function App() {
     return () => cancelAnimationFrame(animationFrameId);
   }, []);
 
-  const isScrollable = location.pathname === "/" || location.pathname === "/vortex" || location.pathname === "/portfolio" || location.pathname === "/soccer-team";
+  const isScrollable = location.pathname === "/" || location.pathname === "/vortex" || location.pathname === "/portfolio" || location.pathname === "/soccer-team" || location.pathname === "/noodle-place";
 
   return (
     <div className={`relative flex min-h-screen bg-theme-bg items-stretch justify-stretch ${isScrollable ? "overflow-y-auto no-scrollbar overscroll-y-none" : "overflow-hidden"}`}>
@@ -155,7 +157,7 @@ export default function App() {
         >
           {/* Liquid Navbar at top middle */}
           <AnimatePresence>
-            {!["/vortex", "/soccer-team"].includes(location.pathname) && (
+            {!["/vortex", "/soccer-team", "/noodle-place"].includes(location.pathname) && (
               <motion.div
                 key="navbar-wrapper"
                 initial={{ opacity: 0, y: -15 }}
@@ -178,6 +180,7 @@ export default function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/vortex" element={<Vortex />} />
               <Route path="/soccer-team" element={<SoccerTeam />} />
+              <Route path="/noodle-place" element={<NoodlePlace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

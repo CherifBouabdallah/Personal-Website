@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import Vortex from "./Vortex";
 import SoccerTeam from "./SoccerTeam";
+import NoodlePlace from "./NoodlePlace";
 import {
   Github,
   ArrowRight,
@@ -107,6 +108,7 @@ export default function Portfolio() {
   const [isMobile, setIsMobile] = useState(false);
   const [isVortexOpen, setIsVortexOpen] = useState(false);
   const [isSoccerOpen, setIsSoccerOpen] = useState(false);
+  const [isNoodleOpen, setIsNoodleOpen] = useState(false);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const currentScrollY = useRef(0);
@@ -156,21 +158,22 @@ export default function Portfolio() {
 
   // Listen to Escape key to close preview modals
   useEffect(() => {
-    if (!isVortexOpen && !isSoccerOpen) return;
+    if (!isVortexOpen && !isSoccerOpen && !isNoodleOpen) return;
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setIsVortexOpen(false);
         setIsSoccerOpen(false);
+        setIsNoodleOpen(false);
       }
     };
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
-  }, [isVortexOpen, isSoccerOpen]);
+  }, [isVortexOpen, isSoccerOpen, isNoodleOpen]);
 
   // Scroll and Resize Observer initialization
   useEffect(() => {
     if (!isReady) return;
-    if (isVortexOpen || isSoccerOpen) return;
+    if (isVortexOpen || isSoccerOpen || isNoodleOpen) return;
 
     const updateMaxScroll = () => {
       if (contentRef.current) {
@@ -269,7 +272,7 @@ export default function Portfolio() {
       window.removeEventListener("resize", updateMaxScroll);
       if (observer) observer.disconnect();
     };
-  }, [isReady, isVortexOpen, isSoccerOpen]);
+  }, [isReady, isVortexOpen, isSoccerOpen, isNoodleOpen]);
 
   const headerText = "Portfolio";
 
@@ -572,6 +575,85 @@ export default function Portfolio() {
 
               </div>
             </motion.div>
+
+            {/* FEATURED PROJECT 3: Kiri Ramen Landing Page */}
+            <motion.div
+              custom={3}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              variants={cardRevealVariants}
+              className="col-span-12"
+            >
+              <div className={`glass-square ${getGlassClass()} p-6 md:p-10 flex flex-col lg:flex-row gap-8 lg:gap-12 items-center text-left overflow-hidden relative group`}>
+
+                {/* Text Description Column */}
+                <div className="flex-1 flex flex-col justify-center min-h-[280px]">
+                  <div>
+                    {/* Metadata Header */}
+                    <div className="flex justify-between items-center mb-6 border-b border-theme-text/10 pb-4">
+                      <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">03 / Featured Project</span>
+                      <span className="font-mono text-[8px] tracking-wider text-theme-text/40 uppercase px-2 py-0.5 rounded border border-theme-text/10 bg-black/10 flex items-center gap-1.5">
+                        <Activity size={10} className="text-[#C85A32] animate-pulse" />
+                        Gastronomy & Brand
+                      </span>
+                    </div>
+
+                    <h2 className="font-maghfirea text-[clamp(1.8rem,4vw,3rem)] text-theme-text tracking-wide mb-4 leading-tight">
+                      Kiri Ramen
+                    </h2>
+
+                    <p className="font-mono text-[10px] md:text-[12px] leading-relaxed text-theme-text/70 mb-6">
+                      A sensory digital showcase for a premium ramen sanctuary. Fuses wabi-sabi aesthetics with smooth scroll-driven typography reveals, asymmetric bento menu layouts, micro-interactive ingredient drawers, and a warm terracotta and charcoal canvas.
+                    </p>
+
+                    {/* Tech stack badges */}
+                    <div className="flex flex-wrap gap-2 mb-8">
+                      {["REACT", "FRAMER MOTION", "BENTO LAYOUT", "WABI-SABI STYLE", "PRECISE CONTRAST"].map((tech) => (
+                        <span key={tech} className="font-mono text-[8px] tracking-widest text-theme-text/80 px-2 py-1 rounded bg-theme-text/5 border border-theme-text/15">
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button
+                      onClick={() => setIsNoodleOpen(true)}
+                      className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text text-theme-bg font-mono text-[10px] font-bold tracking-widest hover:bg-theme-text/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                    >
+                      OPEN PROJECT
+                      <ArrowRight size={12} strokeWidth={2.5} />
+                    </button>
+
+                    <a
+                      href="https://github.com/CherifBouabdallah"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text/5 hover:bg-theme-text/10 text-theme-text border border-theme-text/15 font-mono text-[10px] font-bold tracking-widest active:scale-[0.98] transition-all duration-200"
+                    >
+                      <Github size={12} />
+                      SOURCE CODE
+                    </a>
+                  </div>
+                </div>
+
+                {/* Preview Column — vertically centered */}
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="w-full max-w-[520px]">
+                    <ProjectPreview 
+                      onClick={() => setIsNoodleOpen(true)} 
+                      layoutId="noodle-place-card" 
+                      bgColor="#121212"
+                    >
+                      <NoodlePlace isPreview={true} />
+                    </ProjectPreview>
+                  </div>
+                </div>
+
+              </div>
+            </motion.div>
           </div>
 
           {/* Minimal Editorial Footer */}
@@ -642,6 +724,42 @@ export default function Portfolio() {
               {/* Floating Close Button pinned at top right corner of the modal window card */}
               <button
                 onClick={() => setIsVortexOpen(false)}
+                className="absolute top-6 right-6 z-[120] w-10 h-10 rounded-full bg-black/60 border border-white/10 hover:bg-white/10 hover:border-white/30 text-white flex items-center justify-center font-mono text-[10px] tracking-wider cursor-pointer transition-all duration-300 shadow-md"
+                title="Close Preview (Esc)"
+              >
+                ESC
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Kiri Ramen Preview Overlay Modal */}
+      <AnimatePresence>
+        {isNoodleOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 overflow-hidden cursor-pointer"
+            onClick={() => setIsNoodleOpen(false)}
+          >
+            <div
+              className="w-full h-full max-w-[1280px] max-h-[85vh] relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <motion.div
+                layoutId="noodle-place-card"
+                transition={{ type: "spring", stiffness: 180, damping: 25 }}
+                className="w-full h-full bg-[#121212] border border-white/10 overflow-y-auto no-scrollbar cursor-default relative"
+                style={{ borderRadius: 28, transform: "translate3d(0,0,0)" }}
+              >
+                <NoodlePlace isPreview={true} />
+              </motion.div>
+
+              {/* Floating Close Button */}
+              <button
+                onClick={() => setIsNoodleOpen(false)}
                 className="absolute top-6 right-6 z-[120] w-10 h-10 rounded-full bg-black/60 border border-white/10 hover:bg-white/10 hover:border-white/30 text-white flex items-center justify-center font-mono text-[10px] tracking-wider cursor-pointer transition-all duration-300 shadow-md"
                 title="Close Preview (Esc)"
               >
