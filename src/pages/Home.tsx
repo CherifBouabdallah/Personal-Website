@@ -2,6 +2,8 @@ import { useState, useEffect, memo, Fragment } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, Variants } from "framer-motion";
 import Footer from "../components/Footer";
+import { TRANSLATIONS } from "../data/translations";
+import { LanguageSwitcher } from "../components/LanguageSwitcher";
 
 // SVG Logos for Core Stack
 const JavaLogo = memo(() => (
@@ -69,86 +71,17 @@ const DesignLogo = memo(() => (
   </svg>
 ));
 
-const codeLanguages = [
-  { name: "Java", logo: <JavaLogo /> },
-  { name: "Python", logo: <PythonLogo /> },
-  { name: "Risc-V Assembly", logo: <RiscVLogo /> },
-  { name: "Verilog", logo: <VerilogLogo /> }
-];
-
-const designSkills = [
-  { name: "Arduino", logo: <ArduinoLogo /> },
-  { name: "Latex", logo: <LatexLogo /> },
-  { name: "Blender", logo: <BlenderLogo /> },
-  { name: "Photoshop", logo: <PhotoshopLogo /> },
-  { name: "Creative Web Design", logo: <DesignLogo /> }
-];
-
-const monologueWords = [
-  { text: "I", italic: false },
-  { text: "am", italic: false },
-  { text: "a", italic: false },
-  { text: "designer", italic: false },
-  { text: "and", italic: false },
-  { text: "full-stack", italic: false },
-  { text: "software", italic: false },
-  { text: "engineer", italic: false },
-  { text: "who", italic: false },
-  { text: "focuses", italic: false },
-  { text: "on", italic: false },
-  { text: "bridging", italic: false },
-  { text: "the", italic: false },
-  { text: "gap", italic: false },
-  { text: "between", italic: false },
-  { text: "aesthetics", italic: false },
-  { text: "and", italic: false },
-  { text: "clean", italic: false },
-  { text: "code.", italic: false },
-  { text: "I", italic: true },
-  { text: "build", italic: true },
-  { text: "performant", italic: true },
-  { text: "front-ends", italic: true },
-  { text: "and", italic: true },
-  { text: "interactive", italic: true },
-  { text: "experiences", italic: true },
-  { text: "that", italic: true },
-  { text: "are", italic: true },
-  { text: "highly", italic: true },
-  { text: "responsive", italic: true },
-  { text: "and", italic: true },
-  { text: "structured.", italic: true },
-  { text: "Driven", italic: false },
-  { text: "by", italic: false },
-  { text: "curiosity,", italic: false },
-  { text: "I", italic: false },
-  { text: "aim", italic: false },
-  { text: "to", italic: false },
-  { text: "craft", italic: false },
-  { text: "memorable", italic: false },
-  { text: "digital", italic: false },
-  { text: "products", italic: false },
-  { text: "that", italic: false },
-  { text: "look", italic: false },
-  { text: "beautiful", italic: false },
-  { text: "and", italic: false },
-  { text: "feel", italic: false },
-  { text: "extremely", italic: false },
-  { text: "premium.", italic: false }
-];
-
-const bgParagraphWords = "Currently pursuing software engineering at EPFL (École Polytechnique Fédérale de Lausanne), focusing on distributed architectures, interactive computer graphics, and engineering clean web environments.".split(" ");
-
 // --- Polished Animation Timeline (portrait removed, all elements breathe) ---
 const TIMELINE = {
-  NAME_CHAR_STAGGER: 0.035,
-  NAME_CHAR_DURATION: 0.85,
-  MONOLOGUE_START: 0.6,
-  MONOLOGUE_WORD_STAGGER: 0.022,
-  BG_PARAGRAPH_START: 1.6,
-  BG_WORD_STAGGER: 0.02,
-  SKILLS_START: 2.0,
-  SKILLS_ITEM_STAGGER: 0.06,
-  GATEWAY_START: 2.8,
+  NAME_CHAR_STAGGER: 0.02,
+  NAME_CHAR_DURATION: 0.6,
+  MONOLOGUE_START: 0.2,
+  MONOLOGUE_WORD_STAGGER: 0.015,
+  BG_PARAGRAPH_START: 0.6,
+  BG_WORD_STAGGER: 0.012,
+  SKILLS_START: 0.8,
+  SKILLS_ITEM_STAGGER: 0.04,
+  GATEWAY_START: 1.1,
 };
 
 const monologueContainerVariants = {
@@ -204,15 +137,58 @@ const wordVariants: Variants = {
   }
 };
 
-export default function Home() {
+interface HomeProps {
+  lang: "en" | "fr";
+  setLang: (l: "en" | "fr") => void;
+}
+
+export default function Home({ lang, setLang }: HomeProps) {
   const [isReady, setIsReady] = useState(false);
+  const [isInitialMount, setIsInitialMount] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.fonts.ready.then(() => setIsReady(true));
+    let active = true;
+    document.fonts.ready.then(() => {
+      if (active) setIsReady(true);
+    });
+    const timer = setTimeout(() => {
+      if (active) setIsReady(true);
+    }, 500);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialMount(false);
+    }, 3000);
+    return () => clearTimeout(timer);
   }, []);
 
   const nameText = "Cherif Bouabdallah";
+
+  const t = TRANSLATIONS[lang];
+
+  const codeLanguages = [
+    { name: "Java", logo: <JavaLogo /> },
+    { name: "Python", logo: <PythonLogo /> },
+    { name: t.riscVName, logo: <RiscVLogo /> },
+    { name: "Verilog", logo: <VerilogLogo /> }
+  ];
+
+  const designSkills = [
+    { name: "Arduino", logo: <ArduinoLogo /> },
+    { name: "Latex", logo: <LatexLogo /> },
+    { name: "Blender", logo: <BlenderLogo /> },
+    { name: "Photoshop", logo: <PhotoshopLogo /> },
+    { name: t.creativeWebDesignName, logo: <DesignLogo /> }
+  ];
+
+  const monologueWords = t.monologue;
+  const bgParagraphWords = t.background.split(" ");
 
   return (
     <div className="w-full min-h-screen flex flex-col pt-24 md:pt-32 pb-8 px-6 md:px-16 lg:px-24 xl:px-32 relative bg-theme-bg text-theme-text select-text selection:bg-theme-text selection:text-theme-bg">
@@ -260,7 +236,13 @@ export default function Home() {
           <div className="grid grid-cols-12 gap-x-12 gap-y-16">
 
             <div className="col-span-7 flex flex-col gap-10">
+              {/* Language Switcher */}
+              <div className="flex justify-start">
+                <LanguageSwitcher lang={lang} setLang={setLang} layoutId="active-lang-bg-desktop" />
+              </div>
+
               <motion.div
+                key={`monologue-${lang}`}
                 variants={monologueContainerVariants}
                 initial="hidden"
                 animate={isReady ? "visible" : "hidden"}
@@ -278,6 +260,7 @@ export default function Home() {
               </motion.div>
 
               <motion.div
+                key={`bg-${lang}`}
                 variants={bgContainerVariants}
                 initial="hidden"
                 animate={isReady ? "visible" : "hidden"}
@@ -298,14 +281,14 @@ export default function Home() {
             <div className="col-span-5 flex flex-col gap-12 border-l border-theme-text/10 pl-10">
               <div>
                 <div className="font-mono text-[11px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none">
-                  01 / Core Stack
+                  {t.coreStack}
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <div className="font-mono text-[9px] tracking-[0.2em] uppercase opacity-40 mb-4 select-none border-b border-theme-text/10 pb-2">
-                      LANGUAGES
+                      {t.languages}
                     </div>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-3" key={`languages-${lang}`}>
                       {codeLanguages.map((skill, index) => (
                         <motion.div
                           key={skill.name}
@@ -313,7 +296,7 @@ export default function Home() {
                           animate={isReady ? { opacity: 1, x: 0 } : { opacity: 0, x: -5 }}
                           transition={{
                             duration: 0.5,
-                            delay: TIMELINE.SKILLS_START + index * TIMELINE.SKILLS_ITEM_STAGGER,
+                            delay: isInitialMount ? (TIMELINE.SKILLS_START + index * TIMELINE.SKILLS_ITEM_STAGGER) : (index * 0.02),
                             ease: [0.25, 1, 0.5, 1]
                           }}
                           className="flex items-center gap-2 text-theme-text/80 font-mono text-[11px] hover:text-theme-text transition-colors cursor-default"
@@ -325,9 +308,9 @@ export default function Home() {
                   </div>
                   <div>
                     <div className="font-mono text-[9px] tracking-[0.2em] uppercase opacity-40 mb-4 select-none border-b border-theme-text/10 pb-2">
-                      SKILLS
+                      {t.skills}
                     </div>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-3" key={`skills-${lang}`}>
                       {designSkills.map((skill, index) => (
                         <motion.div
                           key={skill.name}
@@ -335,7 +318,7 @@ export default function Home() {
                           animate={isReady ? { opacity: 1, x: 0 } : { opacity: 0, x: -5 }}
                           transition={{
                             duration: 0.5,
-                            delay: TIMELINE.SKILLS_START + 0.15 + index * TIMELINE.SKILLS_ITEM_STAGGER,
+                            delay: isInitialMount ? (TIMELINE.SKILLS_START + 0.15 + index * TIMELINE.SKILLS_ITEM_STAGGER) : (index * 0.02),
                             ease: [0.25, 1, 0.5, 1]
                           }}
                           className="flex items-center gap-2 text-theme-text/80 font-mono text-[11px] hover:text-theme-text transition-colors cursor-default"
@@ -350,7 +333,7 @@ export default function Home() {
 
               <div>
                 <div className="font-mono text-[11px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none">
-                  02 / Gateway
+                  {t.gateway}
                 </div>
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -368,7 +351,7 @@ export default function Home() {
                       className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
                     >
                       <span className="font-mono text-[12px] tracking-[0.4em] text-theme-text/60 group-hover:text-theme-text/100 group-hover:translate-x-1 transition-all duration-500">
-                        CONTACT
+                        {t.contact}
                       </span>
                       <span className="font-mono text-[10px] text-theme-text/0 group-hover:text-theme-text/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
                         →
@@ -380,7 +363,7 @@ export default function Home() {
                       className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
                     >
                       <span className="font-mono text-[12px] tracking-[0.4em] text-theme-text/60 group-hover:text-theme-text/100 group-hover:translate-x-1 transition-all duration-500">
-                        PORTFOLIO
+                        {t.portfolio}
                       </span>
                       <span className="font-mono text-[10px] text-theme-text/0 group-hover:text-theme-text/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
                         →
@@ -395,6 +378,7 @@ export default function Home() {
 
         {/* Mobile Layout – Elegant vertical rhythm */}
         <div className="flex md:hidden flex-col gap-10 w-full">
+
           {/* Name */}
           <h1 className="font-maghfirea text-[clamp(2.2rem,9vw,4rem)] text-[#F6F0DF] leading-[0.95] text-center w-full overflow-visible">
             {(() => {
@@ -433,41 +417,49 @@ export default function Home() {
           </h1>
 
           {/* Monologue (scroll reveal) */}
-          <motion.div
-            variants={mobileMonologueContainerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            className="text-[16px] leading-relaxed text-[#F6F0DF]/90 font-medium text-left w-full"
-          >
-            {monologueWords.map((word, idx) => (
-              <motion.span
-                key={idx}
-                variants={wordVariants}
-                className={`inline-block mr-1.5 ${word.italic ? "font-serif italic text-[#DEDBC8]" : ""}`}
-              >
-                {word.text}
-              </motion.span>
-            ))}
-          </motion.div>
+          <div className="flex flex-col gap-6 w-full">
+            <div className="flex justify-start">
+              <LanguageSwitcher lang={lang} setLang={setLang} layoutId="active-lang-bg-mobile" />
+            </div>
+            <motion.div
+              key={`mobile-monologue-${lang}`}
+              variants={mobileMonologueContainerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              className="text-[16px] leading-relaxed text-[#F6F0DF]/90 font-medium text-left w-full"
+            >
+              {monologueWords.map((word, idx) => (
+                <motion.span
+                  key={idx}
+                  variants={wordVariants}
+                  className={`inline-block mr-1.5 ${word.italic ? "font-serif italic text-[#DEDBC8]" : ""}`}
+                >
+                  {word.text}
+                </motion.span>
+              ))}
+            </motion.div>
 
-          {/* Background paragraph */}
-          <motion.div
-            variants={mobileBgContainerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            className="text-[14px] leading-relaxed text-[#F6F0DF]/50 text-left w-full"
-          >
-            {bgParagraphWords.map((word, idx) => (
-              <motion.span key={idx} variants={wordVariants} className="inline-block mr-1.5">
-                {word}
-              </motion.span>
-            ))}
-          </motion.div>
+            {/* Background paragraph */}
+            <motion.div
+              key={`mobile-bg-${lang}`}
+              variants={mobileBgContainerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              className="text-[14px] leading-relaxed text-[#F6F0DF]/50 text-left w-full"
+            >
+              {bgParagraphWords.map((word, idx) => (
+                <motion.span key={idx} variants={wordVariants} className="inline-block mr-1.5">
+                  {word}
+                </motion.span>
+              ))}
+            </motion.div>
+          </div>
 
           {/* Core Stack */}
           <motion.div
+            key={`mobile-stack-${lang}`}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
@@ -475,14 +467,14 @@ export default function Home() {
             className="w-full text-left"
           >
             <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
-              01 / Core Stack
+              {t.coreStack}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-theme-text/10 pb-2">
-                  LANGUAGES
+                  {t.languages}
                 </div>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3" key={`mobile-languages-${lang}`}>
                   {codeLanguages.map((skill) => (
                     <div
                       key={skill.name}
@@ -495,9 +487,9 @@ export default function Home() {
               </div>
               <div>
                 <div className="font-mono text-[8px] tracking-[0.2em] uppercase opacity-40 mb-3 select-none border-b border-theme-text/10 pb-2">
-                  SKILLS
+                  {t.skills}
                 </div>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3" key={`mobile-skills-${lang}`}>
                   {designSkills.map((skill) => (
                     <div
                       key={skill.name}
@@ -520,7 +512,7 @@ export default function Home() {
             className="w-full text-left"
           >
             <div className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40 mb-4 select-none">
-              02 / Gateway
+              {t.gateway}
             </div>
             <div className="flex flex-col gap-0 py-2">
               <Link
@@ -529,7 +521,7 @@ export default function Home() {
                 className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
               >
                 <span className="font-mono text-[11px] tracking-[0.4em] text-theme-text/60 group-hover:text-theme-text group-hover:translate-x-1 transition-all duration-500">
-                  CONTACT
+                  {t.contact}
                 </span>
                 <span className="font-mono text-[10px] text-theme-text/0 group-hover:text-theme-text/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
                   →
@@ -541,7 +533,7 @@ export default function Home() {
                 className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
               >
                 <span className="font-mono text-[11px] tracking-[0.4em] text-theme-text/60 group-hover:text-theme-text group-hover:translate-x-1 transition-all duration-500">
-                  PORTFOLIO
+                  {t.portfolio}
                 </span>
                 <span className="font-mono text-[10px] text-theme-text/0 group-hover:text-theme-text/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
                   →

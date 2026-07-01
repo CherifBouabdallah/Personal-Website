@@ -75,18 +75,18 @@ export default function NoodlePlace({ isPreview = false }: NoodlePlaceProps) {
   const navigate = useNavigate();
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   // Custom states
   const [activeMenuTab, setActiveMenuTab] = useState<"signature" | "sides">("signature");
   const [selectedBowlIndex, setSelectedBowlIndex] = useState(0);
   const [isReserved, setIsReserved] = useState(false);
-  
+
   // Form states
   const [name, setName] = useState("");
   const [guests, setGuests] = useState("2");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("19:00");
-  
+
   // Carousel states for Guest Testimonials
   const [testimonialIdx, setTestimonialIdx] = useState(0);
 
@@ -236,9 +236,9 @@ export default function NoodlePlace({ isPreview = false }: NoodlePlaceProps) {
 
   return (
     <main className="overflow-x-hidden w-full max-w-full bg-[#121212] text-[#F4F1EA] selection:bg-[#C85A32] selection:text-[#F4F1EA] relative min-h-[100dvh] custom-scrollbar">
-      
+
       {/* Dynamic Background film-grain noise overlay */}
-      <div 
+      <div
         className="fixed inset-0 pointer-events-none z-50 opacity-[0.03]"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
@@ -643,7 +643,7 @@ export default function NoodlePlace({ isPreview = false }: NoodlePlaceProps) {
       <section className="py-24 px-6 md:px-16 lg:px-24 border-t border-white/5 bg-[#121212]">
         <div className="max-w-[800px] mx-auto text-center relative">
           <span className="font-mono text-[8px] tracking-[0.3em] uppercase text-[#C85A32] mb-8 block">GUEST IMPRESSIONS</span>
-          
+
           <div className="min-h-[160px] flex items-center justify-center">
             <AnimatePresence mode="wait">
               <motion.div
@@ -689,7 +689,7 @@ export default function NoodlePlace({ isPreview = false }: NoodlePlaceProps) {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(200,90,50,0.05)_0%,transparent_50%)] pointer-events-none" />
 
         <div className="max-w-[1440px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
-          
+
           {/* Form Description left column */}
           <div className="lg:col-span-6 text-left">
             <h2 className="font-cabinet text-4xl md:text-5xl font-extrabold tracking-tight mb-4">

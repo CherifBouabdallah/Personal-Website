@@ -33,6 +33,14 @@ export default function App() {
   const [isSiteReady, setIsSiteReady] = useState(false);
   const location = useLocation();
 
+  const [lang, setLang] = useState<"en" | "fr">(() => {
+    return (localStorage.getItem("preferred-lang") as "en" | "fr") || "en";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("preferred-lang", lang);
+  }, [lang]);
+
   const fontsLoadedRef = useRef(fontsLoaded);
   const imageLoadedRef = useRef(imageLoaded);
 
@@ -175,8 +183,8 @@ export default function App() {
           {/* Main Content */}
           <Suspense fallback={null}>
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/" element={<Home lang={lang} setLang={setLang} />} />
+              <Route path="/portfolio" element={<Portfolio lang={lang} setLang={setLang} />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/vortex" element={<Vortex />} />
               <Route path="/soccer-team" element={<SoccerTeam />} />

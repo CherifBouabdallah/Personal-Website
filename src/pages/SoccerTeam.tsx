@@ -159,8 +159,8 @@ function MatchRow({ homeTeam, awayTeam, date, time, venue, isHome, result }: {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-3 mb-2.5">
           <span className={`font-mono text-[8px] tracking-widest uppercase px-2 py-0.5 rounded border font-bold ${isHome
-              ? "bg-slate-150 border-slate-200 text-slate-700"
-              : "bg-slate-50 border-slate-200/50 text-slate-500"
+            ? "bg-slate-150 border-slate-200 text-slate-700"
+            : "bg-slate-50 border-slate-200/50 text-slate-500"
             }`}>
             {isHome ? "HOME" : "AWAY"}
           </span>
@@ -675,8 +675,8 @@ export default function SoccerTeam({ isPreview = false, onClose }: SoccerTeamPro
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`font-mono text-[9px] tracking-widest uppercase px-5 py-2.5 rounded-lg cursor-pointer transition-all duration-300 font-bold ${activeTab === tab
-                        ? "bg-[#12224A] text-white shadow-sm"
-                        : "text-slate-500 hover:text-[#12224A]"
+                      ? "bg-[#12224A] text-white shadow-sm"
+                      : "text-slate-500 hover:text-[#12224A]"
                       }`}
                   >
                     {tab}

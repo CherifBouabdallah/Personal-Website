@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useSpring, useTransform, Variants, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import Vortex from "./Vortex";
@@ -10,6 +10,8 @@ import {
   ArrowRight,
   Activity
 } from "lucide-react";
+import { TRANSLATIONS } from "../data/translations";
+import { LanguageSwitcher } from "../components/LanguageSwitcher";
 
 // Elegant self-drawing border divider rule
 function SelfDrawingLine({ className = "" }: { className?: string }) {
@@ -29,11 +31,12 @@ function SelfDrawingLine({ className = "" }: { className?: string }) {
 // ----------------------------------------------------------------------
 // SHARED PREVIEW: Scaled page thumbnail with unified hover
 // ----------------------------------------------------------------------
-function ProjectPreview({ onClick, layoutId, bgColor, children }: {
+function ProjectPreview({ onClick, layoutId, bgColor, children, hoverLabel = "Open Project" }: {
   onClick: () => void;
   layoutId: string;
   bgColor: string;
   children: React.ReactNode;
+  hoverLabel?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.35);
@@ -89,7 +92,7 @@ function ProjectPreview({ onClick, layoutId, bgColor, children }: {
       >
         <div className={`transition-all duration-300 bg-black/70 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/15 text-theme-text font-mono text-[9px] tracking-[0.25em] uppercase flex items-center gap-2 ${isHovered ? "opacity-100 scale-100" : "opacity-0 scale-90"}`}>
           <ArrowRight size={10} strokeWidth={2.5} />
-          Open Project
+          {hoverLabel}
         </div>
       </div>
     </motion.div>
@@ -101,7 +104,12 @@ function ProjectPreview({ onClick, layoutId, bgColor, children }: {
 // ----------------------------------------------------------------------
 // MAIN PORTFOLIO COMPONENT
 // ----------------------------------------------------------------------
-export default function Portfolio() {
+interface PortfolioProps {
+  lang: "en" | "fr";
+  setLang: (l: "en" | "fr") => void;
+}
+
+export default function Portfolio({ lang, setLang }: PortfolioProps) {
   const [isReady, setIsReady] = useState(false);
   const [maxScroll, setMaxScroll] = useState(0);
   const maxScrollRef = useRef(0);
@@ -115,6 +123,8 @@ export default function Portfolio() {
   const navigate = useNavigate();
 
   const getGlassClass = () => "glass-deep-blur";
+
+  const t = TRANSLATIONS[lang];
 
   // Smooth scroll tracking matching other scrollable screens
   const scrollProgress = useMotionValue(0);
@@ -135,8 +145,13 @@ export default function Portfolio() {
     return `${progress * -travel}px`;
   });
 
+  const [vh, setVh] = useState(window.innerHeight);
+
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setVh(window.innerHeight);
+    };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -274,7 +289,7 @@ export default function Portfolio() {
     };
   }, [isReady, isVortexOpen, isSoccerOpen, isNoodleOpen]);
 
-  const headerText = "Portfolio";
+  const headerText = t.portfolioTitle;
 
   // Title morph animation (centered -> scaled top banner -> scrolling with page)
   const titleY = useTransform(smoothScrollY, (value) => {
@@ -292,6 +307,32 @@ export default function Portfolio() {
   // Invites fade out on scroll
   const inviteOpacity = useTransform(smoothScrollY, [0, 150], [1, 0]);
   const inviteY = useTransform(smoothScrollY, [0, 150], ["0px", "15px"]);
+
+  // Dynamic floating language switcher positions
+  const switcherTopClamp = isMobile ? 24 : 32;
+  const switcherY = useTransform(smoothScrollY, (y) => {
+    const initialPos = vh + 48; // vh + pt-12
+    const currentPos = initialPos - y;
+    return Math.max(switcherTopClamp, currentPos);
+  });
+
+  const switcherLeft = useTransform(smoothScrollY, (y) => {
+    const clampVal = vh + 48 - switcherTopClamp;
+    const endVal = clampVal + 150;
+    if (y <= clampVal) return "50%";
+    if (y >= endVal) return "100%";
+    const pct = 50 + ((y - clampVal) / (endVal - clampVal)) * 50;
+    return `${pct}%`;
+  });
+
+  const switcherX = useTransform(smoothScrollY, (y) => {
+    const clampVal = vh + 48 - switcherTopClamp;
+    const endVal = clampVal + 150;
+    if (y <= clampVal) return "-50%";
+    if (y >= endVal) return "-100%";
+    const pct = -50 - ((y - clampVal) / (endVal - clampVal)) * 50;
+    return `${pct}%`;
+  });
 
   const cardRevealVariants: Variants = {
     hidden: { opacity: 0, y: 35 },
@@ -368,7 +409,7 @@ export default function Portfolio() {
       >
         <div className="flex flex-col items-center justify-center gap-2">
           <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-theme-text/60">
-            SCROLL
+            {t.scrollLabel}
           </span>
           <div className="w-[1.5px] h-[22px] bg-theme-text/20 relative overflow-hidden">
             <motion.div
@@ -387,6 +428,26 @@ export default function Portfolio() {
         </div>
       </motion.div>
 
+      {/* Dynamic Floating Language Switcher Container */}
+      {isReady && (
+        <motion.div
+          style={{ y: switcherY }}
+          className="fixed top-0 left-0 right-0 z-50 pointer-events-none px-6 md:px-16 lg:px-24 xl:px-36 h-12 flex items-center"
+        >
+          <div className="relative w-full h-full">
+            <motion.div
+              style={{
+                left: switcherLeft,
+                x: switcherX
+              }}
+              className="absolute top-1/2 -translate-y-1/2 pointer-events-auto"
+            >
+              <LanguageSwitcher lang={lang} setLang={setLang} layoutId="active-lang-bg-portfolio" />
+            </motion.div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Scrollable Container */}
       {isReady && (
         <motion.div
@@ -403,20 +464,20 @@ export default function Portfolio() {
 
           {/* Subtitle / Intro paragraph */}
           <div className="w-full max-w-[1440px] flex flex-col items-center gap-6 mb-8 md:mb-10 text-center pt-12">
+            <div className="h-6" /> {/* Visual spacer matching switcher height to keep paragraph position aligned */}
             <motion.p
+              key={`intro-${lang}`}
               initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 1.4, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 1.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="font-mono text-[9px] md:text-[11px] tracking-[0.25em] uppercase text-theme-text/60 max-w-xl leading-relaxed mt-2"
             >
-              My personnal projects along with client issued ones, mainly websites and school projects.
+              {t.portfolioIntro}
             </motion.p>
           </div>
 
-          <SelfDrawingLine className="mb-12 max-w-[1440px] mx-auto" />
-
           {/* Exhibition Grid */}
-          <div className="grid grid-cols-12 gap-8 md:gap-12 w-full max-w-[1440px] mx-auto items-stretch">
+          <div key={`grid-${lang}`} className="grid grid-cols-12 gap-8 md:gap-12 w-full max-w-[1440px] mx-auto items-stretch">
 
             {/* FEATURED PROJECT 1: Vortex OS Creative Sandbox */}
             <motion.div
@@ -434,10 +495,10 @@ export default function Portfolio() {
                   <div>
                     {/* Metadata Header */}
                     <div className="flex justify-between items-center mb-6 border-b border-theme-text/10 pb-4">
-                      <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">01 / Featured Project</span>
+                      <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">01 / {t.featuredProjectLabel}</span>
                       <span className="font-mono text-[8px] tracking-wider text-theme-text/40 uppercase px-2 py-0.5 rounded border border-theme-text/10 bg-black/10 flex items-center gap-1.5">
                         <Activity size={10} className="text-orange-500 animate-pulse" />
-                        Interactive Sandbox
+                        {t.sandboxLabel}
                       </span>
                     </div>
 
@@ -446,7 +507,7 @@ export default function Portfolio() {
                     </h2>
 
                     <p className="font-mono text-[10px] md:text-[12px] leading-relaxed text-theme-text/70 mb-6">
-                      An interactive digital gallery and OS mockup created to display high-performance frontend micro-interactions. Includes a ticking clock thread, custom responsive Dynamic Island widgets, parametric control docks, gooey physics morph filter elements, and custom Framer Motion spring sliders.
+                      {t.vortexDesc}
                     </p>
 
                     {/* Tech stack badges */}
@@ -465,7 +526,7 @@ export default function Portfolio() {
                       onClick={() => setIsVortexOpen(true)}
                       className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text text-theme-bg font-mono text-[10px] font-bold tracking-widest hover:bg-theme-text/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
                     >
-                      OPEN PROJECT
+                      {t.openProjectLabel}
                       <ArrowRight size={12} strokeWidth={2.5} />
                     </button>
 
@@ -476,7 +537,7 @@ export default function Portfolio() {
                       className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text/5 hover:bg-theme-text/10 text-theme-text border border-theme-text/15 font-mono text-[10px] font-bold tracking-widest active:scale-[0.98] transition-all duration-200"
                     >
                       <Github size={12} />
-                      SOURCE CODE
+                      {t.sourceCodeLabel}
                     </a>
                   </div>
                 </div>
@@ -484,10 +545,11 @@ export default function Portfolio() {
                 {/* Preview Column — vertically centered */}
                 <div className="flex-1 flex items-center justify-center">
                   <div className="w-full max-w-[520px]">
-                    <ProjectPreview 
-                      onClick={() => setIsVortexOpen(true)} 
-                      layoutId="vortex-sandbox-card" 
+                    <ProjectPreview
+                      onClick={() => setIsVortexOpen(true)}
+                      layoutId="vortex-sandbox-card"
                       bgColor="#141212"
+                      hoverLabel={t.openProjectHover}
                     >
                       <Vortex isPreview={true} />
                     </ProjectPreview>
@@ -513,10 +575,10 @@ export default function Portfolio() {
                   <div>
                     {/* Metadata Header */}
                     <div className="flex justify-between items-center mb-6 border-b border-theme-text/10 pb-4">
-                      <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">02 / Featured Project</span>
+                      <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">02 / {t.featuredProjectLabel}</span>
                       <span className="font-mono text-[8px] tracking-wider text-theme-text/40 uppercase px-2 py-0.5 rounded border border-theme-text/10 bg-black/10 flex items-center gap-1.5">
                         <Activity size={10} className="text-red-500 animate-pulse" />
-                        Web Design
+                        {t.webDesignLabel}
                       </span>
                     </div>
 
@@ -525,7 +587,7 @@ export default function Portfolio() {
                     </h2>
 
                     <p className="font-mono text-[10px] md:text-[12px] leading-relaxed text-theme-text/70 mb-6">
-                      A clean, modern one-page website designed for a professional soccer club. Features a light flat theme with bold sporty typography, animated stat counters, interactive squad & fixture tabs, horizontal scroll tickers, and SVG stadium illustrations with draw-on scroll animations.
+                      {t.soccerDesc}
                     </p>
 
                     {/* Tech stack badges */}
@@ -544,7 +606,7 @@ export default function Portfolio() {
                       onClick={() => setIsSoccerOpen(true)}
                       className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text text-theme-bg font-mono text-[10px] font-bold tracking-widest hover:bg-theme-text/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
                     >
-                      OPEN PROJECT
+                      {t.openProjectLabel}
                       <ArrowRight size={12} strokeWidth={2.5} />
                     </button>
 
@@ -555,7 +617,7 @@ export default function Portfolio() {
                       className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text/5 hover:bg-theme-text/10 text-theme-text border border-theme-text/15 font-mono text-[10px] font-bold tracking-widest active:scale-[0.98] transition-all duration-200"
                     >
                       <Github size={12} />
-                      SOURCE CODE
+                      {t.sourceCodeLabel}
                     </a>
                   </div>
                 </div>
@@ -563,10 +625,11 @@ export default function Portfolio() {
                 {/* Preview Column — vertically centered */}
                 <div className="flex-1 flex items-center justify-center">
                   <div className="w-full max-w-[520px]">
-                    <ProjectPreview 
+                    <ProjectPreview
                       onClick={() => setIsSoccerOpen(true)}
-                      layoutId="soccer-team-card" 
+                      layoutId="soccer-team-card"
                       bgColor="#FAFAF8"
+                      hoverLabel={t.openProjectHover}
                     >
                       <SoccerTeam isPreview={true} />
                     </ProjectPreview>
@@ -592,10 +655,10 @@ export default function Portfolio() {
                   <div>
                     {/* Metadata Header */}
                     <div className="flex justify-between items-center mb-6 border-b border-theme-text/10 pb-4">
-                      <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">03 / Featured Project</span>
+                      <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">03 / {t.featuredProjectLabel}</span>
                       <span className="font-mono text-[8px] tracking-wider text-theme-text/40 uppercase px-2 py-0.5 rounded border border-theme-text/10 bg-black/10 flex items-center gap-1.5">
                         <Activity size={10} className="text-[#C85A32] animate-pulse" />
-                        Gastronomy & Brand
+                        {t.ramenLabel}
                       </span>
                     </div>
 
@@ -604,7 +667,7 @@ export default function Portfolio() {
                     </h2>
 
                     <p className="font-mono text-[10px] md:text-[12px] leading-relaxed text-theme-text/70 mb-6">
-                      A sensory digital showcase for a premium ramen sanctuary. Fuses wabi-sabi aesthetics with smooth scroll-driven typography reveals, asymmetric bento menu layouts, micro-interactive ingredient drawers, and a warm terracotta and charcoal canvas.
+                      {t.ramenDesc}
                     </p>
 
                     {/* Tech stack badges */}
@@ -623,7 +686,7 @@ export default function Portfolio() {
                       onClick={() => setIsNoodleOpen(true)}
                       className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text text-theme-bg font-mono text-[10px] font-bold tracking-widest hover:bg-theme-text/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
                     >
-                      OPEN PROJECT
+                      {t.openProjectLabel}
                       <ArrowRight size={12} strokeWidth={2.5} />
                     </button>
 
@@ -634,7 +697,7 @@ export default function Portfolio() {
                       className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text/5 hover:bg-theme-text/10 text-theme-text border border-theme-text/15 font-mono text-[10px] font-bold tracking-widest active:scale-[0.98] transition-all duration-200"
                     >
                       <Github size={12} />
-                      SOURCE CODE
+                      {t.sourceCodeLabel}
                     </a>
                   </div>
                 </div>
@@ -642,10 +705,11 @@ export default function Portfolio() {
                 {/* Preview Column — vertically centered */}
                 <div className="flex-1 flex items-center justify-center">
                   <div className="w-full max-w-[520px]">
-                    <ProjectPreview 
-                      onClick={() => setIsNoodleOpen(true)} 
-                      layoutId="noodle-place-card" 
+                    <ProjectPreview
+                      onClick={() => setIsNoodleOpen(true)}
+                      layoutId="noodle-place-card"
                       bgColor="#121212"
+                      hoverLabel={t.openProjectHover}
                     >
                       <NoodlePlace isPreview={true} />
                     </ProjectPreview>
