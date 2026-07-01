@@ -1,190 +1,227 @@
-import { motion, useScroll, useTransform, useInView, useSpring, Variants, AnimatePresence } from "framer-motion";
+"use client";
+
+import { motion, AnimatePresence, useScroll, Variants } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import {
+  Trophy,
+  ArrowUpRight,
+  Shield,
+  Zap
+} from "lucide-react";
+import HolographicBall from "../components/HolographicBall";
 
-interface SoccerTeamProps {
-  isPreview?: boolean;
-  onClose?: () => void;
-}
-
-// ── COLORS ──
-const C = {
-  bg: "#FAFAF8",
-  surface: "#F0EFEB",
-  text: "#1A1A1A",
-  muted: "#6B6B6B",
-  light: "#9E9E9E",
-  accent: "#C62828",
-  accentLight: "#FCEAEA",
-  border: "#E2E0DC",
-  white: "#FFFFFF",
+// --- ANIMATION CONFIGURATION ---
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06 } },
 };
 
-// ── Animated counter ──
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
+};
+
+// --- COMPONENT: COUNTER ---
 function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const [isIntersecting, setIsIntersecting] = useState(false);
 
   useEffect(() => {
-    if (!inView) return;
-    const dur = 1800;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsIntersecting(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isIntersecting) return;
+    const duration = 1500;
     const start = Date.now();
     const tick = () => {
-      const p = Math.min((Date.now() - start) / dur, 1);
-      const ease = 1 - Math.pow(1 - p, 4);
+      const elapsed = Date.now() - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 4); // Quartic ease out
       setCount(Math.floor(ease * target));
-      if (p < 1) requestAnimationFrame(tick);
+      if (progress < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-  }, [inView, target]);
+  }, [isIntersecting, target]);
 
-  return <span ref={ref}>{count}{suffix}</span>;
+  return <span ref={ref} className="font-mono tabular-nums">{count}{suffix}</span>;
 }
 
-// ── Stagger container ──
-const stagger: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.07 } },
-};
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 1, 0.5, 1] } },
-};
-const fadeIn: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { duration: 0.8 } },
-};
-
-// ── Horizontal ticker ──
+// --- COMPONENT: TICKER ---
 function Ticker({ items, speed = 30 }: { items: string[]; speed?: number }) {
   const doubled = [...items, ...items];
   return (
-    <div className="ticker-wrap" style={{ overflow: "hidden", width: "100%" }}>
+    <div className="w-full overflow-hidden border-y border-slate-200/80 bg-[#FAF8F5]/60 py-5 select-none relative z-20">
       <motion.div
         animate={{ x: [0, `-${100 / doubled.length * items.length}%`] }}
         transition={{ repeat: Infinity, duration: speed, ease: "linear" }}
-        style={{ display: "flex", gap: "3rem", whiteSpace: "nowrap", width: "max-content" }}
+        className="flex gap-16 whitespace-nowrap w-max"
       >
-        {doubled.map((t, i) => (
-          <span key={i} style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700,
-            fontSize: "clamp(3rem, 8vw, 7rem)",
-            textTransform: "uppercase",
-            letterSpacing: "-0.02em",
-            color: i % 2 === 0 ? C.border : "transparent",
-            WebkitTextStroke: i % 2 === 0 ? "none" : `1.5px ${C.border}`,
-            lineHeight: 1,
-            userSelect: "none",
-          }}>
-            {t}
-          </span>
+        {doubled.map((text, i) => (
+          <div key={i} className="flex items-center gap-6">
+            <span className="font-mono text-[9px] tracking-[0.2em] text-[#12224A]/60 uppercase font-semibold select-none">
+              // OLYMPUS ATHLETIC SYSTEM
+            </span>
+            <span
+              className="font-display font-bold text-xl md:text-2xl tracking-tight text-slate-800 uppercase"
+              style={{ fontFamily: "'Clash Display', sans-serif" }}
+            >
+              {text}
+            </span>
+          </div>
         ))}
       </motion.div>
     </div>
   );
 }
 
-// ── Player Card ──
-function PlayerCard({ name, position, number, flag }: {
-  name: string; position: string; number: number; flag: string;
-}) {
+// --- COMPONENT: DOUBLE BEZEL CARD ENCLOSURE ---
+function DoubleBezelCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <motion.div variants={fadeUp} style={{
-      display: "flex", alignItems: "center", gap: "1rem",
-      padding: "1rem 1.25rem",
-      background: C.white,
-      border: `1px solid ${C.border}`,
-      borderRadius: "12px",
-      cursor: "default",
-      transition: "border-color 0.25s",
-    }}
-      whileHover={{ borderColor: C.accent }}
+    <div className={`bg-slate-100/50 border border-slate-200/40 p-2 rounded-[2rem] flex flex-col justify-stretch items-stretch ${className}`}>
+      <div className="bg-white shadow-[inset_0_1px_1.5px_rgba(255,255,255,0.8)] border border-slate-100/60 rounded-[calc(2rem-0.5rem)] p-6 md:p-8 flex-1 flex flex-col justify-between overflow-hidden relative">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// --- COMPONENT: PLAYER CARD WITH COUNTRY FLAG ---
+function PlayerCard({ name, position, number, country }: {
+  name: string; position: string; number: number; country: string;
+}) {
+  // Map country code to ISO 3166-1 alpha-2 for flag CDN
+  const countryMap: { [key: string]: string } = {
+    COL: "co",
+    BEL: "be",
+    ALG: "dz",
+    JPN: "jp",
+    IRL: "ie",
+    POR: "pt",
+    EGY: "eg",
+    NOR: "no",
+    SEN: "sn",
+    ITA: "it",
+    ARG: "ar"
+  };
+  const flagCode = countryMap[country] || "un";
+
+  return (
+    <motion.div
+      variants={fadeUp}
+      className="group relative bg-white border border-slate-200/60 rounded-xl p-4 flex items-center gap-4 hover:border-slate-350 hover:bg-slate-50/50 active:scale-[0.98] transition-all duration-300 shadow-[0_2px_8px_rgba(0,0,0,0.01)]"
     >
-      <div style={{
-        width: 44, height: 44, borderRadius: 10,
-        background: C.accentLight, display: "flex", alignItems: "center", justifyContent: "center",
-        fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "1.25rem",
-        color: C.accent, flexShrink: 0,
-      }}>
+      <div
+        className="w-10 h-10 rounded-lg bg-slate-900/[0.03] border border-slate-200/50 flex items-center justify-center font-mono font-bold text-sm text-[#0F172A] group-hover:text-white group-hover:bg-[#12224A] group-hover:border-[#12224A] transition-all duration-300 tabular-nums"
+      >
         {number}
       </div>
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontFamily: "'Barlow', sans-serif", fontWeight: 600, fontSize: "0.9rem", color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
-          <span style={{ fontSize: "0.85rem" }}>{flag}</span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="font-sans font-semibold text-xs text-[#0F172A] truncate">{name}</span>
+          <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200/40">
+            <img
+              src={`https://flagcdn.com/16x12/${flagCode}.png`}
+              alt={`${country} flag`}
+              className="w-3.5 h-2.5 object-cover rounded-[1px]"
+              loading="lazy"
+            />
+            <span className="font-mono text-[8px] text-slate-655 font-bold uppercase">{country}</span>
+          </div>
         </div>
-        <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 500, fontSize: "0.7rem", letterSpacing: "0.12em", textTransform: "uppercase", color: C.muted }}>{position}</span>
+        <span className="block font-mono text-[8px] tracking-[0.18em] text-slate-600 uppercase mt-1">{position}</span>
       </div>
     </motion.div>
   );
 }
 
-// ── Match Row ──
+// --- COMPONENT: MATCH ROW ---
 function MatchRow({ homeTeam, awayTeam, date, time, venue, isHome, result }: {
   homeTeam: string; awayTeam: string; date: string; time: string; venue: string; isHome: boolean; result?: string;
 }) {
   return (
-    <motion.div variants={fadeUp} style={{
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "1rem 1.25rem", background: C.white,
-      border: `1px solid ${C.border}`, borderRadius: "12px",
-      gap: "1rem", cursor: "default", transition: "border-color 0.25s",
-    }}
-      whileHover={{ borderColor: C.accent }}
+    <motion.div
+      variants={fadeUp}
+      className="group bg-white border border-slate-200/60 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-slate-350 hover:bg-slate-50/30 transition-all duration-300 shadow-[0_2px_8px_rgba(0,0,0,0.01)]"
     >
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-          <span style={{
-            fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 600,
-            fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase",
-            padding: "2px 8px", borderRadius: 6,
-            background: isHome ? C.accentLight : C.surface,
-            color: isHome ? C.accent : C.muted,
-          }}>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-3 mb-2.5">
+          <span className={`font-mono text-[8px] tracking-widest uppercase px-2 py-0.5 rounded border font-bold ${isHome
+              ? "bg-slate-150 border-slate-200 text-slate-700"
+              : "bg-slate-50 border-slate-200/50 text-slate-500"
+            }`}>
             {isHome ? "HOME" : "AWAY"}
           </span>
-          <span style={{ fontFamily: "'Barlow', sans-serif", fontWeight: 400, fontSize: "0.7rem", color: C.light }}>{date}</span>
+          <span className="font-mono text-[8px] text-slate-500 font-semibold">{date}</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontFamily: "'Barlow', sans-serif", fontWeight: 600, fontSize: "0.9rem", color: C.text }}>{homeTeam}</span>
-          <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 500, fontSize: "0.65rem", color: C.light, letterSpacing: "0.1em" }}>VS</span>
-          <span style={{ fontFamily: "'Barlow', sans-serif", fontWeight: 600, fontSize: "0.9rem", color: C.text }}>{awayTeam}</span>
+
+        <div
+          className="flex items-center gap-3 font-display font-semibold text-sm md:text-base text-[#0F172A]"
+          style={{ fontFamily: "'Clash Display', sans-serif" }}
+        >
+          <span className={isHome ? "text-[#0F172A]" : "text-slate-700"}>{homeTeam}</span>
+          <span className="font-mono text-[9px] text-slate-350 tracking-widest font-normal">VS</span>
+          <span className={!isHome ? "text-[#0F172A]" : "text-slate-700"}>{awayTeam}</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
-          <span style={{ fontFamily: "'Barlow', sans-serif", fontWeight: 400, fontSize: "0.7rem", color: C.light }}>{time}</span>
-          <span style={{ color: C.border }}>·</span>
-          <span style={{ fontFamily: "'Barlow', sans-serif", fontWeight: 400, fontSize: "0.7rem", color: C.light }}>{venue}</span>
+
+        <div className="flex items-center gap-4 mt-2.5 font-mono text-[8px] text-slate-655">
+          <span>{time}</span>
+          <span className="w-1 h-1 rounded-full bg-slate-200" />
+          <span className="truncate">{venue}</span>
         </div>
       </div>
-      {result && (
-        <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "1.4rem", color: C.accent, letterSpacing: "-0.02em" }}>{result}</div>
-          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 500, fontSize: "0.55rem", letterSpacing: "0.15em", textTransform: "uppercase", color: C.light }}>FULL TIME</div>
+
+      {result ? (
+        <div className="flex items-center gap-4 md:text-right border-t border-slate-100/80 md:border-none pt-3.5 md:pt-0">
+          <div>
+            <div
+              className="font-display font-bold text-xl tracking-tight text-[#12224A]"
+              style={{ fontFamily: "'Clash Display', sans-serif" }}
+            >
+              {result}
+            </div>
+            <div className="font-mono text-[8px] tracking-widest text-slate-550 uppercase mt-1">FULL TIME</div>
+          </div>
         </div>
+      ) : (
+        <button className="self-start md:self-auto group/btn flex items-center justify-center gap-2 bg-slate-50 hover:bg-[#12224A] border border-slate-200 hover:border-[#12224A] text-slate-700 hover:text-white font-mono text-[8px] tracking-widest uppercase pl-4 pr-3 py-3 min-h-[44px] rounded-lg active:scale-[0.98] transition-all duration-300 cursor-pointer font-bold">
+          Pre-register
+          <ArrowUpRight className="w-3.5 h-3.5 text-slate-450 group-hover/btn:text-white transition-colors" />
+        </button>
       )}
     </motion.div>
   );
 }
 
+interface SoccerTeamProps {
+  isPreview?: boolean;
+  onClose?: () => void;
+}
 
 // ====================================================================
-// MAIN COMPONENT
+// MAIN COMPONENT: SOCCER TEAM LANDING PAGE (LIGHT CREAM/LUXURY BLUE EXCLUSIVELY)
 // ====================================================================
-export default function SoccerTeam({ isPreview = false }: SoccerTeamProps) {
+export default function SoccerTeam({ isPreview = false, onClose }: SoccerTeamProps) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"squad" | "fixtures">("squad");
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Parallax for hero
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end start"] });
-  const heroY = useTransform(scrollYProgress, [0, 0.3], [0, -60]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
-
+  // Load Clash Display, Satoshi, and JetBrains Mono dynamically
   useEffect(() => {
     const link = document.createElement("link");
-    link.href = "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap";
+    link.href = "https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&f[]=clash-display@400,500,600,700&f[]=jet-brains-mono@300,400,500,700&display=swap";
     link.rel = "stylesheet";
     document.head.appendChild(link);
     return () => { document.head.removeChild(link); };
@@ -192,23 +229,23 @@ export default function SoccerTeam({ isPreview = false }: SoccerTeamProps) {
 
   const players = {
     goalkeepers: [
-      { name: "Álvaro Montero", position: "Goalkeeper", number: 1, flag: "🇨🇴" },
+      { name: "Álvaro Montero", position: "Goalkeeper", number: 1, country: "COL" },
     ],
     defenders: [
-      { name: "Lucas Delvaux", position: "Centre-Back", number: 4, flag: "🇧🇪" },
-      { name: "Karim Hadj", position: "Centre-Back", number: 5, flag: "🇩🇿" },
-      { name: "Yuto Nakamura", position: "Left-Back", number: 3, flag: "🇯🇵" },
-      { name: "James O'Brien", position: "Right-Back", number: 2, flag: "🇮🇪" },
+      { name: "Lucas Delvaux", position: "Centre-Back", number: 4, country: "BEL" },
+      { name: "Karim Hadj", position: "Centre-Back", number: 5, country: "ALG" },
+      { name: "Yuto Nakamura", position: "Left-Back", number: 3, country: "JPN" },
+      { name: "James O'Brien", position: "Right-Back", number: 2, country: "IRL" },
     ],
     midfielders: [
-      { name: "André Ferreira", position: "Defensive Mid", number: 6, flag: "🇵🇹" },
-      { name: "Sami El-Masri", position: "Central Mid", number: 8, flag: "🇪🇬" },
-      { name: "Nils Eriksen", position: "Attacking Mid", number: 10, flag: "🇳🇴" },
+      { name: "André Ferreira", position: "Defensive Mid", number: 6, country: "POR" },
+      { name: "Sami El-Masri", position: "Central Mid", number: 8, country: "EGY" },
+      { name: "Nils Eriksen", position: "Attacking Mid", number: 10, country: "NOR" },
     ],
     forwards: [
-      { name: "Moussa Diallo", position: "Left Wing", number: 11, flag: "🇸🇳" },
-      { name: "Luca Moretti", position: "Striker", number: 9, flag: "🇮🇹" },
-      { name: "Diego Vargas", position: "Right Wing", number: 7, flag: "🇦🇷" },
+      { name: "Moussa Diallo", position: "Left Wing", number: 11, country: "SEN" },
+      { name: "Luca Moretti", position: "Striker", number: 9, country: "ITA" },
+      { name: "Diego Vargas", position: "Right Wing", number: 7, country: "ARG" },
     ],
   };
 
@@ -227,471 +264,584 @@ export default function SoccerTeam({ isPreview = false }: SoccerTeamProps) {
     { value: 3, suffix: "x", label: "TITLES" },
   ];
 
+  const milestones = [
+    {
+      year: "2021",
+      title: "RETRACTABLE CANOPY & HYBRID PITCH",
+      description: "A major engineering breakthrough for our home ground, installing state-of-the-art hybrid pitch technology and a fully retractable geometric steel roof.",
+    },
+    {
+      year: "2023",
+      title: "THE UNBEATEN TRIPLE CHAMPIONSHIP",
+      description: "Writing historic records by lifting the domestic league trophy, continental cup, and super cup in a single run without suffering a single defeat.",
+    },
+    {
+      year: "2025",
+      title: "DIGITAL ARENA INTEGRATION",
+      description: "Launching real-time analytic fan tracking, full-stadium digital connectivity, and modern physical-to-virtual sensory matches.",
+    },
+  ];
+
   return (
     <div
       ref={containerRef}
-      style={{
-        width: "100%", minHeight: isPreview ? undefined : "100vh",
-        background: C.bg, color: C.text, fontFamily: "'Barlow', sans-serif",
-        overflowX: "hidden", position: "relative",
-      }}
+      className="w-full min-h-screen bg-[#FDFBF7] text-[#0F172A] overflow-x-hidden relative transition-colors duration-500"
+      style={{ fontFamily: "'Satoshi', sans-serif" }}
     >
-      {/* ── NAV ── */}
-      <header style={{
-        position: isPreview ? "absolute" : "fixed",
-        top: 0, left: 0, right: 0, zIndex: 30,
-        background: `${C.bg}E6`,
-        backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
-        borderBottom: `1px solid ${C.border}`,
-      }}>
-        <div style={{
-          maxWidth: 1200, margin: "0 auto",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-        }}
-          className="py-3 px-4 md:px-6"
-        >
-          {/* Logo */}
-          <Link
-            to={isPreview ? "#" : "/portfolio"}
-            style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", textDecoration: "none", color: "inherit" }}
-            onClick={(e) => isPreview && e.preventDefault()}
-          >
-            <div style={{
-              width: 36, height: 36, borderRadius: 8,
-              background: C.accent, display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
-              </svg>
-            </div>
-            <div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "1.1rem", lineHeight: 1, letterSpacing: "-0.01em", color: C.text }}>OLYMPUS FC</div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 500, fontSize: "0.55rem", letterSpacing: "0.2em", color: C.light, textTransform: "uppercase" }}>EST. 2019</div>
-            </div>
-          </Link>
+      {/* Light structural noise background texture overlay */}
+      <div
+        className="fixed inset-0 pointer-events-none z-50 opacity-[0.012] mix-blend-overlay bg-repeat"
+        style={{ backgroundImage: "url('data:image/svg+xml,%3Csvg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cfilter id=\"noiseFilter\"%3E%3CfeTurbulence type=\"fractalNoise\" baseFrequency=\"0.8\" numOctaves=\"3\" stitchTiles=\"stitch\"/%3E%3C/filter%3E%3Crect width=\"100%25\" height=\"100%25\" filter=\"url(%23noiseFilter)\"/%3E%3C/svg%3E')" }}
+      />
+
+      {/* Subtle radial atmospheric glows */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#12224A]/[0.02] blur-[150px]" />
+        <div className="absolute bottom-[10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#12224A]/[0.01] blur-[150px]" />
+      </div>
+
+      {/* 3D Holographic Canvas Element (Strictly Light Themed) */}
+      <div className="fixed inset-0 w-full h-full pointer-events-none z-10">
+        <HolographicBall themeColor="#12224A" isLightMode={true} />
+      </div>
+
+      {/* --- navigation bar (totally reworked, minimalist topbar, no shadow, no glow, sits flush at top) --- */}
+      <header className={`${isPreview ? "absolute" : "fixed"
+        } top-0 left-0 w-full z-50 bg-[#FDFBF7]/95 border-b border-slate-200/50 backdrop-blur-md transition-colors duration-500 shadow-none`}>
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+
+          {/* Logo Crest - Minimalist Bold Text with no icons */}
+          <div className="flex items-baseline gap-2.5 select-none">
+            <span
+              className="font-display font-bold text-sm tracking-wider text-[#12224A] leading-none uppercase"
+              style={{ fontFamily: "'Clash Display', sans-serif" }}
+            >
+              OLYMPUS FC
+            </span>
+          </div>
 
           {/* Nav links */}
-          <nav style={{ display: "flex", alignItems: "center", gap: "1.5rem" }} className="gap-3 sm:gap-6">
+          <nav className="flex items-center gap-1 md:gap-2">
             {["Squad", "Fixtures", "Stadium"].map((item) => (
-              <a key={item} href={`#${item.toLowerCase()}`} style={{
-                fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 600,
-                fontSize: "0.75rem", letterSpacing: "0.12em", textTransform: "uppercase",
-                color: C.muted, textDecoration: "none", transition: "color 0.2s",
-              }}
-                className="hidden sm:inline"
-                onMouseEnter={e => (e.currentTarget.style.color = C.accent)}
-                onMouseLeave={e => (e.currentTarget.style.color = C.muted)}
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="font-mono text-[8.5px] tracking-[0.22em] text-[#1D2E54] hover:text-[#12224A] uppercase transition-colors duration-200 font-semibold px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-slate-200 min-h-[38px] flex items-center"
               >
                 {item}
               </a>
             ))}
-            {!isPreview && (
+            {(onClose || !isPreview) && (
               <button
-                onClick={() => navigate("/portfolio")}
-                style={{
-                  fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 600,
-                  fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase",
-                  color: C.light, background: "none", border: "none", cursor: "pointer",
+                onClick={() => {
+                  if (onClose) onClose();
+                  else navigate("/portfolio");
                 }}
+                className="font-mono text-[8.5px] tracking-[0.22em] text-[#1D2E54] hover:text-[#12224A] uppercase transition-colors cursor-pointer font-semibold px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-slate-200 min-h-[38px] flex items-center"
               >
-                ← Portfolio
+                {onClose ? "Close" : "Back"}
               </button>
             )}
-            <button style={{
-              fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700,
-              fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase",
-              padding: "0.5rem 1.25rem", borderRadius: 8,
-              background: C.accent, color: C.white, border: "none", cursor: "pointer",
-              transition: "opacity 0.2s",
-            }}
-              onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
-              onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
-            >
-              Tickets
-            </button>
           </nav>
+
+          {/* CTA Button (44px target, no shadow, no glow) */}
+          <a
+            href="#tickets"
+            className="group flex items-center gap-2.5 bg-[#12224A] hover:bg-[#1D3557] text-[#FDFBF7] font-mono text-[8.5px] tracking-widest uppercase pl-4 pr-3 py-2.5 min-h-[44px] rounded-md active:scale-[0.98] transition-all duration-200 shadow-none border border-[#12224A]"
+          >
+            Reserve
+            <ArrowUpRight className="w-3.5 h-3.5 text-[#FDFBF7] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </a>
+
         </div>
       </header>
 
-      {/* ── HERO ── */}
-      <motion.section
-        style={{
-          y: heroY, opacity: heroOpacity,
-          paddingTop: isPreview ? "6rem" : "8rem",
-          paddingBottom: "3rem",
-          textAlign: "center",
-          maxWidth: 1200, margin: "0 auto",
-          paddingLeft: "1.5rem", paddingRight: "1.5rem",
-          position: "relative",
-        }}
-      >
-        {/* Shield badge */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
-          style={{ marginBottom: "1.5rem" }}
-        >
-          <div style={{
-            width: 72, height: 72, borderRadius: 16, margin: "0 auto",
-            background: C.accentLight, display: "flex", alignItems: "center", justifyContent: "center",
-            border: `1px solid ${C.border}`,
-          }}>
-            <svg width="36" height="36" viewBox="0 0 24 24" fill={C.accent}>
-              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
-            </svg>
-          </div>
-        </motion.div>
+      {/* --- CONTENT CONTAINER --- */}
+      <main className="relative z-20 w-full overflow-hidden">
 
-        <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 1, 0.5, 1] }}
-          style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 900,
-            fontSize: "clamp(3.5rem, 12vw, 9rem)",
-            lineHeight: 0.9,
-            letterSpacing: "-0.03em",
-            textTransform: "uppercase",
-            color: C.text,
-            margin: 0,
-          }}
-        >
-          OLYMPUS
-          <br />
-          <span style={{ color: C.accent }}>FC</span>
-        </motion.h1>
+        {/* --- HERO SECTION --- */}
+        <section className="min-h-[100dvh] flex flex-col justify-center px-6 pt-32 pb-16 relative">
+          <div className="max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.35, ease: [0.25, 1, 0.5, 1] }}
-          style={{
-            fontFamily: "'Barlow', sans-serif",
-            fontWeight: 400, fontSize: "1rem",
-            color: C.muted, maxWidth: 440, margin: "1.25rem auto 2rem",
-            lineHeight: 1.6,
-          }}
-        >
-          Where legacy meets ambition. Five seasons of relentless pursuit, three championship titles, one unwavering vision.
-        </motion.p>
+            {/* Left Block: Stark Typography */}
+            <div className="md:col-span-8 z-30">
 
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          style={{ display: "flex", justifyContent: "center", gap: "0.75rem", flexWrap: "wrap" }}
-        >
-          <a href="#squad" style={{
-            fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700,
-            fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase",
-            padding: "0.75rem 2rem", borderRadius: 10,
-            background: C.accent, color: C.white, textDecoration: "none",
-            transition: "opacity 0.2s",
-          }}>
-            Meet the Squad
-          </a>
-          <a href="#fixtures" style={{
-            fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700,
-            fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase",
-            padding: "0.75rem 2rem", borderRadius: 10,
-            background: "transparent", color: C.text, textDecoration: "none",
-            border: `1px solid ${C.border}`,
-            transition: "border-color 0.2s",
-          }}>
-            View Fixtures
-          </a>
-        </motion.div>
-      </motion.section>
-
-      {/* ── TICKER ── */}
-      <div style={{ padding: "1.5rem 0", overflow: "hidden" }}>
-        <Ticker items={["OLYMPUS FC", "SINCE 2019", "CHAMPIONS", "GLORY", "OLYMPUS FC", "FEARLESS"]} speed={40} />
-      </div>
-
-      {/* ── STATS ── */}
-      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-60px" }}
-          style={{ gap: "1rem" }}
-          className="grid grid-cols-2 md:grid-cols-4"
-        >
-          {stats.map((s, i) => (
-            <motion.div key={i} variants={fadeUp} style={{
-              textAlign: "center", padding: "2rem 1rem",
-              background: C.white, border: `1px solid ${C.border}`, borderRadius: 14,
-            }}>
-              <div style={{
-                fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,
-                fontSize: "clamp(2.5rem, 5vw, 3.5rem)", color: C.accent,
-                lineHeight: 1, letterSpacing: "-0.03em",
-              }}>
-                <Counter target={s.value} suffix={s.suffix} />
-              </div>
-              <div style={{
-                fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 600,
-                fontSize: "0.65rem", letterSpacing: "0.2em", color: C.light,
-                textTransform: "uppercase", marginTop: "0.5rem",
-              }}>
-                {s.label}
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-
-      {/* ── DIVIDER ── */}
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem" }}>
-        <div style={{ height: 1, background: C.border }} />
-      </div>
-
-      {/* ── SQUAD / FIXTURES TABS ── */}
-      <section id="squad" style={{ maxWidth: 1200, margin: "0 auto", padding: "3rem 1.5rem" }}>
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.6 }}
-          style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem" }}
-        >
-          <div>
-            <h2 style={{
-              fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,
-              fontSize: "clamp(2rem, 5vw, 3rem)", textTransform: "uppercase",
-              letterSpacing: "-0.02em", margin: 0, lineHeight: 1,
-            }}>
-              Club <span style={{ color: C.accent }}>Directory</span>
-            </h2>
-            <p style={{
-              fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 500,
-              fontSize: "0.7rem", letterSpacing: "0.15em", color: C.light,
-              textTransform: "uppercase", marginTop: 4,
-            }}>
-              Season 2025–26
-            </p>
-          </div>
-
-          {/* Tab toggle */}
-          <div style={{ display: "flex", border: `1px solid ${C.border}`, borderRadius: 10, overflow: "hidden" }}>
-            {(["squad", "fixtures"] as const).map(tab => (
-              <button key={tab} onClick={() => setActiveTab(tab)} style={{
-                fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700,
-                fontSize: "0.7rem", letterSpacing: "0.12em", textTransform: "uppercase",
-                padding: "0.5rem 1.25rem", border: "none", cursor: "pointer",
-                background: activeTab === tab ? C.accent : "transparent",
-                color: activeTab === tab ? C.white : C.muted,
-                transition: "all 0.2s",
-              }}>
-                {tab}
-              </button>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Tab content */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 8, filter: "blur(2px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: -8, filter: "blur(2px)" }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {activeTab === "squad" ? (
-              <div>
-                {(Object.entries(players) as [string, typeof players.goalkeepers][]).map(([group, list]) => (
-                  <div key={group} style={{ marginBottom: "2rem" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "0.75rem" }}>
-                      <div style={{ width: 3, height: 16, borderRadius: 2, background: C.accent }} />
-                      <span style={{
-                        fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700,
-                        fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: C.muted,
-                      }}>
-                        {group}
-                      </span>
-                      <span style={{
-                        fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 600,
-                        fontSize: "0.6rem", color: C.light,
-                      }}>
-                        {list.length}
-                      </span>
-                    </div>
-                    <motion.div
-                      variants={stagger}
-                      initial="hidden"
-                      whileInView="show"
-                      viewport={{ once: true, margin: "-40px" }}
-                      style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "0.75rem" }}
-                    >
-                      {list.map(p => <PlayerCard key={p.number} {...p} />)}
-                    </motion.div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <motion.div
-                id="fixtures"
-                variants={stagger}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, margin: "-40px" }}
-                style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+              <motion.h1
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="font-display font-bold text-5xl md:text-8xl tracking-tighter leading-[0.92] uppercase text-[#0F172A]"
+                style={{ fontFamily: "'Clash Display', sans-serif" }}
               >
-                {matches.map((m, i) => <MatchRow key={i} {...m} />)}
+                OLYMPUS <br />
+                <span className="text-[#12224A] drop-shadow-[0_4px_25px_rgba(18,34,74,0.04)]">ATHLETIC</span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                className="font-sans text-xs md:text-sm text-slate-655 max-w-[42ch] mt-6 leading-relaxed"
+              >
+                Engineered physical performance. Tactical discipline, computational movement, and athletic velocity on the pitch.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                className="flex items-center gap-4 mt-8 flex-wrap"
+              >
+                {/* Button-in-Button Trailing Icon for CTA (44px target) */}
+                <a
+                  href="#tickets"
+                  className="group flex items-center gap-3 bg-[#12224A] text-white font-mono text-[8.5px] tracking-widest uppercase pl-6 pr-3.5 py-3.5 min-h-[44px] rounded-full shadow-lg shadow-[#12224A]/10 hover:bg-[#1D3557] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                >
+                  Secure Tickets
+                  <div className="w-5 h-5 rounded-full bg-white/15 flex items-center justify-center group-hover:bg-white/25 transition-colors">
+                    <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </div>
+                </a>
+
+                <a
+                  href="#squad"
+                  className="group font-mono text-[8.5px] tracking-widest uppercase border border-slate-200 bg-[#FDFBF7] hover:bg-[#FAF6EE] text-slate-700 px-6 py-3.5 min-h-[44px] rounded-full transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center"
+                >
+                  Explore Squad
+                </a>
               </motion.div>
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </section>
-
-      {/* ── DIVIDER ── */}
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem" }}>
-        <div style={{ height: 1, background: C.border }} />
-      </div>
-
-      {/* ── STADIUM ── */}
-      <section id="stadium" style={{ maxWidth: 1200, margin: "0 auto", padding: "3rem 1.5rem" }}>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.7, ease: [0.25, 1, 0.5, 1] }}
-          style={{
-            alignItems: "center", background: C.white,
-            border: `1px solid ${C.border}`, borderRadius: 20,
-          }}
-          className="flex flex-wrap gap-6 md:gap-12 p-6 md:p-10"
-        >
-          {/* Text */}
-          <div style={{ flex: "1 1 320px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: "1rem" }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill={C.accent}>
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-              </svg>
-              <span style={{
-                fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700,
-                fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: C.accent,
-              }}>
-                Home Ground
-              </span>
             </div>
 
-            <h2 style={{
-              fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,
-              fontSize: "clamp(2rem, 5vw, 2.8rem)", textTransform: "uppercase",
-              letterSpacing: "-0.02em", margin: "0 0 0.75rem", lineHeight: 1,
-            }}>
-              Olympus <span style={{ color: C.accent }}>Arena</span>
-            </h2>
+            {/* Right Block: Empty spacing to reveal 3D canvas object */}
+            <div className="hidden md:block md:col-span-4 h-64 pointer-events-none" />
 
-            <p style={{
-              fontFamily: "'Barlow', sans-serif", fontWeight: 400,
-              fontSize: "0.9rem", color: C.muted, lineHeight: 1.65, maxWidth: 400, marginBottom: "1.5rem",
-            }}>
-              A 42,000-seat state-of-the-art stadium featuring a fully retractable roof, hybrid pitch technology, and the iconic Golden Stand.
-            </p>
+          </div>
+        </section>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
-              {[
-                { label: "CAPACITY", value: "42,000" },
-                { label: "BUILT", value: "2021" },
-                { label: "PITCH", value: "Hybrid" },
-              ].map(item => (
-                <div key={item.label} style={{ textAlign: "center" }}>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "1.3rem", color: C.accent }}>{item.value}</div>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 500, fontSize: "0.55rem", letterSpacing: "0.18em", color: C.light, textTransform: "uppercase" }}>{item.label}</div>
+        {/* --- TICKER --- */}
+        <Ticker items={["Olympus FC", "High Performance Design", "Three Championship Titles", "WebGL Sandbox Integration"]} />
+
+        {/* --- BENTO GRID SECTION --- */}
+        <section className="py-24 md:py-36 px-6 relative">
+          <div className="max-w-6xl mx-auto">
+
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 grid-flow-dense">
+
+              {/* Card 1: Striker Showcase (Double Bezel Layout) */}
+              <div className="md:col-span-4">
+                <DoubleBezelCard className="h-full min-h-[380px] group">
+                  {/* Background portrait with high-contrast grayscale filter */}
+                  <div className="absolute inset-0 z-0 overflow-hidden bg-slate-50">
+                    <img
+                      src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80"
+                      alt="Luca Moretti Striker Profile"
+                      loading="lazy"
+                      className="w-full h-full object-cover filter grayscale contrast-[1.1] opacity-75 group-hover:scale-105 transition-transform duration-700 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#FDFBF7] via-[#FDFBF7]/50 to-transparent" />
+                  </div>
+
+                  {/* Top Header */}
+                  <div className="z-10 flex justify-between items-start">
+                    <span className="font-mono text-[8px] tracking-[0.18em] text-[#12224A] uppercase font-bold bg-[#12224A]/5 border border-[#12224A]/10 px-2.5 py-0.5 rounded">
+                      Featured Striker
+                    </span>
+                    <span
+                      className="font-mono font-bold text-2xl text-[#12224A]/10 group-hover:text-[#12224A]/20 transition-colors duration-500"
+                    >
+                      09
+                    </span>
+                  </div>
+
+                  {/* Bottom Stats */}
+                  <div className="z-10 mt-auto">
+                    <h3
+                      className="font-display font-semibold text-xl tracking-tight text-[#0F172A] leading-tight"
+                      style={{ fontFamily: "'Clash Display', sans-serif" }}
+                    >
+                      Luca Moretti
+                    </h3>
+                    <p className="font-mono text-[8px] tracking-widest text-slate-555 uppercase mt-1">Striker / Italy</p>
+
+                    <div className="h-px bg-slate-150 my-4" />
+
+                    <div className="grid grid-cols-3 gap-2 font-mono text-left font-bold">
+                      <div>
+                        <div className="text-sm text-[#0F172A] tabular-nums">24</div>
+                        <div className="text-[6.5px] text-slate-600 tracking-wider uppercase font-semibold">Goals</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-[#0F172A] tabular-nums">12</div>
+                        <div className="text-[6.5px] text-slate-600 tracking-wider uppercase font-semibold">Assists</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-[#0F172A] tabular-nums">32</div>
+                        <div className="text-[6.5px] text-slate-600 tracking-wider uppercase font-semibold">Matches</div>
+                      </div>
+                    </div>
+                  </div>
+                </DoubleBezelCard>
+              </div>
+
+              {/* Card 2: Performance Metrics (Double Bezel Layout) */}
+              <div className="md:col-span-8">
+                <DoubleBezelCard className="h-full">
+                  <div>
+                    <h3
+                      className="font-display font-semibold text-lg tracking-wider text-[#0F172A] uppercase"
+                      style={{ fontFamily: "'Clash Display', sans-serif" }}
+                    >
+                      Performance Indicators
+                    </h3>
+                    <p className="font-sans text-xs text-slate-655 mt-1 max-w-[45ch] leading-relaxed">
+                      Overview of historical stats achieved by the roster since the club's entry.
+                    </p>
+                  </div>
+
+                  {/* Core metric modules */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 mb-4">
+                    {stats.map((s, i) => (
+                      <div key={i} className="relative p-4 rounded-xl bg-slate-50 border border-slate-200/50">
+                        <div
+                          className="font-display font-bold text-3xl text-[#12224A] tracking-tight"
+                          style={{ fontFamily: "'Clash Display', sans-serif" }}
+                        >
+                          <Counter target={s.value} suffix={s.suffix} />
+                        </div>
+                        <div className="font-mono text-[8px] tracking-widest text-slate-550 uppercase mt-1.5 font-bold">
+                          {s.label}
+                        </div>
+                        {/* Sleek status indicator tag */}
+                        <div className="absolute top-3 right-3 font-mono text-[7px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded border border-emerald-100 font-bold select-none">
+                          ACTIVE
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </DoubleBezelCard>
+              </div>
+
+              {/* Card 3: Philosophy (Double Bezel Layout) */}
+              <div className="md:col-span-5">
+                <DoubleBezelCard className="h-full min-h-[260px]">
+                  <div>
+                    <span className="font-mono text-[7.5px] tracking-[0.2em] text-slate-550 uppercase font-bold">Core Ethos</span>
+                    <h3
+                      className="font-display font-semibold text-lg tracking-tight text-[#0F172A] uppercase mt-2.5"
+                      style={{ fontFamily: "'Clash Display', sans-serif" }}
+                    >
+                      Tactical Adaptation
+                    </h3>
+                    <p className="font-sans text-xs text-slate-655 leading-relaxed mt-3">
+                      We reject mechanical sports automation. We value organic error transformed by rapid adaptation. We construct visual geometry on the pitch, executing asymmetric plays that puzzle the defense.
+                    </p>
+                  </div>
+                  <div className="mt-6 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#12224A]" />
+                    <span className="font-mono text-[8px] tracking-widest text-[#12224A] uppercase font-bold">Unwavering Vision</span>
+                  </div>
+                </DoubleBezelCard>
+              </div>
+
+              {/* Card 4: Stadium Details (Double Bezel Layout) */}
+              <div className="md:col-span-7">
+                <DoubleBezelCard className="h-full min-h-[260px] group">
+                  {/* Background architectural shot in grayscale */}
+                  <div className="absolute inset-0 z-0 overflow-hidden bg-slate-100">
+                    <img
+                      src="https://images.unsplash.com/photo-1524646888194-7ea97032017e?auto=format&fit=crop&w=1200&q=80"
+                      alt="Olympus Stadium Architecture"
+                      loading="lazy"
+                      className="w-full h-full object-cover filter grayscale contrast-[1.15] opacity-25 group-hover:scale-103 transition-transform duration-700 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
+                  </div>
+
+                  <div className="z-10 flex flex-col h-full justify-between">
+                    <div>
+                      <span className="font-mono text-[7.5px] tracking-[0.2em] text-[#12224A] uppercase font-bold">Home Arena</span>
+                      <h3
+                        className="font-display font-semibold text-xl tracking-tight text-[#0F172A] uppercase mt-1.5"
+                        style={{ fontFamily: "'Clash Display', sans-serif" }}
+                      >
+                        Olympus Arena
+                      </h3>
+                      <p className="font-sans text-xs text-slate-650 mt-2 max-w-[40ch] leading-relaxed">
+                        A 42,000-seat state-of-the-art structure featuring a fully retractable roof system and premium hybrid turf.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4 mt-6 pt-5 border-t border-slate-150 font-mono">
+                      <div>
+                        <div className="font-bold text-sm text-[#0F172A] tabular-nums">42,000</div>
+                        <div className="text-[6.5px] text-slate-600 tracking-wider uppercase font-semibold mt-0.5">Capacity</div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-sm text-[#0F172A] tabular-nums">2021</div>
+                        <div className="text-[6.5px] text-slate-600 tracking-wider uppercase font-semibold mt-0.5">Built</div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-sm text-[#0F172A]">Hybrid</div>
+                        <div className="text-[6.5px] text-slate-600 tracking-wider uppercase font-semibold mt-0.5">Pitch</div>
+                      </div>
+                    </div>
+                  </div>
+                </DoubleBezelCard>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* --- VIEWPORT CARD STACK SECTION --- */}
+        <section className="py-24 md:py-36 px-6 relative border-t border-slate-200/60 bg-slate-50/30">
+          <div className="max-w-6xl mx-auto">
+
+            <div className="text-center mb-16 md:mb-20">
+              <h2
+                className="font-display font-semibold text-3xl md:text-4xl tracking-tight text-[#0F172A] uppercase"
+                style={{ fontFamily: "'Clash Display', sans-serif" }}
+              >
+                Club Milestones
+              </h2>
+            </div>
+
+            {/* Sticky Viewport Stack with Double Bezel styling */}
+            <div className="relative flex flex-col gap-10 max-w-3xl mx-auto">
+              {milestones.map((m, idx) => (
+                <div
+                  key={idx}
+                  className="sticky top-32 bg-slate-100/50 border border-slate-200/40 p-2 rounded-[2.25rem] shadow-[0_20px_50px_rgba(0,0,0,0.03)]"
+                  style={{
+                    transform: `translateY(${idx * 10}px) scale(${1 - (milestones.length - 1 - idx) * 0.02})`,
+                    zIndex: idx + 1
+                  }}
+                >
+                  <div className="bg-white border border-slate-100 rounded-[calc(2.25rem-0.5rem)] p-6 md:p-10 min-h-[260px] flex flex-col justify-between">
+
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                      <span
+                        className="font-display font-bold text-3xl text-[#12224A]"
+                        style={{ fontFamily: "'Clash Display', sans-serif" }}
+                      >
+                        {m.year}
+                      </span>
+                      <span className="font-mono text-[8px] text-slate-500 tracking-widest uppercase font-bold">Milestone // 0{idx + 1}</span>
+                    </div>
+
+                    <div className="my-5">
+                      <h3
+                        className="font-display font-semibold text-base md:text-lg text-[#0F172A] tracking-tight uppercase"
+                        style={{ fontFamily: "'Clash Display', sans-serif" }}
+                      >
+                        {m.title}
+                      </h3>
+                      <p className="font-sans text-xs text-slate-655 mt-2 leading-relaxed">
+                        {m.description}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 mt-auto">
+                      <Trophy className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span className="font-mono text-[8px] tracking-widest text-[#12224A] uppercase font-bold">Championship Level</span>
+                    </div>
+
+                  </div>
                 </div>
               ))}
             </div>
+
           </div>
+        </section>
 
-          {/* Stadium SVG */}
-          <div style={{ flex: "1 1 300px", maxWidth: 400 }}>
-            <svg viewBox="0 0 240 160" style={{ width: "100%" }} fill="none">
-              <motion.path
-                d="M20,120 Q20,50 120,30 Q220,50 220,120"
-                stroke={C.accent} strokeWidth="1.5" fill="none" strokeOpacity="0.3"
-                initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }}
-                viewport={{ once: true }} transition={{ duration: 2, ease: "easeOut" }}
-              />
-              <motion.path
-                d="M45,115 Q45,65 120,48 Q195,65 195,115"
-                stroke={C.accent} strokeWidth="1" fill="none" strokeOpacity="0.15"
-                initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }}
-                viewport={{ once: true }} transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
-              />
-              <rect x="55" y="95" width="130" height="55" rx="3" fill={C.accentLight} stroke={C.accent} strokeWidth="0.5" strokeOpacity="0.2" />
-              <circle cx="120" cy="122" r="12" stroke={C.accent} strokeWidth="0.5" fill="none" strokeOpacity="0.25" />
-              <circle cx="120" cy="122" r="1.5" fill={C.accent} fillOpacity="0.3" />
-              <line x1="120" y1="95" x2="120" y2="150" stroke={C.accent} strokeWidth="0.5" strokeOpacity="0.15" />
-              <rect x="85" y="95" width="70" height="18" rx="1" fill="none" stroke={C.accent} strokeWidth="0.5" strokeOpacity="0.12" />
-              <rect x="85" y="132" width="70" height="18" rx="1" fill="none" stroke={C.accent} strokeWidth="0.5" strokeOpacity="0.12" />
-              {[30, 210].map(x => (
-                <g key={x}>
-                  <line x1={x} y1="120" x2={x} y2="35" stroke={C.accent} strokeWidth="1.5" strokeOpacity="0.2" />
-                  <circle cx={x} cy="35" r="3" fill={C.accent} fillOpacity="0.15" />
-                  <circle cx={x} cy="35" r="1.5" fill={C.accent} fillOpacity="0.4" />
-                </g>
-              ))}
-              <line x1="10" y1="135" x2="230" y2="135" stroke={C.border} strokeWidth="0.5" />
-            </svg>
-          </div>
-        </motion.div>
-      </section>
+        {/* --- INTERACTIVE DIRECTORY --- */}
+        <section id="squad" className="py-24 md:py-36 px-6 relative border-t border-slate-200/60 bg-slate-50/10">
+          <div className="max-w-6xl mx-auto">
 
-      {/* ── SECOND TICKER ── */}
-      <div style={{ padding: "1rem 0 2rem", overflow: "hidden" }}>
-        <Ticker items={["MATCH DAY", "OLYMPUS ARENA", "42K SEATS", "GOLDEN STAND", "HYBRID PITCH"]} speed={35} />
-      </div>
-
-      {/* ── FOOTER ── */}
-      <footer style={{ maxWidth: 1200, margin: "0 auto", padding: "0 1.5rem 3rem" }}>
-        <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: "1.5rem" }}>
-          <div style={{
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            flexWrap: "wrap", gap: "1rem",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{
-                width: 24, height: 24, borderRadius: 6,
-                background: C.accentLight, display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill={C.accent}>
-                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
-                </svg>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+              <div>
+                <h2
+                  className="font-display font-semibold text-3xl md:text-4xl tracking-tight text-[#0F172A] uppercase"
+                  style={{ fontFamily: "'Clash Display', sans-serif" }}
+                >
+                  Club Directory
+                </h2>
               </div>
-              <span style={{
-                fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700,
-                fontSize: "0.75rem", letterSpacing: "0.1em", color: C.muted, textTransform: "uppercase",
-              }}>
-                Olympus FC
-              </span>
+
+              {/* High-Performance Selector Toggle */}
+              <div className="flex bg-slate-100 border border-slate-200/60 rounded-xl p-1 w-max">
+                {(["squad", "fixtures"] as const).map(tab => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`font-mono text-[9px] tracking-widest uppercase px-5 py-2.5 rounded-lg cursor-pointer transition-all duration-300 font-bold ${activeTab === tab
+                        ? "bg-[#12224A] text-white shadow-sm"
+                        : "text-slate-500 hover:text-[#12224A]"
+                      }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div style={{ display: "flex", gap: "1.5rem" }}>
-              {["Privacy", "Terms", "Press", "Careers"].map(l => (
-                <span key={l} style={{
-                  fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 600,
-                  fontSize: "0.65rem", letterSpacing: "0.1em", color: C.light,
-                  textTransform: "uppercase", cursor: "pointer",
-                }}>
-                  {l}
-                </span>
-              ))}
+            {/* Transition View Wrapper */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {activeTab === "squad" ? (
+                  <div className="flex flex-col gap-10">
+                    {(Object.entries(players) as [string, typeof players.goalkeepers][]).map(([group, list]) => (
+                      <div key={group}>
+                        <div className="flex items-center gap-2 mb-5">
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#12224A]" />
+                          <span className="font-mono text-[8.5px] tracking-widest text-[#12224A] uppercase font-bold">
+                            {group}
+                          </span>
+                          <span className="font-mono text-[8px] text-slate-550 font-semibold">
+                            / {list.length} players
+                          </span>
+                        </div>
+
+                        <motion.div
+                          variants={stagger}
+                          initial="hidden"
+                          whileInView="show"
+                          viewport={{ once: true }}
+                          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                        >
+                          {list.map(p => <PlayerCard key={p.number} {...p} />)}
+                        </motion.div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <motion.div
+                    id="fixtures"
+                    variants={stagger}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true }}
+                    className="flex flex-col gap-4 max-w-4xl mx-auto"
+                  >
+                    {matches.map((m, i) => <MatchRow key={i} {...m} />)}
+                  </motion.div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+
+          </div>
+        </section>
+
+        {/* --- TICKET RESERVATION BANNER --- */}
+        <section id="tickets" className="py-24 md:py-36 px-6 relative border-t border-slate-200/60">
+          <div className="max-w-4xl mx-auto">
+
+            {/* Double-Bezel Light Container */}
+            <div className="bg-slate-100/50 border border-slate-200/40 p-2 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.02)]">
+              <div className="bg-white border border-slate-100/60 rounded-[calc(2rem-0.5rem)] p-8 md:p-14 text-center relative overflow-hidden">
+
+                {/* Radial Glow */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[70%] rounded-full bg-[#12224A]/[0.02] blur-[80px]" />
+                </div>
+
+                <div className="relative z-10">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-center mx-auto mb-5 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
+                    <Trophy className="w-5 h-5 text-[#D4AF37]" />
+                  </div>
+
+                  <h2
+                    className="font-display font-semibold text-2xl md:text-4xl tracking-tight text-[#0F172A] uppercase"
+                    style={{ fontFamily: "'Clash Display', sans-serif" }}
+                  >
+                    Join the Glory
+                  </h2>
+
+                  <p className="font-sans text-xs text-slate-555 max-w-[42ch] mx-auto mt-3 leading-relaxed">
+                    Reserve your seat for the upcoming 2026-27 championship campaign. Sign up below to get early ticket access and match updates.
+                  </p>
+
+                  {/* Form Block */}
+                  <form
+                    onSubmit={(e) => e.preventDefault()}
+                    className="max-w-md mx-auto mt-8"
+                  >
+                    <div className="text-left mb-2">
+                      <label
+                        htmlFor="email-reserve"
+                        className="font-mono text-[7.5px] tracking-[0.2em] text-slate-555 uppercase pl-3 font-bold cursor-pointer"
+                      >
+                        Email Address
+                      </label>
+                    </div>
+
+                    {/* Double-Bezel inspired Input */}
+                    <div className="flex bg-[#F9FAFB] border border-slate-200 focus-within:border-slate-400 focus-within:bg-white rounded-xl p-1.5 transition-all duration-300">
+                      <input
+                        type="email"
+                        id="email-reserve"
+                        placeholder="placeholder@domain.com"
+                        required
+                        className="flex-1 bg-transparent border-none text-xs text-[#0F172A] px-3 focus:outline-none placeholder-slate-400 font-sans"
+                      />
+                      <button
+                        type="submit"
+                        className="group flex items-center justify-center gap-2 bg-[#12224A] hover:bg-[#1D3557] text-[#FDFBF7] font-mono text-[8.5px] tracking-widest uppercase pl-4 pr-2.5 py-3 min-h-[44px] rounded-lg active:scale-[0.98] transition-all duration-200 cursor-pointer font-bold"
+                      >
+                        Reserve
+                        <div className="w-4 h-4 rounded bg-white/15 flex items-center justify-center group-hover:bg-white/25 transition-colors">
+                          <ArrowUpRight className="w-3.5 h-3.5 text-white" />
+                        </div>
+                      </button>
+                    </div>
+
+                    <div className="text-left mt-2.5">
+                      <span className="font-mono text-[7.5px] text-[#12224A] uppercase pl-3 block font-bold tracking-wider">
+                        * Early access registrations close soon
+                      </span>
+                    </div>
+                  </form>
+                </div>
+
+              </div>
             </div>
 
-            <span style={{
-              fontFamily: "'Barlow', sans-serif", fontWeight: 400,
-              fontSize: "0.65rem", color: C.light,
-            }}>
-              © {new Date().getFullYear()} Olympus FC
+          </div>
+        </section>
+
+      </main>
+
+      {/* --- FOOTER --- */}
+      <footer className="border-t border-slate-200/60 bg-[#FAF8F5] py-10 px-6 relative z-20 transition-colors duration-500">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-md bg-[#12224A]/10 border border-[#12224A]/20 flex items-center justify-center">
+              <Shield className="w-4 h-4 text-[#12224A]" />
+            </div>
+            <span className="font-display font-semibold text-[10.5px] tracking-wider text-slate-700 uppercase" style={{ fontFamily: "'Clash Display', sans-serif" }}>
+              Olympus FC
             </span>
           </div>
+
+          <div className="flex items-center gap-5">
+            {["Privacy", "Terms", "Support"].map(item => (
+              <span key={item} className="font-mono text-[8.5px] tracking-wider text-slate-500 hover:text-[#12224A] uppercase cursor-pointer transition-colors font-semibold">
+                {item}
+              </span>
+            ))}
+          </div>
+
+          <div className="font-mono text-[8.5px] text-slate-500 font-semibold tracking-wider">
+            &copy; {new Date().getFullYear()} Olympus FC. All rights reserved.
+          </div>
+
         </div>
       </footer>
     </div>
