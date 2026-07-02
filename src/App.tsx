@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useRef, Suspense, lazy, ComponentType } from "react";
-import { Routes, Route, useLocation, Link } from "react-router-dom";
+import { useState, useEffect, useRef, Suspense, lazy, ComponentType, useCallback } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import Home from "./pages/Home";
 import LiquidNavbar from "./components/LiquidNavbar";
+
+// Static routes config to prevent recreation on every render
+const SCROLLABLE_ROUTES = new Set(["/", "/vortex", "/portfolio", "/soccer-team", "/noodle-place"]);
+const NAVBAR_HIDDEN_ROUTES = new Set(["/vortex", "/soccer-team", "/noodle-place"]);
 
 // Helper to support preloading on lazy components
 function lazyWithPreload<T extends ComponentType<any>>(
@@ -26,51 +30,48 @@ const SoccerTeam = lazyWithPreload(() => import("./pages/SoccerTeam"));
 const NoodlePlace = lazyWithPreload(() => import("./pages/NoodlePlace"));
 const NotFound = lazyWithPreload(() => import("./pages/NotFound"));
 
+type Language = "en" | "fr";
+
 export default function App() {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isSiteReady, setIsSiteReady] = useState(false);
   const location = useLocation();
 
-  const [lang, setLang] = useState<"en" | "fr">(() => {
-    return (localStorage.getItem("preferred-lang") as "en" | "fr") || "en";
+  const [lang, setLang] = useState<Language>(() => {
+    const saved = localStorage.getItem("preferred-lang");
+    return (saved === "en" || saved === "fr") ? saved : "en";
   });
 
   useEffect(() => {
     localStorage.setItem("preferred-lang", lang);
   }, [lang]);
 
-  const fontsLoadedRef = useRef(fontsLoaded);
-  const imageLoadedRef = useRef(imageLoaded);
+  // Stable language setter callback to prevent children re-renders
+  const handleSetLang = useCallback((newLang: Language) => {
+    setLang(newLang);
+  }, []);
 
-  useEffect(() => {
-    fontsLoadedRef.current = fontsLoaded;
-  }, [fontsLoaded]);
-
-  useEffect(() => {
-    imageLoadedRef.current = imageLoaded;
-  }, [imageLoaded]);
+  const fontsLoadedRef = useRef(false);
+  const imagesLoadedRef = useRef(false);
 
   useEffect(() => {
     // Fonts load check
-    document.fonts.ready.then(() => setFontsLoaded(true));
+    document.fonts.ready.then(() => {
+      fontsLoadedRef.current = true;
+    });
 
-    // Preload heavy images sitewide to prevent navigation and animation lag
+    // Streamlined preloading of heavy images using Promise.all
     const imagesToPreload = ["/IMG_2656.webp", "/OG2.webp"];
-    let loadedCount = 0;
+    const preloadImage = (src: string) =>
+      new Promise<void>((resolve) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => resolve();
+        img.onerror = () => resolve(); // Avoid blocking on failure
+      });
 
-    imagesToPreload.forEach((src) => {
-      const img = new Image();
-      img.src = src;
-      const handleLoad = () => {
-        loadedCount++;
-        if (loadedCount === imagesToPreload.length) {
-          setImageLoaded(true);
-        }
-      };
-      img.onload = handleLoad;
-      img.onerror = handleLoad; // Fallback to avoid blocking if image path fails
+    Promise.all(imagesToPreload.map(preloadImage)).then(() => {
+      imagesLoadedRef.current = true;
     });
 
     // Idle-Time Preloading for lazy loaded page components
@@ -90,13 +91,14 @@ export default function App() {
     }
   }, []);
 
-  // Smooth loading progress animation
+  // Simplified and consolidated progress animation loop
   useEffect(() => {
     let animationFrameId: number;
+    let timeoutId: number;
     let currentProgress = 0;
 
     const updateProgress = () => {
-      const loaded = fontsLoadedRef.current && imageLoadedRef.current;
+      const loaded = fontsLoadedRef.current && imagesLoadedRef.current;
       const target = loaded ? 100 : 90;
 
       if (currentProgress < target) {
@@ -108,7 +110,7 @@ export default function App() {
       }
 
       if (currentProgress >= 100) {
-        setTimeout(() => {
+        timeoutId = window.setTimeout(() => {
           setIsSiteReady(true);
         }, 300);
         return;
@@ -118,10 +120,14 @@ export default function App() {
     };
 
     animationFrameId = requestAnimationFrame(updateProgress);
-    return () => cancelAnimationFrame(animationFrameId);
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
-  const isScrollable = location.pathname === "/" || location.pathname === "/vortex" || location.pathname === "/portfolio" || location.pathname === "/soccer-team" || location.pathname === "/noodle-place";
+  const isScrollable = SCROLLABLE_ROUTES.has(location.pathname);
+  const showNavbar = !NAVBAR_HIDDEN_ROUTES.has(location.pathname);
 
   return (
     <div className={`relative flex min-h-screen bg-theme-bg items-stretch justify-stretch ${isScrollable ? "overflow-y-auto no-scrollbar overscroll-y-none" : "overflow-hidden"}`}>
@@ -165,7 +171,7 @@ export default function App() {
         >
           {/* Liquid Navbar at top middle */}
           <AnimatePresence>
-            {!["/vortex", "/soccer-team", "/noodle-place"].includes(location.pathname) && (
+            {showNavbar && (
               <motion.div
                 key="navbar-wrapper"
                 initial={{ opacity: 0, y: -15 }}
@@ -179,12 +185,11 @@ export default function App() {
             )}
           </AnimatePresence>
 
-
           {/* Main Content */}
           <Suspense fallback={null}>
             <Routes>
-              <Route path="/" element={<Home lang={lang} setLang={setLang} />} />
-              <Route path="/portfolio" element={<Portfolio lang={lang} setLang={setLang} />} />
+              <Route path="/" element={<Home lang={lang} setLang={handleSetLang} />} />
+              <Route path="/portfolio" element={<Portfolio lang={lang} setLang={handleSetLang} />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/vortex" element={<Vortex />} />
               <Route path="/soccer-team" element={<SoccerTeam />} />
