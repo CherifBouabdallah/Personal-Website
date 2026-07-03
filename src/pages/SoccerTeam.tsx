@@ -433,7 +433,7 @@ export default function SoccerTeam({ isPreview = false, onClose }: SoccerTeamPro
                   {/* Background portrait with high-contrast grayscale filter */}
                   <div className="absolute inset-0 z-0 overflow-hidden bg-slate-50">
                     <img
-                      src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80"
+                      src="/soccer_striker.png"
                       alt="Luca Moretti Striker Profile"
                       loading="lazy"
                       className="w-full h-full object-cover filter grayscale contrast-[1.1] opacity-75 group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -549,7 +549,7 @@ export default function SoccerTeam({ isPreview = false, onClose }: SoccerTeamPro
                   {/* Background architectural shot in grayscale */}
                   <div className="absolute inset-0 z-0 overflow-hidden bg-slate-100">
                     <img
-                      src="https://images.unsplash.com/photo-1524646888194-7ea97032017e?auto=format&fit=crop&w=1200&q=80"
+                      src="/stadium_architecture.png"
                       alt="Olympus Stadium Architecture"
                       loading="lazy"
                       className="w-full h-full object-cover filter grayscale contrast-[1.15] opacity-25 group-hover:scale-103 transition-transform duration-700 ease-out"

@@ -7,3 +7,10 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Agent/IDE and audit directories
+.agents/
+.codex/
+.gemini/
+.impeccable/
+motion-audits/

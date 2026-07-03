@@ -142,12 +142,12 @@ export default function HolographicBall({
 
     // --- ANIMATION LOOP (SPRING KINEMATICS & ELASTIC DEFORMATION) ---
     let animationFrameId: number;
-    let clock = new THREE.Clock();
+    const startTime = performance.now();
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
 
-      const elapsedTime = clock.getElapsedTime();
+      const elapsedTime = (performance.now() - startTime) / 1000;
 
       // Lerp mouse positions for physical lag
       mouse.x += (mouse.targetX - mouse.x) * 0.05;

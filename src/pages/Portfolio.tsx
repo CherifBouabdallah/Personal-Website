@@ -1,11 +1,9 @@
 import { motion, useMotionValue, useSpring, useTransform, Variants, AnimatePresence } from "framer-motion";
 import React, { useState, useEffect, useRef, useCallback, useMemo, Suspense } from "react";
-import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import {
   Github,
-  ArrowRight,
-  Activity
+  ArrowRight
 } from "lucide-react";
 import { TRANSLATIONS } from "../data/translations";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
@@ -62,23 +60,8 @@ const FEATURED_PROJECTS: FeaturedProject[] = [
     showGithub: false,
     layoutId: "noodle-place-card",
     bgColor: "#121212",
-  },
+  }
 ];
-
-// 2. Elegant self-drawing border divider rule (Memoized)
-const SelfDrawingLine = React.memo(({ className = "" }: { className?: string }) => {
-  return (
-    <div className={`relative w-full h-[1px] bg-[#F6F0DF]/10 overflow-hidden ${className}`}>
-      <motion.div
-        initial={{ scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        viewport={{ once: true, margin: "-40px" }}
-        transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute inset-0 bg-[#F6F0DF]/30 origin-left"
-      />
-    </div>
-  );
-});
 
 // 3. Shared Preview: Scaled page thumbnail with unified hover (Memoized)
 const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hoverLabel = "Open Project" }: {
@@ -371,7 +354,6 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
 
   const contentRef = useRef<HTMLDivElement>(null);
   const currentScrollY = useRef(0);
-  const navigate = useNavigate();
 
   const getGlassClass = useCallback(() => "glass-deep-blur", []);
 
@@ -698,7 +680,9 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
                 ? "vortex-sandbox-card"
                 : activeModal === "soccer"
                 ? "soccer-team-card"
-                : "noodle-place-card"
+                : activeModal === "noodle"
+                ? "noodle-place-card"
+                : "sf-animation-card"
             }
             bgColor={
               activeModal === "vortex"
