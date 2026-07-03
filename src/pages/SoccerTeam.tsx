@@ -208,24 +208,31 @@ function MatchRow({ homeTeam, awayTeam, date, time, venue, isHome, result }: {
 interface SoccerTeamProps {
   isPreview?: boolean;
   onClose?: () => void;
+  isCardPreview?: boolean;
 }
 
 // ====================================================================
 // MAIN COMPONENT: SOCCER TEAM LANDING PAGE (LIGHT CREAM/LUXURY BLUE EXCLUSIVELY)
 // ====================================================================
-export default function SoccerTeam({ isPreview = false, onClose }: SoccerTeamProps) {
+export default function SoccerTeam({ isPreview = false, onClose, isCardPreview = false }: SoccerTeamProps) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"squad" | "fixtures">("squad");
   const containerRef = useRef<HTMLDivElement>(null);
+  const [shouldRenderBall, setShouldRenderBall] = useState(false);
 
-  // Load Clash Display, Satoshi, and JetBrains Mono dynamically
   useEffect(() => {
-    const link = document.createElement("link");
-    link.href = "https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&f[]=clash-display@400,500,600,700&f[]=jet-brains-mono@300,400,500,700&display=swap";
-    link.rel = "stylesheet";
-    document.head.appendChild(link);
-    return () => { document.head.removeChild(link); };
-  }, []);
+    if (isCardPreview) {
+      setShouldRenderBall(false);
+      return;
+    }
+
+    // Delay the mounting of HolographicBall to allow transitions to complete smoothly
+    const timer = setTimeout(() => {
+      setShouldRenderBall(true);
+    }, 650);
+
+    return () => clearTimeout(timer);
+  }, [isCardPreview]);
 
   const players = {
     goalkeepers: [
@@ -301,9 +308,19 @@ export default function SoccerTeam({ isPreview = false, onClose }: SoccerTeamPro
       </div>
 
       {/* 3D Holographic Canvas Element (Strictly Light Themed) */}
-      <div className="fixed inset-0 w-full h-full pointer-events-none z-10">
-        <HolographicBall themeColor="#12224A" isLightMode={true} />
-      </div>
+      <AnimatePresence>
+        {shouldRenderBall && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="fixed inset-0 w-full h-full pointer-events-none z-10"
+          >
+            <HolographicBall themeColor="#12224A" isLightMode={true} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* --- navigation bar (totally reworked, minimalist topbar, no shadow, no glow, sits flush at top) --- */}
       <header className={`${isPreview ? "absolute" : "fixed"

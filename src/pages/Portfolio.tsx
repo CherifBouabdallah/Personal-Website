@@ -283,7 +283,7 @@ const FeaturedCard = React.memo(({ project, t, onOpen, getGlassClass }: Featured
                 {project.id === "vortex" ? (
                   <Vortex isPreview={true} />
                 ) : project.id === "soccer" ? (
-                  <SoccerTeam isPreview={true} />
+                  <SoccerTeam isPreview={true} isCardPreview={true} />
                 ) : (
                   <NoodlePlace isPreview={true} />
                 )}

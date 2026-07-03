@@ -73,7 +73,7 @@ function DoubleBezelCard({ children, className = "", onClick, whileHover }: {
 
 export default function NoodlePlace({ isPreview = false }: NoodlePlaceProps) {
   const navigate = useNavigate();
-  const [fontsLoaded, setFontsLoaded] = useState(false);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Custom states
@@ -113,42 +113,7 @@ export default function NoodlePlace({ isPreview = false }: NoodlePlaceProps) {
   const heroImageY = useTransform(scrollYProgress, [0, 0.4], [0, 100]);
   const heroTextY = useTransform(scrollYProgress, [0, 0.4], [0, -40]);
 
-  // Dynamic style injection (Cabinet Grotesk + custom css overrides)
-  useEffect(() => {
-    // Fonts load
-    const linkFonts = document.createElement("link");
-    linkFonts.href = "https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,500,400&display=swap";
-    linkFonts.rel = "stylesheet";
-    document.head.appendChild(linkFonts);
 
-    // CSS Keyframe styles
-    const style = document.createElement("style");
-    style.innerHTML = `
-      .font-cabinet {
-        font-family: 'Cabinet Grotesk', sans-serif;
-      }
-      .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(244, 241, 234, 0.1);
-        border-radius: 3px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: rgba(244, 241, 234, 0.25);
-      }
-    `;
-    document.head.appendChild(style);
-    setFontsLoaded(true);
-
-    return () => {
-      document.head.removeChild(linkFonts);
-      document.head.removeChild(style);
-    };
-  }, []);
 
   const signatureBowls = [
     {
@@ -232,7 +197,7 @@ export default function NoodlePlace({ isPreview = false }: NoodlePlaceProps) {
     setIsReserved(true);
   };
 
-  if (!fontsLoaded) return null;
+
 
   return (
     <main className="overflow-x-hidden w-full max-w-full bg-[#121212] text-[#F4F1EA] selection:bg-[#C85A32] selection:text-[#F4F1EA] relative min-h-[100dvh] custom-scrollbar">

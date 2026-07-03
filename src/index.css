@@ -134,6 +134,26 @@
     pointer-events: none;
     font-weight: bold;
   }
+
+  /* NoodlePlace: Cabinet Grotesk font utility */
+  .font-cabinet {
+    font-family: 'Cabinet Grotesk', sans-serif;
+  }
+
+  /* NoodlePlace: Custom scrollbar styling */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(244, 241, 234, 0.1);
+    border-radius: 3px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(244, 241, 234, 0.25);
+  }
 }
 
 @layer utilities {

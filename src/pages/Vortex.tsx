@@ -38,12 +38,6 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
 
   // Dynamic font and style inject
   useEffect(() => {
-    // Fonts load
-    const link = document.createElement("link");
-    link.href = "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Geist+Mono:wght@100..900&display=swap";
-    link.rel = "stylesheet";
-    document.head.appendChild(link);
-
     // CSS Keyframe styles
     const style = document.createElement("style");
     style.innerHTML = `
@@ -118,7 +112,6 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
     }, 1000);
 
     return () => {
-      document.head.removeChild(link);
       document.head.removeChild(style);
       clearInterval(clockInterval);
     };
