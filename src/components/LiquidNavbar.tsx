@@ -2,19 +2,21 @@ import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 
-const PATHS = ["/", "/portfolio", "/contact"];
+const SECTIONS = ["home", "portfolio", "contact"];
 
 interface LiquidNavbarProps {
   className?: string;
+  activeSection?: string;
+  setActiveSection?: (section: string) => void;
 }
 
-export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
+export default function LiquidNavbar({ className = "", activeSection = "home", setActiveSection }: LiquidNavbarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const shouldReduceMotion = useReducedMotion();
 
   // Find the active index
-  const activeIndex = PATHS.indexOf(location.pathname);
+  const activeIndex = SECTIONS.indexOf(activeSection);
 
   // Refs for tracking coordinates
   const containerRef = useRef<HTMLDivElement>(null);
@@ -65,10 +67,19 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
   }, [activeIndex]);
 
   // Click handler for menu items
-  const handleNavClick = (path: string, e: React.MouseEvent) => {
+  const handleNavClick = (section: string, e: React.MouseEvent) => {
     e.preventDefault();
-    if (location.pathname !== path) {
-      navigate(path);
+    if (location.pathname !== "/") {
+      navigate(`/#${section}`);
+    } else {
+      const el = document.getElementById(section);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+        window.history.pushState(null, "", `#${section}`);
+        if (setActiveSection) {
+          setActiveSection(section);
+        }
+      }
     }
   };
 
@@ -79,20 +90,20 @@ export default function LiquidNavbar({ className = "" }: LiquidNavbarProps) {
         ref={containerRef}
         className="flex items-center gap-10 md:gap-16 relative py-3 px-6 border-b border-theme-text/10"
       >
-        {PATHS.map((path, index) => {
+        {SECTIONS.map((section, index) => {
           let label = "Home";
-          if (path === "/portfolio") label = "Portfolio";
-          if (path === "/contact") label = "Contact";
+          if (section === "portfolio") label = "Portfolio";
+          if (section === "contact") label = "Contact";
 
-          const active = location.pathname === path;
+          const active = activeSection === section;
           return (
             <a
-              key={path}
-              href={path}
+              key={section}
+              href={`#${section}`}
               ref={(el) => {
                 linkRefs.current[index] = el;
               }}
-              onClick={(e) => handleNavClick(path, e)}
+              onClick={(e) => handleNavClick(section, e)}
               className={`relative font-mono text-[9px] sm:text-[10px] tracking-[0.25em] uppercase transition-colors duration-200 py-1.5 cursor-pointer decoration-none inline-flex flex-col items-center justify-center ${
                 active ? "text-theme-text font-bold" : "text-theme-text/55 hover:text-theme-text/90"
               }`}

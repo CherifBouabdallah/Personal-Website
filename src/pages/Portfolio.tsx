@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useSpring, useTransform, Variants, AnimatePresence } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, Variants, AnimatePresence, useScroll } from "framer-motion";
 import React, { useState, useEffect, useRef, useCallback, useMemo, Suspense } from "react";
 import Footer from "../components/Footer";
 import {
@@ -348,26 +348,25 @@ interface PortfolioProps {
 
 export default function Portfolio({ lang, setLang }: PortfolioProps) {
   const [isReady, setIsReady] = useState(false);
-  const maxScrollRef = useRef(0);
   const [isMobile, setIsMobile] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalKey | null>(null);
 
   const contentRef = useRef<HTMLDivElement>(null);
-  const currentScrollY = useRef(0);
-
   const getGlassClass = useCallback(() => "glass-deep-blur", []);
 
   const t = TRANSLATIONS[lang];
 
-  // Smooth scroll tracking matching other scrollable screens
-  const scrollProgress = useMotionValue(0);
-  const smoothScrollY = useSpring(scrollProgress, {
+  const portfolioRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: portfolioRef,
+    offset: ["start start", "end end"]
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
     damping: 30,
     stiffness: 120,
     mass: 0.8,
   });
-
-  const contentY = useTransform(smoothScrollY, y => -y);
 
   const [vh, setVh] = useState(window.innerHeight);
 
@@ -385,16 +384,6 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
     document.fonts.ready.then(() => setIsReady(true));
   }, []);
 
-  // Lock scroll bar on document mount/unmount
-  useEffect(() => {
-    document.documentElement.classList.add("no-scrollbar");
-    document.body.classList.add("no-scrollbar");
-    return () => {
-      document.documentElement.classList.remove("no-scrollbar");
-      document.body.classList.remove("no-scrollbar");
-    };
-  }, []);
-
   // Unified ESC key listener to close preview modals
   useEffect(() => {
     if (!activeModal) return;
@@ -407,153 +396,23 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
     return () => window.removeEventListener("keydown", handleEsc);
   }, [activeModal]);
 
-  // Scroll and Resize Observer initialization
-  useEffect(() => {
-    if (!isReady) return;
-    if (activeModal) return;
-
-    const updateMaxScroll = () => {
-      if (contentRef.current) {
-        const contentHeight = contentRef.current.scrollHeight;
-        const viewportHeight = window.innerHeight;
-        const newMax = Math.max(0, contentHeight - viewportHeight);
-        maxScrollRef.current = newMax;
-
-        if (currentScrollY.current > newMax) {
-          currentScrollY.current = newMax;
-          scrollProgress.set(newMax);
-        }
-      }
-    };
-
-    let observer: ResizeObserver | null = null;
-    if (contentRef.current) {
-      observer = new ResizeObserver(() => {
-        updateMaxScroll();
-      });
-      observer.observe(contentRef.current);
-    }
-
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      const contentHeight = contentRef.current ? contentRef.current.scrollHeight : 0;
-      const viewportHeight = window.innerHeight;
-      const activeMax = Math.max(0, contentHeight - viewportHeight);
-
-      const delta = e.deltaY * 1.8;
-      currentScrollY.current = Math.max(0, Math.min(activeMax, currentScrollY.current + delta));
-      scrollProgress.set(currentScrollY.current);
-    };
-
-    let startY = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      startY = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.cancelable) e.preventDefault();
-      const contentHeight = contentRef.current ? contentRef.current.scrollHeight : 0;
-      const viewportHeight = window.innerHeight;
-      const activeMax = Math.max(0, contentHeight - viewportHeight);
-
-      const currentY = e.touches[0].clientY;
-      const deltaY = startY - currentY;
-      const delta = deltaY * 2.4;
-      currentScrollY.current = Math.max(0, Math.min(activeMax, currentScrollY.current + delta));
-      scrollProgress.set(currentScrollY.current);
-      startY = currentY;
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const contentHeight = contentRef.current ? contentRef.current.scrollHeight : 0;
-      const viewportHeight = window.innerHeight;
-      const activeMax = Math.max(0, contentHeight - viewportHeight);
-
-      if (e.key === "ArrowDown") {
-        currentScrollY.current = Math.max(0, Math.min(activeMax, currentScrollY.current + 100));
-        scrollProgress.set(currentScrollY.current);
-      } else if (e.key === "ArrowUp") {
-        currentScrollY.current = Math.max(0, Math.min(activeMax, currentScrollY.current - 100));
-        scrollProgress.set(currentScrollY.current);
-      } else if (e.key === " " || e.key === "PageDown") {
-        e.preventDefault();
-        currentScrollY.current = Math.max(0, Math.min(activeMax, currentScrollY.current + viewportHeight * 0.8));
-        scrollProgress.set(currentScrollY.current);
-      } else if (e.key === "PageUp") {
-        e.preventDefault();
-        currentScrollY.current = Math.max(0, Math.min(activeMax, currentScrollY.current - viewportHeight * 0.8));
-        scrollProgress.set(currentScrollY.current);
-      } else if (e.key === "Home") {
-        currentScrollY.current = 0;
-        scrollProgress.set(currentScrollY.current);
-      } else if (e.key === "End") {
-        currentScrollY.current = activeMax;
-        scrollProgress.set(currentScrollY.current);
-      }
-    };
-
-    window.addEventListener("wheel", handleWheel, { passive: false });
-    window.addEventListener("touchstart", handleTouchStart);
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("resize", updateMaxScroll);
-
-    updateMaxScroll();
-
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("resize", updateMaxScroll);
-      if (observer) observer.disconnect();
-    };
-  }, [isReady, activeModal]);
-
   const headerText = t.portfolioTitle;
 
-  // Title morph animation (centered -> scaled top banner -> scrolling with page)
-  const titleY = useTransform(smoothScrollY, (value) => {
-    const targetLimit = 500;
-    const vhVal = window.innerHeight;
-    const baseOffset = -0.16 * vhVal;
-    if (value <= targetLimit) {
-      return (value / targetLimit) * baseOffset;
-    } else {
-      return baseOffset - (value - targetLimit);
+  // Title morph animation (centered -> scaled top banner)
+  const titleY = useTransform(smoothProgress, (val) => {
+    const vhVal = vh;
+    const topOffset = isMobile ? 24 : 36;
+    const endY = -(vhVal / 2 - topOffset - 20); // Move to the very top of the sticky container
+    if (val <= 0.3) {
+      return (val / 0.3) * endY;
     }
+    return endY;
   });
-  const titleScale = useTransform(smoothScrollY, [0, 500], [1, isMobile ? 0.65 : 0.45]);
+  const titleScale = useTransform(smoothProgress, [0, 0.3], [1, isMobile ? 0.65 : 0.45]);
 
   // Invites fade out on scroll
-  const inviteOpacity = useTransform(smoothScrollY, [0, 150], [1, 0]);
-  const inviteY = useTransform(smoothScrollY, [0, 150], ["0px", "15px"]);
-
-  // Dynamic floating language switcher positions
-  const switcherTopClamp = isMobile ? 24 : 32;
-  const switcherY = useTransform(smoothScrollY, (y) => {
-    const initialPos = vh + 48; // vh + pt-12
-    const currentPos = initialPos - y;
-    return Math.max(switcherTopClamp, currentPos);
-  });
-
-  const switcherLeft = useTransform(smoothScrollY, (y) => {
-    const clampVal = vh + 48 - switcherTopClamp;
-    const endVal = clampVal + 150;
-    if (y <= clampVal) return "50%";
-    if (y >= endVal) return "100%";
-    const pct = 50 + ((y - clampVal) / (endVal - clampVal)) * 50;
-    return `${pct}%`;
-  });
-
-  const switcherX = useTransform(smoothScrollY, (y) => {
-    const clampVal = vh + 48 - switcherTopClamp;
-    const endVal = clampVal + 150;
-    if (y <= clampVal) return "-50%";
-    if (y >= endVal) return "-100%";
-    const pct = -50 - ((y - clampVal) / (endVal - clampVal)) * 50;
-    return `${pct}%`;
-  });
+  const inviteOpacity = useTransform(smoothProgress, [0, 0.1], [1, 0]);
+  const inviteY = useTransform(smoothProgress, [0, 0.1], ["0px", "15px"]);
 
   // Stable callbacks for modal operations to prevent child re-renders
   const handleOpen = useCallback((key: ModalKey) => {
@@ -565,63 +424,46 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
   }, []);
 
   return (
-    <div className="w-full h-screen min-h-screen bg-theme-bg text-theme-text relative overflow-hidden touch-none selection:bg-theme-text selection:text-theme-bg">
+    <div id="portfolio" ref={portfolioRef} className="w-full bg-theme-bg text-theme-text relative selection:bg-theme-text selection:text-theme-bg">
 
-      {/* Large Centered Title */}
-      <div className="fixed inset-0 w-full h-screen flex flex-col items-center justify-center pointer-events-none z-10">
-        <motion.div
-          style={{ y: titleY, scale: titleScale }}
-          className="cursor-default pointer-events-auto select-none"
-        >
-          <MorphingTitle text={headerText} />
-        </motion.div>
-      </div>
+      {/* Sticky Title Wrapper (stretches to fill parent height) */}
+      <div className="absolute inset-0 pointer-events-none z-30">
+        {/* Sticky Container */}
+        <div className="sticky top-0 w-full h-screen flex flex-col items-center justify-center">
+          <motion.div
+            style={{ y: titleY, scale: titleScale }}
+            className="cursor-default pointer-events-auto select-none"
+          >
+            <MorphingTitle text={headerText} />
+          </motion.div>
 
-      {/* Scroll Invite indicator */}
-      <motion.div
-        style={{ opacity: inviteOpacity, y: inviteY }}
-        className="fixed bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2.5 z-20 pointer-events-none"
-      >
-        <div className="flex flex-col items-center justify-center gap-2">
-          <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-theme-text/60">
-            {t.scrollLabel}
-          </span>
-          <div className="w-[1.5px] h-[22px] bg-theme-text/20 relative overflow-hidden">
-            <motion.div
-              animate={{
-                y: ["-100%", "100%"],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className="absolute inset-0 bg-theme-text/80 h-full w-full"
-              style={{ originY: 0 }}
-            />
-          </div>
+          {/* Scroll Invite indicator */}
+          <motion.div
+            style={{ opacity: inviteOpacity, y: inviteY }}
+            className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2.5 pointer-events-auto"
+          >
+            <div className="flex flex-col items-center justify-center gap-2">
+              <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-theme-text/60">
+                {t.scrollLabel}
+              </span>
+              <div className="w-[1.5px] h-[22px] bg-theme-text/20 relative overflow-hidden">
+                <motion.div
+                  animate={{
+                    y: ["-100%", "100%"],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute inset-0 bg-theme-text/80 h-full w-full"
+                  style={{ originY: 0 }}
+                />
+              </div>
+            </div>
+          </motion.div>
         </div>
-      </motion.div>
-
-      {/* Dynamic Floating Language Switcher Container */}
-      {isReady && (
-        <motion.div
-          style={{ y: switcherY }}
-          className="fixed top-0 left-0 right-0 z-50 pointer-events-none px-6 md:px-16 lg:px-24 xl:px-36 h-12 flex items-center"
-        >
-          <div className="relative w-full h-full">
-            <motion.div
-              style={{
-                left: switcherLeft,
-                x: switcherX
-              }}
-              className="absolute top-1/2 -translate-y-1/2 pointer-events-auto"
-            >
-              <LanguageSwitcher lang={lang} setLang={setLang} layoutId="active-lang-bg-portfolio" />
-            </motion.div>
-          </div>
-        </motion.div>
-      )}
+      </div>
 
       {/* Scrollable Container */}
       {isReady && (
@@ -631,15 +473,14 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute top-0 left-0 w-full px-6 md:px-16 lg:px-24 xl:px-36 pb-8 flex flex-col items-center z-20 select-text"
-          style={{ y: contentY }}
+          className="relative w-full px-6 md:px-16 lg:px-24 xl:px-36 pb-8 flex flex-col items-center z-20 select-text"
         >
-          {/* Scroll fold spacer */}
-          <div className="w-full h-screen flex-shrink-0" />
+          {/* Scroll fold spacer to create a pinned cinematic reveal effect */}
+          <div className="w-full h-[145vh] flex-shrink-0 pointer-events-none" />
 
           {/* Subtitle / Intro paragraph */}
           <div className="w-full max-w-[1440px] flex flex-col items-center gap-6 mb-8 md:mb-10 text-center pt-12">
-            <div className="h-6" /> {/* Visual spacer matching switcher height to keep paragraph position aligned */}
+            <div className="h-6" /> {/* Visual spacer to align formatting */}
             <motion.p
               key={`intro-${lang}`}
               initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
@@ -663,10 +504,6 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
               />
             ))}
           </div>
-
-          {/* Minimal Editorial Footer */}
-          <Footer className="w-full text-center text-theme-text/30 mt-10 z-10" />
-
         </motion.div>
       )}
 

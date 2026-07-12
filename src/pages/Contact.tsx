@@ -1,5 +1,5 @@
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { motion, useMotionValue, useSpring, useTransform, AnimatePresence, useScroll } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
 import Footer from "../components/Footer";
 
 // Inline SVGs to ensure cross-browser compatibility and consistent styling
@@ -95,9 +95,13 @@ export default function Contact() {
     return () => document.removeEventListener("click", handleOutsideClick);
   }, [activePopup]);
 
-  // Smooth virtual scroll tracking
-  const scrollProgress = useMotionValue(0);
-  const smoothProgress = useSpring(scrollProgress, {
+  const contactRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: contactRef,
+    offset: ["start end", "end end"]
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
     damping: 30,
     stiffness: 120,
     mass: 0.8,
@@ -105,76 +109,7 @@ export default function Contact() {
 
   useEffect(() => {
     document.fonts.ready.then(() => setIsReady(true));
-
-    // Apply no-scrollbar to HTML and Body to ensure clean scrollbar-free virtual scroll layout
-    document.documentElement.classList.add("no-scrollbar");
-    document.body.classList.add("no-scrollbar");
-
-    return () => {
-      document.documentElement.classList.remove("no-scrollbar");
-      document.body.classList.remove("no-scrollbar");
-    };
   }, []);
-
-
-
-  useEffect(() => {
-    let current = 0;
-    let lastTime = Date.now();
-
-    const handleWheel = (e: WheelEvent) => {
-
-      const now = Date.now();
-      const timeDiff = now - lastTime;
-      lastTime = now;
-
-      // Dampen extreme/fast scroll bursts
-      let delta = e.deltaY * 0.002;
-      if (timeDiff < 20 && Math.abs(e.deltaY) > 80) {
-        delta = e.deltaY * 0.0006;
-      }
-
-      current = Math.max(0, Math.min(1, current + delta));
-      scrollProgress.set(current);
-    };
-
-    let startY = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      startY = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.cancelable) e.preventDefault();
-      const currentY = e.touches[0].clientY;
-      const deltaY = startY - currentY;
-      const delta = deltaY * 0.005; // Touch scroll sensitivity
-      current = Math.max(0, Math.min(1, current + delta));
-      scrollProgress.set(current);
-      startY = currentY;
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowDown" || e.key === " " || e.key === "PageDown") {
-        current = Math.max(0, Math.min(1, current + 0.25));
-        scrollProgress.set(current);
-      } else if (e.key === "ArrowUp" || e.key === "PageUp") {
-        current = Math.max(0, Math.min(1, current - 0.25));
-        scrollProgress.set(current);
-      }
-    };
-
-    window.addEventListener("wheel", handleWheel, { passive: true });
-    window.addEventListener("touchstart", handleTouchStart);
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [scrollProgress]);
 
   const text = "Contact";
 
@@ -213,7 +148,7 @@ export default function Contact() {
   ];
 
   return (
-    <div className="w-full h-screen min-h-screen flex flex-col items-center justify-center relative overflow-hidden touch-none selection:bg-theme-text selection:text-theme-bg">
+    <div id="contact" ref={contactRef} className="w-full h-screen relative flex flex-col items-center justify-center selection:bg-theme-text selection:text-theme-bg">
       
 
       {/* Large Title */}

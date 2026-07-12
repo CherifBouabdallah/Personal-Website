@@ -1,7 +1,5 @@
 import { useState, useEffect, memo, Fragment } from "react";
-import { useNavigate, Link } from "react-router-dom";
 import { motion, Variants } from "framer-motion";
-import Footer from "../components/Footer";
 import { TRANSLATIONS } from "../data/translations";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 
@@ -145,7 +143,15 @@ interface HomeProps {
 export default function Home({ lang, setLang }: HomeProps) {
   const [isReady, setIsReady] = useState(false);
   const [isInitialMount, setIsInitialMount] = useState(true);
-  const navigate = useNavigate();
+
+  const handleScrollTo = (id: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+      window.history.pushState(null, "", `#${id}`);
+    }
+  };
 
   useEffect(() => {
     let active = true;
@@ -191,7 +197,7 @@ export default function Home({ lang, setLang }: HomeProps) {
   const bgParagraphWords = t.background.split(" ");
 
   return (
-    <div className="w-full min-h-screen flex flex-col pt-24 md:pt-32 pb-8 px-6 md:px-16 lg:px-24 xl:px-32 relative bg-theme-bg text-theme-text select-text selection:bg-theme-text selection:text-theme-bg">
+    <div id="home" className="w-full min-h-screen flex flex-col pt-24 md:pt-32 pb-8 px-6 md:px-16 lg:px-24 xl:px-32 relative bg-theme-bg text-theme-text select-text selection:bg-theme-text selection:text-theme-bg">
 
       <div className="flex-1 flex flex-col w-full mx-auto max-w-7xl">
 
@@ -345,9 +351,10 @@ export default function Home({ lang, setLang }: HomeProps) {
                   }}
                 >
                   <div className="flex flex-col gap-0">
-                    <Link
-                      to="/contact"
+                    <a
+                      href="#contact"
                       id="desktop-gateway-contact"
+                      onClick={handleScrollTo("contact")}
                       className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
                     >
                       <span className="font-mono text-[12px] tracking-[0.4em] text-theme-text/60 group-hover:text-theme-text/100 group-hover:translate-x-1 transition-all duration-500">
@@ -356,10 +363,11 @@ export default function Home({ lang, setLang }: HomeProps) {
                       <span className="font-mono text-[10px] text-theme-text/0 group-hover:text-theme-text/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
                         →
                       </span>
-                    </Link>
-                    <Link
-                      to="/portfolio"
+                    </a>
+                    <a
+                      href="#portfolio"
                       id="desktop-gateway-portfolio"
+                      onClick={handleScrollTo("portfolio")}
                       className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
                     >
                       <span className="font-mono text-[12px] tracking-[0.4em] text-theme-text/60 group-hover:text-theme-text/100 group-hover:translate-x-1 transition-all duration-500">
@@ -368,7 +376,7 @@ export default function Home({ lang, setLang }: HomeProps) {
                       <span className="font-mono text-[10px] text-theme-text/0 group-hover:text-theme-text/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
                         →
                       </span>
-                    </Link>
+                    </a>
                   </div>
                 </motion.div>
               </div>
@@ -515,9 +523,10 @@ export default function Home({ lang, setLang }: HomeProps) {
               {t.gateway}
             </div>
             <div className="flex flex-col gap-0 py-2">
-              <Link
-                to="/contact"
+              <a
+                href="#contact"
                 id="mobile-gateway-contact"
+                onClick={handleScrollTo("contact")}
                 className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
               >
                 <span className="font-mono text-[11px] tracking-[0.4em] text-theme-text/60 group-hover:text-theme-text group-hover:translate-x-1 transition-all duration-500">
@@ -526,10 +535,11 @@ export default function Home({ lang, setLang }: HomeProps) {
                 <span className="font-mono text-[10px] text-theme-text/0 group-hover:text-theme-text/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
                   →
                 </span>
-              </Link>
-              <Link
-                to="/portfolio"
+              </a>
+              <a
+                href="#portfolio"
                 id="mobile-gateway-portfolio"
+                onClick={handleScrollTo("portfolio")}
                 className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
               >
                 <span className="font-mono text-[11px] tracking-[0.4em] text-theme-text/60 group-hover:text-theme-text group-hover:translate-x-1 transition-all duration-500">
@@ -538,13 +548,11 @@ export default function Home({ lang, setLang }: HomeProps) {
                 <span className="font-mono text-[10px] text-theme-text/0 group-hover:text-theme-text/40 transition-all duration-500 ml-auto -translate-x-4 group-hover:translate-x-0">
                   →
                 </span>
-              </Link>
+              </a>
             </div>
           </motion.div>
         </div>
       </div>
-
-      <Footer className="w-full text-center text-theme-text/30 mt-auto pt-8 z-10" />
     </div>
   );
 }

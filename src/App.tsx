@@ -4,10 +4,11 @@
  */
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef, Suspense, lazy, ComponentType, useCallback } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
-import Home from "./pages/Home";
+import MainPage from "./pages/MainPage";
 import LiquidNavbar from "./components/LiquidNavbar";
+import Lenis from "lenis";
 
 // Static routes config to prevent recreation on every render
 const SCROLLABLE_ROUTES = new Set(["/", "/vortex", "/portfolio", "/soccer-team", "/noodle-place"]);
@@ -23,8 +24,6 @@ function lazyWithPreload<T extends ComponentType<any>>(
 }
 
 // Lazy load pages with preload hooks
-const Portfolio = lazyWithPreload(() => import("./pages/Portfolio"));
-const Contact = lazyWithPreload(() => import("./pages/Contact"));
 const Vortex = lazyWithPreload(() => import("./pages/Vortex"));
 const SoccerTeam = lazyWithPreload(() => import("./pages/SoccerTeam"));
 const NoodlePlace = lazyWithPreload(() => import("./pages/NoodlePlace"));
@@ -41,6 +40,8 @@ export default function App() {
     const saved = localStorage.getItem("preferred-lang");
     return (saved === "en" || saved === "fr") ? saved : "en";
   });
+
+  const [activeSection, setActiveSection] = useState("home");
 
   useEffect(() => {
     localStorage.setItem("preferred-lang", lang);
@@ -76,8 +77,6 @@ export default function App() {
 
     // Idle-Time Preloading for lazy loaded page components
     const preloadPages = () => {
-      Portfolio.preload();
-      Contact.preload();
       Vortex.preload();
       SoccerTeam.preload();
       NoodlePlace.preload();
@@ -126,11 +125,33 @@ export default function App() {
     };
   }, []);
 
+  // Initialize Lenis smooth scroll on mount / when site is ready
+  useEffect(() => {
+    if (!isSiteReady) return;
+
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // easeOutExpo
+      smoothWheel: true,
+    });
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, [isSiteReady]);
+
   const isScrollable = SCROLLABLE_ROUTES.has(location.pathname);
   const showNavbar = !NAVBAR_HIDDEN_ROUTES.has(location.pathname);
 
   return (
-    <div className={`relative flex min-h-screen bg-theme-bg items-stretch justify-stretch ${isScrollable ? "overflow-y-auto no-scrollbar overscroll-y-none" : "overflow-hidden"}`}>
+    <div className={`relative flex min-h-screen bg-theme-bg items-stretch justify-stretch ${isScrollable ? "overflow-y-visible" : "overflow-hidden"}`}>
       <AnimatePresence mode="wait">
         {!isSiteReady && (
           <motion.div
@@ -180,7 +201,11 @@ export default function App() {
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 className="absolute top-6 md:top-8 left-0 right-0 z-50 flex justify-center pointer-events-none"
               >
-                <LiquidNavbar className="pointer-events-auto" />
+                <LiquidNavbar
+                  activeSection={activeSection}
+                  setActiveSection={setActiveSection}
+                  className="pointer-events-auto"
+                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -188,9 +213,19 @@ export default function App() {
           {/* Main Content */}
           <Suspense fallback={null}>
             <Routes>
-              <Route path="/" element={<Home lang={lang} setLang={handleSetLang} />} />
-              <Route path="/portfolio" element={<Portfolio lang={lang} setLang={handleSetLang} />} />
-              <Route path="/contact" element={<Contact />} />
+              <Route
+                path="/"
+                element={
+                  <MainPage
+                    lang={lang}
+                    setLang={handleSetLang}
+                    activeSection={activeSection}
+                    setActiveSection={setActiveSection}
+                  />
+                }
+              />
+              <Route path="/portfolio" element={<Navigate to="/#portfolio" replace />} />
+              <Route path="/contact" element={<Navigate to="/#contact" replace />} />
               <Route path="/vortex" element={<Vortex />} />
               <Route path="/soccer-team" element={<SoccerTeam />} />
               <Route path="/noodle-place" element={<NoodlePlace />} />
