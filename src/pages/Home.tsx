@@ -149,7 +149,7 @@ export default function Home({ lang, setLang }: HomeProps) {
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
-      window.history.pushState(null, "", `#${id}`);
+      window.history.pushState(null, "", id === "home" ? "/" : `/${id}`);
     }
   };
 
@@ -352,7 +352,7 @@ export default function Home({ lang, setLang }: HomeProps) {
                 >
                   <div className="flex flex-col gap-0">
                     <a
-                      href="#contact"
+                      href="/contact"
                       id="desktop-gateway-contact"
                       onClick={handleScrollTo("contact")}
                       className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
@@ -365,7 +365,7 @@ export default function Home({ lang, setLang }: HomeProps) {
                       </span>
                     </a>
                     <a
-                      href="#portfolio"
+                      href="/portfolio"
                       id="desktop-gateway-portfolio"
                       onClick={handleScrollTo("portfolio")}
                       className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
@@ -524,7 +524,7 @@ export default function Home({ lang, setLang }: HomeProps) {
             </div>
             <div className="flex flex-col gap-0 py-2">
               <a
-                href="#contact"
+                href="/contact"
                 id="mobile-gateway-contact"
                 onClick={handleScrollTo("contact")}
                 className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"
@@ -537,7 +537,7 @@ export default function Home({ lang, setLang }: HomeProps) {
                 </span>
               </a>
               <a
-                href="#portfolio"
+                href="/portfolio"
                 id="mobile-gateway-portfolio"
                 onClick={handleScrollTo("portfolio")}
                 className="cursor-pointer group flex items-center gap-6 py-1.5 border-b border-transparent hover:border-theme-text/10 transition-all duration-500 decoration-none"

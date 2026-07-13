@@ -4,14 +4,14 @@
  */
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef, Suspense, lazy, ComponentType, useCallback } from "react";
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import MainPage from "./pages/MainPage";
 import LiquidNavbar from "./components/LiquidNavbar";
 import Lenis from "lenis";
 
 // Static routes config to prevent recreation on every render
-const SCROLLABLE_ROUTES = new Set(["/", "/vortex", "/portfolio", "/soccer-team", "/noodle-place"]);
+const SCROLLABLE_ROUTES = new Set(["/", "/vortex", "/portfolio", "/contact", "/soccer-team", "/noodle-place"]);
 const NAVBAR_HIDDEN_ROUTES = new Set(["/vortex", "/soccer-team", "/noodle-place"]);
 
 // Helper to support preloading on lazy components
@@ -199,7 +199,7 @@ export default function App() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute top-6 md:top-8 left-0 right-0 z-50 flex justify-center pointer-events-none"
+                className="fixed top-6 md:top-8 left-0 right-0 z-50 flex justify-center pointer-events-none"
               >
                 <LiquidNavbar
                   activeSection={activeSection}
@@ -224,8 +224,28 @@ export default function App() {
                   />
                 }
               />
-              <Route path="/portfolio" element={<Navigate to="/#portfolio" replace />} />
-              <Route path="/contact" element={<Navigate to="/#contact" replace />} />
+              <Route
+                path="/portfolio"
+                element={
+                  <MainPage
+                    lang={lang}
+                    setLang={handleSetLang}
+                    activeSection={activeSection}
+                    setActiveSection={setActiveSection}
+                  />
+                }
+              />
+              <Route
+                path="/contact"
+                element={
+                  <MainPage
+                    lang={lang}
+                    setLang={handleSetLang}
+                    activeSection={activeSection}
+                    setActiveSection={setActiveSection}
+                  />
+                }
+              />
               <Route path="/vortex" element={<Vortex />} />
               <Route path="/soccer-team" element={<SoccerTeam />} />
               <Route path="/noodle-place" element={<NoodlePlace />} />

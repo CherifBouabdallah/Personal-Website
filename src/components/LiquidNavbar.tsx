@@ -69,13 +69,14 @@ export default function LiquidNavbar({ className = "", activeSection = "home", s
   // Click handler for menu items
   const handleNavClick = (section: string, e: React.MouseEvent) => {
     e.preventDefault();
-    if (location.pathname !== "/") {
-      navigate(`/#${section}`);
+    const cleanPath = section === "home" ? "/" : `/${section}`;
+    if (location.pathname !== "/" && location.pathname !== "/portfolio" && location.pathname !== "/contact") {
+      navigate(cleanPath);
     } else {
       const el = document.getElementById(section);
       if (el) {
         el.scrollIntoView({ behavior: "smooth" });
-        window.history.pushState(null, "", `#${section}`);
+        window.history.pushState(null, "", cleanPath);
         if (setActiveSection) {
           setActiveSection(section);
         }
@@ -99,7 +100,7 @@ export default function LiquidNavbar({ className = "", activeSection = "home", s
           return (
             <a
               key={section}
-              href={`#${section}`}
+              href={section === "home" ? "/" : `/${section}`}
               ref={(el) => {
                 linkRefs.current[index] = el;
               }}

@@ -135,9 +135,32 @@ const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hover
 // 4. Morphing Title animation - centered split header (Memoized & character split tree optimized)
 interface MorphingTitleProps {
   text: string;
+  isReady: boolean;
 }
 
-const MorphingTitle = React.memo(({ text }: MorphingTitleProps) => {
+const MorphingTitle = React.memo(({ text, isReady }: MorphingTitleProps) => {
+  const [hasBeenInView, setHasBeenInView] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+
+  // Use IntersectionObserver to detect when title scrolls into view
+  useEffect(() => {
+    if (!isReady || hasBeenInView) return;
+    const el = titleRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasBeenInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isReady, hasBeenInView]);
+
   // Memoize character split tree to prevent rebuilding character span objects on re-renders
   const splitText = useMemo(() => {
     let charCounter = 0;
@@ -150,10 +173,11 @@ const MorphingTitle = React.memo(({ text }: MorphingTitleProps) => {
     });
   }, [text]);
 
+  const shouldAnimate = isReady && hasBeenInView;
+
   return (
     <motion.h1
-      initial="hidden"
-      animate="visible"
+      ref={titleRef}
       className="font-maghfirea text-[clamp(2.3rem,12vw,200px)] text-theme-text flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] px-4 w-full"
     >
       {splitText.map(({ wordIndex, chars }) => (
@@ -162,23 +186,16 @@ const MorphingTitle = React.memo(({ text }: MorphingTitleProps) => {
             <span
               key={charIndex}
               className="inline-block overflow-hidden"
-              style={{ paddingBottom: "0.12em", marginBottom: "-0.12em" }}
+              style={{ paddingBottom: "0.08em", marginBottom: "-0.08em" }}
             >
               <motion.span
                 className="inline-block"
-                custom={globalIndex}
-                variants={{
-                  hidden: { opacity: 0, y: 55, filter: "blur(10px)" },
-                  visible: (idx: number) => ({
-                    opacity: 1,
-                    y: 0,
-                    filter: "blur(0px)",
-                    transition: {
-                      duration: 1.1,
-                      ease: [0.16, 1, 0.3, 1],
-                      delay: idx * 0.04
-                    }
-                  })
+                initial={{ opacity: 0, y: 35, filter: "blur(10px)" }}
+                animate={shouldAnimate ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 35, filter: "blur(10px)" }}
+                transition={{
+                  duration: 1.0,
+                  ease: [0.21, 1, 0.36, 1],
+                  delay: globalIndex * 0.05,
                 }}
               >
                 {char}
@@ -351,7 +368,6 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalKey | null>(null);
 
-  const contentRef = useRef<HTMLDivElement>(null);
   const getGlassClass = useCallback(() => "glass-deep-blur", []);
 
   const t = TRANSLATIONS[lang];
@@ -368,12 +384,9 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
     mass: 0.8,
   });
 
-  const [vh, setVh] = useState(window.innerHeight);
-
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
-      setVh(window.innerHeight);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -398,19 +411,9 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
 
   const headerText = t.portfolioTitle;
 
-  // Title morph animation (centered -> scaled top banner)
-  const titleY = useTransform(smoothProgress, (val) => {
-    const vhVal = vh;
-    const topOffset = isMobile ? 24 : 36;
-    const endY = -(vhVal / 2 - topOffset - 20); // Move to the very top of the sticky container
-    if (val <= 0.3) {
-      return (val / 0.3) * endY;
-    }
-    return endY;
-  });
-  const titleScale = useTransform(smoothProgress, [0, 0.3], [1, isMobile ? 0.65 : 0.45]);
+  const titleScale = isMobile ? 0.8 : 0.55;
+  const titleOpacity = 1;
 
-  // Invites fade out on scroll
   const inviteOpacity = useTransform(smoothProgress, [0, 0.1], [1, 0]);
   const inviteY = useTransform(smoothProgress, [0, 0.1], ["0px", "15px"]);
 
@@ -424,23 +427,34 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
   }, []);
 
   return (
-    <div id="portfolio" ref={portfolioRef} className="w-full bg-theme-bg text-theme-text relative selection:bg-theme-text selection:text-theme-bg">
+    <div id="portfolio" ref={portfolioRef} className="w-full bg-theme-bg text-theme-text border-t-80 border-theme-text relative selection:bg-theme-text selection:text-theme-bg">
 
-      {/* Sticky Title Wrapper (stretches to fill parent height) */}
-      <div className="absolute inset-0 pointer-events-none z-30">
-        {/* Sticky Container */}
-        <div className="sticky top-0 w-full h-screen flex flex-col items-center justify-center">
+      {/* Split Layout */}
+      <div className="flex flex-col md:flex-row w-full">
+
+        {/* Left Column: Sticky Title */}
+        <div className="w-full md:w-[38%] md:sticky md:top-0 md:h-screen flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-theme-text/10 py-16 md:py-0 relative">
+
           <motion.div
-            style={{ y: titleY, scale: titleScale }}
-            className="cursor-default pointer-events-auto select-none"
+            style={{ scale: titleScale, opacity: titleOpacity }}
+            className="text-center px-6 cursor-default select-none"
           >
-            <MorphingTitle text={headerText} />
+            <MorphingTitle text={headerText} isReady={isReady} />
           </motion.div>
 
-          {/* Scroll Invite indicator */}
+          <motion.p
+            key={`intro-${lang}`}
+            initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1.4, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="font-mono text-[9px] md:text-[11px] tracking-[0.25em] uppercase text-theme-text/60 max-w-sm leading-relaxed mt-6 text-center px-6"
+          >
+            {t.portfolioIntro}
+          </motion.p>
+
           <motion.div
             style={{ opacity: inviteOpacity, y: inviteY }}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2.5 pointer-events-auto"
+            className="hidden md:flex absolute bottom-12 left-1/2 -translate-x-1/2 flex-col items-center gap-2.5 pointer-events-auto"
           >
             <div className="flex flex-col items-center justify-center gap-2">
               <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-theme-text/60">
@@ -448,14 +462,8 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
               </span>
               <div className="w-[1.5px] h-[22px] bg-theme-text/20 relative overflow-hidden">
                 <motion.div
-                  animate={{
-                    y: ["-100%", "100%"],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
+                  animate={{ y: ["-100%", "100%"] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                   className="absolute inset-0 bg-theme-text/80 h-full w-full"
                   style={{ originY: 0 }}
                 />
@@ -463,49 +471,29 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
             </div>
           </motion.div>
         </div>
+
+        {/* Right Column: Scrollable Projects */}
+        <div className="w-full md:w-[62%]">
+          {isReady && (
+            <div className="flex flex-col">
+              {FEATURED_PROJECTS.map((project) => (
+                <div
+                  key={project.id}
+                  className="min-h-[80vh] md:min-h-screen flex items-center justify-center p-6 md:p-10 lg:p-16"
+                >
+                  <FeaturedCard
+                    project={project}
+                    t={t}
+                    onOpen={handleOpen}
+                    getGlassClass={getGlassClass}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
       </div>
-
-      {/* Scrollable Container */}
-      {isReady && (
-        <motion.div
-          key="portfolio-scroll-container"
-          ref={contentRef}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full px-6 md:px-16 lg:px-24 xl:px-36 pb-8 flex flex-col items-center z-20 select-text"
-        >
-          {/* Scroll fold spacer to create a pinned cinematic reveal effect */}
-          <div className="w-full h-[145vh] flex-shrink-0 pointer-events-none" />
-
-          {/* Subtitle / Intro paragraph */}
-          <div className="w-full max-w-[1440px] flex flex-col items-center gap-6 mb-8 md:mb-10 text-center pt-12">
-            <div className="h-6" /> {/* Visual spacer to align formatting */}
-            <motion.p
-              key={`intro-${lang}`}
-              initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 1.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="font-mono text-[9px] md:text-[11px] tracking-[0.25em] uppercase text-theme-text/60 max-w-xl leading-relaxed mt-2"
-            >
-              {t.portfolioIntro}
-            </motion.p>
-          </div>
-
-          {/* Exhibition Grid */}
-          <div key={`grid-${lang}`} className="grid grid-cols-12 gap-8 md:gap-12 w-full max-w-[1440px] mx-auto items-stretch">
-            {FEATURED_PROJECTS.map((project) => (
-              <FeaturedCard
-                key={project.id}
-                project={project}
-                t={t}
-                onOpen={handleOpen}
-                getGlassClass={getGlassClass}
-              />
-            ))}
-          </div>
-        </motion.div>
-      )}
 
       {/* Shared Overlay Modal for Project Previews */}
       <AnimatePresence>

@@ -16,47 +16,70 @@ interface MainPageProps {
 export default function MainPage({ lang, setLang, activeSection, setActiveSection }: MainPageProps) {
   const location = useLocation();
 
-  // Scroll to hash section on mount or when hash changes
+  // Scroll to section on mount based on pathname or hash
   useEffect(() => {
-    const hash = location.hash || window.location.hash;
-    if (hash) {
-      const id = hash.replace("#", "");
+    // Determine target section from pathname or hash
+    let targetId = "";
+    if (location.pathname === "/portfolio") {
+      targetId = "portfolio";
+    } else if (location.pathname === "/contact") {
+      targetId = "contact";
+    } else {
+      const hash = location.hash || window.location.hash;
+      if (hash) {
+        targetId = hash.replace("#", "");
+      }
+    }
+
+    if (targetId) {
       const timer = setTimeout(() => {
-        const el = document.getElementById(id);
+        const el = document.getElementById(targetId);
         if (el) {
           el.scrollIntoView({ behavior: "smooth" });
         }
       }, 150); // slight delay to ensure layouts are stable and Lenis is active
       return () => clearTimeout(timer);
     }
-  }, [location.hash]);
+  }, [location.pathname, location.hash]);
 
-  // Scroll spy to update the active navbar state based on viewport intersection
+  // Scroll spy to update the active navbar state based on scroll position
   useEffect(() => {
     const sections = ["home", "portfolio", "contact"];
-    const observers = sections.map((id) => {
-      const el = document.getElementById(id);
-      if (!el) return null;
-      const observer = new IntersectionObserver(
-        (entries) => {
-          const entry = entries[0];
-          if (entry.isIntersecting) {
-            setActiveSection(id);
-          }
-        },
-        {
-          rootMargin: "-30% 0px -40% 0px", // focus on the middle section of the screen
-          threshold: 0,
+
+    const handleScroll = () => {
+      // If near the bottom of the page, always show contact
+      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
+      if (isAtBottom) {
+        setActiveSection("contact");
+        return;
+      }
+
+      // Find the section whose top is closest to (but above) the viewport center
+      const viewportCenter = window.scrollY + window.innerHeight * 0.35;
+      let current = "home";
+
+      for (const id of sections) {
+        const el = document.getElementById(id);
+        if (el && el.offsetTop <= viewportCenter) {
+          current = id;
         }
-      );
-      observer.observe(el);
-      return { observer, el };
-    });
+      }
+
+      setActiveSection(current);
+
+      // Update URL to reflect the current section with clean paths
+      const cleanPath = current === "home" ? "/" : `/${current}`;
+      if (window.location.pathname !== cleanPath) {
+        window.history.replaceState(null, "", cleanPath);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    // Run once on mount to set the correct initial state
+    handleScroll();
 
     return () => {
-      observers.forEach((obs) => {
-        if (obs) obs.observer.unobserve(obs.el);
-      });
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [setActiveSection]);
 
@@ -64,7 +87,7 @@ export default function MainPage({ lang, setLang, activeSection, setActiveSectio
     <div className="w-full flex flex-col items-stretch justify-start bg-theme-bg">
       <Home lang={lang} setLang={setLang} />
       <Portfolio lang={lang} setLang={setLang} />
-      <Contact />
+      <Contact lang={lang} />
     </div>
   );
 }

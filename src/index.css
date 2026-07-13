@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@layer base {
+/* Base Styles */
   :root {
     --theme-bg: #223D27;
     --theme-text: #F6F0DF;
@@ -28,9 +28,8 @@
     --color-theme-bg: var(--theme-bg, #223D27);
     --color-theme-muted: var(--theme-muted, #DEDBC8);
   }
-}
 
-@layer components {
+/* Component Styles */
   /* Glassy Square Style - Matches Liquid Navbar Bubble styling but scaled up */
   .glass-square {
     background: rgba(34, 61, 39, 0.35);
@@ -154,9 +153,8 @@
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(244, 241, 234, 0.25);
   }
-}
 
-@layer utilities {
+/* Utility Styles */
   /* Hide scrollbar utility for a borderless premium desktop aesthetic */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -190,7 +188,6 @@
     content-visibility: auto;
     contain-intrinsic-size: auto 500px;
   }
-}
 
 /* Accessibility: respect user preference for reduced motion */
 @media (prefers-reduced-motion: reduce) {
