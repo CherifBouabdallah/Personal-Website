@@ -1,5 +1,6 @@
 import { useState, useEffect, memo, Fragment } from "react";
 import { motion, Variants } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { TRANSLATIONS } from "../data/translations";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 
@@ -141,8 +142,24 @@ interface HomeProps {
 }
 
 export default function Home({ lang, setLang }: HomeProps) {
+  const navigate = useNavigate();
+  const [photoshopClicks, setPhotoshopClicks] = useState(0);
   const [isReady, setIsReady] = useState(false);
   const [isInitialMount, setIsInitialMount] = useState(true);
+
+  const handlePhotoshopClick = () => {
+    const isMobile = window.innerWidth < 768;
+    if (isMobile && lang === "fr") {
+      setPhotoshopClicks((prev) => {
+        const next = prev + 1;
+        if (next >= 10) {
+          navigate("/secret101");
+          return 0;
+        }
+        return next;
+      });
+    }
+  };
 
   const handleScrollTo = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault();
@@ -320,6 +337,7 @@ export default function Home({ lang, setLang }: HomeProps) {
                       {designSkills.map((skill, index) => (
                         <motion.div
                           key={skill.name}
+                          onClick={skill.name === "Photoshop" ? handlePhotoshopClick : undefined}
                           initial={{ opacity: 0, x: -5 }}
                           animate={isReady ? { opacity: 1, x: 0 } : { opacity: 0, x: -5 }}
                           transition={{
@@ -501,6 +519,7 @@ export default function Home({ lang, setLang }: HomeProps) {
                   {designSkills.map((skill) => (
                     <div
                       key={skill.name}
+                      onClick={skill.name === "Photoshop" ? handlePhotoshopClick : undefined}
                       className="flex items-center gap-2 text-theme-text/80 font-mono text-[10px] hover:text-theme-text transition-colors cursor-default"
                     >
                       <span className="opacity-60">{skill.logo}</span> {skill.name}

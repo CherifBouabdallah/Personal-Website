@@ -12,7 +12,7 @@ import Lenis from "lenis";
 
 // Static routes config to prevent recreation on every render
 const SCROLLABLE_ROUTES = new Set(["/", "/vortex", "/portfolio", "/contact", "/soccer-team", "/noodle-place"]);
-const NAVBAR_HIDDEN_ROUTES = new Set(["/vortex", "/soccer-team", "/noodle-place"]);
+const NAVBAR_HIDDEN_ROUTES = new Set(["/vortex", "/soccer-team", "/noodle-place", "/secret101"]);
 
 // Helper to support preloading on lazy components
 function lazyWithPreload<T extends ComponentType<any>>(
@@ -28,6 +28,7 @@ const Vortex = lazyWithPreload(() => import("./pages/Vortex"));
 const SoccerTeam = lazyWithPreload(() => import("./pages/SoccerTeam"));
 const NoodlePlace = lazyWithPreload(() => import("./pages/NoodlePlace"));
 const NotFound = lazyWithPreload(() => import("./pages/NotFound"));
+const Secret101 = lazyWithPreload(() => import("./pages/Secret101"));
 
 type Language = "en" | "fr";
 
@@ -81,6 +82,7 @@ export default function App() {
       SoccerTeam.preload();
       NoodlePlace.preload();
       NotFound.preload();
+      Secret101.preload();
     };
 
     if ("requestIdleCallback" in window) {
@@ -184,75 +186,83 @@ export default function App() {
       </AnimatePresence>
 
       {isSiteReady && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full min-h-screen relative flex flex-col items-stretch justify-start"
-        >
-          {/* Liquid Navbar at top middle */}
-          <AnimatePresence>
-            {showNavbar && (
-              <motion.div
-                key="navbar-wrapper"
-                initial={{ opacity: 0, y: -15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="fixed top-6 md:top-8 left-0 right-0 z-50 flex justify-center pointer-events-none"
-              >
-                <LiquidNavbar
-                  activeSection={activeSection}
-                  setActiveSection={setActiveSection}
-                  className="pointer-events-auto"
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Main Content */}
+        location.pathname === "/secret101" ? (
           <Suspense fallback={null}>
             <Routes>
-              <Route
-                path="/"
-                element={
-                  <MainPage
-                    lang={lang}
-                    setLang={handleSetLang}
-                    activeSection={activeSection}
-                    setActiveSection={setActiveSection}
-                  />
-                }
-              />
-              <Route
-                path="/portfolio"
-                element={
-                  <MainPage
-                    lang={lang}
-                    setLang={handleSetLang}
-                    activeSection={activeSection}
-                    setActiveSection={setActiveSection}
-                  />
-                }
-              />
-              <Route
-                path="/contact"
-                element={
-                  <MainPage
-                    lang={lang}
-                    setLang={handleSetLang}
-                    activeSection={activeSection}
-                    setActiveSection={setActiveSection}
-                  />
-                }
-              />
-              <Route path="/vortex" element={<Vortex />} />
-              <Route path="/soccer-team" element={<SoccerTeam />} />
-              <Route path="/noodle-place" element={<NoodlePlace />} />
-              <Route path="*" element={<NotFound />} />
+              <Route path="/secret101" element={<Secret101 />} />
             </Routes>
           </Suspense>
-        </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full min-h-screen relative flex flex-col items-stretch justify-start"
+          >
+            {/* Liquid Navbar at top middle */}
+            <AnimatePresence>
+              {showNavbar && (
+                <motion.div
+                  key="navbar-wrapper"
+                  initial={{ opacity: 0, y: -15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  className="fixed top-6 md:top-8 left-0 right-0 z-50 flex justify-center pointer-events-none"
+                >
+                  <LiquidNavbar
+                    activeSection={activeSection}
+                    setActiveSection={setActiveSection}
+                    className="pointer-events-auto"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Main Content */}
+            <Suspense fallback={null}>
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <MainPage
+                      lang={lang}
+                      setLang={handleSetLang}
+                      activeSection={activeSection}
+                      setActiveSection={setActiveSection}
+                    />
+                  }
+                />
+                <Route
+                  path="/portfolio"
+                  element={
+                    <MainPage
+                      lang={lang}
+                      setLang={handleSetLang}
+                      activeSection={activeSection}
+                      setActiveSection={setActiveSection}
+                    />
+                  }
+                />
+                <Route
+                  path="/contact"
+                  element={
+                    <MainPage
+                      lang={lang}
+                      setLang={handleSetLang}
+                      activeSection={activeSection}
+                      setActiveSection={setActiveSection}
+                    />
+                  }
+                />
+                <Route path="/vortex" element={<Vortex />} />
+                <Route path="/soccer-team" element={<SoccerTeam />} />
+                <Route path="/noodle-place" element={<NoodlePlace />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </motion.div>
+        )
       )}
       <Analytics />
     </div>
