@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef, Suspense, lazy, ComponentType, useCallback } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import MainPage from "./pages/MainPage";
 import LiquidNavbar from "./components/LiquidNavbar";
 import Lenis from "lenis";
@@ -265,6 +266,7 @@ export default function App() {
         )
       )}
       <Analytics />
+      <SpeedInsights />
     </div>
   );
 }
