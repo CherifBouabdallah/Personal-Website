@@ -77,13 +77,25 @@ export default function App() {
       imagesLoadedRef.current = true;
     });
 
-    // Idle-Time Preloading for lazy loaded page components
+    // Idle-Time Preloading for lazy loaded page components and heavy assets
     const preloadPages = () => {
       Vortex.preload();
       SoccerTeam.preload();
       NoodlePlace.preload();
       NotFound.preload();
       Secret101.preload();
+
+      // Preload heavy portfolio images during idle time so page loads are instant
+      const images = [
+        "/soccer_striker.png",
+        "/stadium_architecture.png",
+        "/kiri_ramen_hero.webp",
+        "/kiri_ramen_interior.webp"
+      ];
+      images.forEach((src) => {
+        const img = new Image();
+        img.src = src;
+      });
     };
 
     if ("requestIdleCallback" in window) {
@@ -138,6 +150,8 @@ export default function App() {
       smoothWheel: true,
     });
 
+    (window as any).__lenis = lenis;
+
     function raf(time: number) {
       lenis.raf(time);
       requestAnimationFrame(raf);
@@ -147,6 +161,7 @@ export default function App() {
 
     return () => {
       lenis.destroy();
+      (window as any).__lenis = undefined;
     };
   }, [isSiteReady]);
 

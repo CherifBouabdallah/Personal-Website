@@ -302,7 +302,7 @@ const FeaturedCard = React.memo(({ project, t, onOpen, getGlassClass }: Featured
                 ) : project.id === "soccer" ? (
                   <SoccerTeam isPreview={true} isCardPreview={true} />
                 ) : (
-                  <NoodlePlace isPreview={true} />
+                  <NoodlePlace isPreview={true} isCardPreview={true} />
                 )}
               </Suspense>
             </ProjectPreview>
@@ -322,6 +322,30 @@ interface PreviewModalProps {
 }
 
 const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: PreviewModalProps) => {
+  const [isLayoutComplete, setIsLayoutComplete] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Fallback timer: in case onLayoutAnimationComplete doesn't fire for some reason
+    const fallbackTimer = setTimeout(() => {
+      setIsLayoutComplete(true);
+    }, 850);
+
+    return () => clearTimeout(fallbackTimer);
+  }, []);
+
+  useEffect(() => {
+    if (isLayoutComplete) {
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [isLayoutComplete]);
+
+  const isLightBg = bgColor === "#FAFAF8";
+  const textColorClass = isLightBg ? "text-slate-800" : "text-stone-200";
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -337,10 +361,46 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
         <motion.div
           layoutId={layoutId}
           transition={{ type: "spring", stiffness: 180, damping: 25 }}
+          onLayoutAnimationComplete={() => {
+            setIsLayoutComplete(true);
+          }}
           className="w-full h-full border border-white/10 overflow-y-auto no-scrollbar cursor-default relative"
           style={{ borderRadius: 28, transform: "translate3d(0,0,0)", backgroundColor: bgColor }}
+          data-lenis-prevent
         >
-          {children}
+          <AnimatePresence mode="wait">
+            {!isLayoutComplete ? (
+              <div key="blank" className="w-full h-full" />
+            ) : isLoading ? (
+              <motion.div
+                key="loader"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className="absolute inset-0 w-full h-full flex flex-col items-center justify-center select-none p-6"
+              >
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+                  className={`w-8 h-8 rounded-full border-2 border-t-transparent ${isLightBg ? 'border-[#12224A]' : 'border-orange-500'}`}
+                />
+                <div className={`mt-6 font-mono text-[9px] tracking-[0.25em] uppercase ${textColorClass} opacity-60 text-center`}>
+                  // INITIALIZING PROJECT PREVIEW
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.45, ease: "easeOut" }}
+                className="w-full h-full"
+              >
+                {children}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* Floating Close Button */}
@@ -407,6 +467,22 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
     };
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
+  }, [activeModal]);
+
+  // Lock background scroll when modal is active
+  useEffect(() => {
+    const lenis = (window as any).__lenis;
+    if (activeModal) {
+      document.documentElement.style.overflow = "hidden";
+      lenis?.stop();
+    } else {
+      document.documentElement.style.overflow = "";
+      lenis?.start();
+    }
+    return () => {
+      document.documentElement.style.overflow = "";
+      lenis?.start();
+    };
   }, [activeModal]);
 
   const headerText = t.portfolioTitle;

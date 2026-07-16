@@ -16,6 +16,7 @@ import {
 
 interface NoodlePlaceProps {
   isPreview?: boolean;
+  isCardPreview?: boolean;
 }
 
 // ── Static Quote Text ──
@@ -28,12 +29,12 @@ function ScrubbingTextReveal({ text }: { text: string }) {
 }
 
 // ── Infinite Marquee ──
-function Marquee({ items, speed = 25 }: { items: string[]; speed?: number }) {
+function Marquee({ items, speed = 25, isCardPreview = false }: { items: string[]; speed?: number; isCardPreview?: boolean }) {
   const doubled = [...items, ...items, ...items];
   return (
     <div className="w-full overflow-hidden relative py-4 border-y border-white/5 bg-black/25">
       <motion.div
-        animate={{ x: [0, "-33.33%"] }}
+        animate={isCardPreview ? {} : { x: [0, "-33.33%"] }}
         transition={{ repeat: Infinity, duration: speed, ease: "linear" }}
         className="flex gap-16 white-space-nowrap w-max px-4 text-center items-center"
       >
@@ -71,7 +72,7 @@ function DoubleBezelCard({ children, className = "", onClick, whileHover }: {
   );
 }
 
-export default function NoodlePlace({ isPreview = false }: NoodlePlaceProps) {
+export default function NoodlePlace({ isPreview = false, isCardPreview = false }: NoodlePlaceProps) {
   const navigate = useNavigate();
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -112,6 +113,9 @@ export default function NoodlePlace({ isPreview = false }: NoodlePlaceProps) {
   });
   const heroImageY = useTransform(scrollYProgress, [0, 0.4], [0, 100]);
   const heroTextY = useTransform(scrollYProgress, [0, 0.4], [0, -40]);
+
+  const yImageOffset = isCardPreview ? 0 : heroImageY;
+  const yTextOffset = isCardPreview ? 0 : heroTextY;
 
 
 
@@ -204,7 +208,7 @@ export default function NoodlePlace({ isPreview = false }: NoodlePlaceProps) {
 
       {/* Dynamic Background film-grain noise overlay */}
       <div
-        className="fixed inset-0 pointer-events-none z-50 opacity-[0.03]"
+        className={`${isPreview ? "absolute" : "fixed"} inset-0 pointer-events-none z-50 opacity-[0.03]`}
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
         }}
@@ -243,7 +247,7 @@ export default function NoodlePlace({ isPreview = false }: NoodlePlaceProps) {
         <div className="max-w-[1440px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
           {/* Headline block (Left col-span-7) */}
           <motion.div
-            style={{ y: heroTextY }}
+            style={{ y: yTextOffset }}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
@@ -290,7 +294,7 @@ export default function NoodlePlace({ isPreview = false }: NoodlePlaceProps) {
 
           {/* Hero Image (Right col-span-5) */}
           <motion.div
-            style={{ y: heroImageY }}
+            style={{ y: yImageOffset }}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
@@ -602,7 +606,7 @@ export default function NoodlePlace({ isPreview = false }: NoodlePlaceProps) {
       </section>
 
       {/* Auto-scrolling ingredients marquee */}
-      <Marquee items={marqueeItems} />
+      <Marquee items={marqueeItems} isCardPreview={isCardPreview} />
 
       {/* ── SECTION 4: TESTIMONIAL CAROUSEL ── */}
       <section className="py-24 px-6 md:px-16 lg:px-24 border-t border-white/5 bg-[#121212]">

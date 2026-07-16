@@ -36,7 +36,7 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
           observer.disconnect();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.25 }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
@@ -60,12 +60,12 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
 }
 
 // --- COMPONENT: TICKER ---
-function Ticker({ items, speed = 30 }: { items: string[]; speed?: number }) {
+function Ticker({ items, speed = 30, isCardPreview = false }: { items: string[]; speed?: number; isCardPreview?: boolean }) {
   const doubled = [...items, ...items];
   return (
     <div className="w-full overflow-hidden border-y border-slate-200/80 bg-[#FAF8F5]/60 py-5 select-none relative z-20">
       <motion.div
-        animate={{ x: [0, `-${100 / doubled.length * items.length}%`] }}
+        animate={isCardPreview ? {} : { x: [0, `-${100 / doubled.length * items.length}%`] }}
         transition={{ repeat: Infinity, duration: speed, ease: "linear" }}
         className="flex gap-16 whitespace-nowrap w-max"
       >
@@ -218,21 +218,7 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"squad" | "fixtures">("squad");
   const containerRef = useRef<HTMLDivElement>(null);
-  const [shouldRenderBall, setShouldRenderBall] = useState(false);
 
-  useEffect(() => {
-    if (isCardPreview) {
-      setShouldRenderBall(false);
-      return;
-    }
-
-    // Delay the mounting of HolographicBall to allow transitions to complete smoothly
-    const timer = setTimeout(() => {
-      setShouldRenderBall(true);
-    }, 650);
-
-    return () => clearTimeout(timer);
-  }, [isCardPreview]);
 
   const players = {
     goalkeepers: [
@@ -297,30 +283,16 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
     >
       {/* Light structural noise background texture overlay */}
       <div
-        className="fixed inset-0 pointer-events-none z-50 opacity-[0.012] mix-blend-overlay bg-repeat"
+        className={`${isPreview ? "absolute" : "fixed"} inset-0 pointer-events-none z-50 opacity-[0.012] mix-blend-overlay bg-repeat`}
         style={{ backgroundImage: "url('data:image/svg+xml,%3Csvg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cfilter id=\"noiseFilter\"%3E%3CfeTurbulence type=\"fractalNoise\" baseFrequency=\"0.8\" numOctaves=\"3\" stitchTiles=\"stitch\"/%3E%3C/filter%3E%3Crect width=\"100%25\" height=\"100%25\" filter=\"url(%23noiseFilter)\"/%3E%3C/svg%3E')" }}
       />
 
       {/* Subtle radial atmospheric glows */}
-      <div className="fixed inset-0 pointer-events-none z-0">
+      <div className={`${isPreview ? "absolute" : "fixed"} inset-0 pointer-events-none z-0`}>
         <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#12224A]/[0.02] blur-[150px]" />
         <div className="absolute bottom-[10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#12224A]/[0.01] blur-[150px]" />
       </div>
 
-      {/* 3D Holographic Canvas Element (Strictly Light Themed) */}
-      <AnimatePresence>
-        {shouldRenderBall && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
-            className="fixed inset-0 w-full h-full pointer-events-none z-10"
-          >
-            <HolographicBall themeColor="#12224A" isLightMode={true} />
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* --- navigation bar (totally reworked, minimalist topbar, no shadow, no glow, sits flush at top) --- */}
       <header className={`${isPreview ? "absolute" : "fixed"
@@ -429,14 +401,29 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
               </motion.div>
             </div>
 
-            {/* Right Block: Empty spacing to reveal 3D canvas object */}
-            <div className="hidden md:block md:col-span-4 h-64 pointer-events-none" />
+            {/* Gyroscope placement wrapper */}
+            {isCardPreview ? (
+              <div className="w-full h-64 mt-6 pointer-events-none relative z-30 flex items-center justify-center">
+                <HolographicBall themeColor="#12224A" isLightMode={true} isPreview={isPreview} isCardPreview={isCardPreview} />
+              </div>
+            ) : (
+              <>
+                {/* Desktop Block: positioned absolutely in the right part of the screen */}
+                <div className="hidden md:block absolute right-[8vw] top-[50%] -translate-y-[50%] pointer-events-none z-30 w-[28vw] h-[28vw] max-w-[400px] max-h-[400px]">
+                  <HolographicBall themeColor="#12224A" isLightMode={true} isPreview={isPreview} isCardPreview={isCardPreview} />
+                </div>
+                {/* Mobile Block: centered below text */}
+                <div className="block md:hidden w-full h-64 mt-8 pointer-events-none relative z-30 flex items-center justify-center">
+                  <HolographicBall themeColor="#12224A" isLightMode={true} isPreview={isPreview} isCardPreview={isCardPreview} />
+                </div>
+              </>
+            )}
 
           </div>
         </section>
 
         {/* --- TICKER --- */}
-        <Ticker items={["Olympus FC", "High Performance Design", "Three Championship Titles", "WebGL Sandbox Integration"]} />
+        <Ticker items={["Olympus FC", "High Performance Design", "Three Championship Titles", "WebGL Sandbox Integration"]} isCardPreview={isCardPreview} />
 
         {/* --- BENTO GRID SECTION --- */}
         <section className="py-24 md:py-36 px-6 relative">
