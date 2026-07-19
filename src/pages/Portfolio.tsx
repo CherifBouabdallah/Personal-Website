@@ -356,6 +356,24 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
   const [isLayoutComplete, setIsLayoutComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { reduced, transition } = useMotionPrefs();
+  const { variant } = useMotionVariant();
+  const [isClosing, setIsClosing] = useState(false);
+
+  // Reduced motion skips the staged close (content-fade -> morph -> backdrop-clear)
+  // entirely and closes immediately, same as Variant B.
+  const requestClose = () => {
+    if (variant === "b" || reduced) {
+      onClose();
+      return;
+    }
+    setIsClosing(true);
+  };
+
+  useEffect(() => {
+    if (!isClosing) return;
+    const timer = setTimeout(onClose, 180);
+    return () => clearTimeout(timer);
+  }, [isClosing, onClose]);
 
   useEffect(() => {
     // Fallback timer: in case onLayoutAnimationComplete doesn't fire for some reason
@@ -383,8 +401,9 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={variant === "b" ? undefined : transition({ duration: 0.6, ease: EASE_ENTER })}
       className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 overflow-hidden cursor-pointer"
-      onClick={onClose}
+      onClick={requestClose}
     >
       <div
         className="w-full h-full max-w-[1280px] max-h-[85vh] relative"
@@ -401,7 +420,15 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
           data-lenis-prevent
         >
           <AnimatePresence mode="wait">
-            {!isLayoutComplete ? (
+            {isClosing && variant !== "b" ? (
+              <motion.div
+                key="closing"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
+                className="w-full h-full"
+              />
+            ) : !isLayoutComplete ? (
               <div key="blank" className="w-full h-full" />
             ) : isLoading ? (
               <motion.div
@@ -437,7 +464,7 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
 
         {/* Floating Close Button */}
         <button
-          onClick={onClose}
+          onClick={requestClose}
           className="absolute top-6 right-6 z-[120] w-10 h-10 rounded-full bg-black/60 border border-white/10 hover:bg-white/10 hover:border-white/30 text-white flex items-center justify-center font-mono text-[10px] tracking-wider cursor-pointer transition-all duration-300 shadow-md"
           title="Close Preview (Esc)"
         >
