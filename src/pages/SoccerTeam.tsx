@@ -10,6 +10,7 @@ import {
   Zap
 } from "lucide-react";
 import HolographicBall from "../components/HolographicBall";
+import { useRouteFonts, FONTSHARE_HREF } from "../hooks/useRouteFonts";
 
 // --- ANIMATION CONFIGURATION ---
 const stagger = {
@@ -215,6 +216,7 @@ interface SoccerTeamProps {
 // MAIN COMPONENT: SOCCER TEAM LANDING PAGE (LIGHT CREAM/LUXURY BLUE EXCLUSIVELY)
 // ====================================================================
 export default function SoccerTeam({ isPreview = false, onClose, isCardPreview = false }: SoccerTeamProps) {
+  useRouteFonts([FONTSHARE_HREF]);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"squad" | "fixtures">("squad");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -437,9 +439,12 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                   {/* Background portrait with high-contrast grayscale filter */}
                   <div className="absolute inset-0 z-0 overflow-hidden bg-slate-50">
                     <img
-                      src="/soccer_striker.png"
+                      src="/soccer_striker.webp"
                       alt="Luca Moretti Striker Profile"
+                      width={1024}
+                      height={1024}
                       loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover filter grayscale contrast-[1.1] opacity-75 group-hover:scale-105 transition-transform duration-700 ease-out"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#FDFBF7] via-[#FDFBF7]/50 to-transparent" />
@@ -553,9 +558,12 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                   {/* Background architectural shot in grayscale */}
                   <div className="absolute inset-0 z-0 overflow-hidden bg-slate-100">
                     <img
-                      src="/stadium_architecture.png"
+                      src="/stadium_architecture.webp"
                       alt="Olympus Stadium Architecture"
+                      width={1024}
+                      height={1024}
                       loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover filter grayscale contrast-[1.15] opacity-25 group-hover:scale-103 transition-transform duration-700 ease-out"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />

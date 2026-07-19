@@ -13,6 +13,7 @@ import {
   ChevronRight,
   CheckCircle
 } from "lucide-react";
+import { useRouteFonts, FONTSHARE_HREF } from "../hooks/useRouteFonts";
 
 interface NoodlePlaceProps {
   isPreview?: boolean;
@@ -73,6 +74,7 @@ function DoubleBezelCard({ children, className = "", onClick, whileHover }: {
 }
 
 export default function NoodlePlace({ isPreview = false, isCardPreview = false }: NoodlePlaceProps) {
+  useRouteFonts([FONTSHARE_HREF]);
   const navigate = useNavigate();
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -306,6 +308,10 @@ export default function NoodlePlace({ isPreview = false, isCardPreview = false }
                 <img
                   src="/kiri_ramen_hero.webp"
                   alt="Steaming bowl of Kiri Tonkotsu Ramen"
+                  width={1024}
+                  height={1024}
+                  decoding="async"
+                  fetchPriority="high"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.5s] ease-out"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 pointer-events-none" />
@@ -512,6 +518,10 @@ export default function NoodlePlace({ isPreview = false, isCardPreview = false }
                     <img
                       src="/kiri_ramen_interior.webp"
                       alt="Counter detail"
+                      width={1024}
+                      height={1024}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover grayscale opacity-60 hover:grayscale-0 transition-all duration-700"
                     />
                   </div>
@@ -573,6 +583,10 @@ export default function NoodlePlace({ isPreview = false, isCardPreview = false }
           <img
             src="/kiri_ramen_interior.webp"
             alt="Intimate Ramen bar"
+            width={1024}
+            height={1024}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover scale-110"
           />
         </div>

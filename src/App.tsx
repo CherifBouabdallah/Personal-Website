@@ -64,7 +64,7 @@ export default function App() {
     });
 
     // Streamlined preloading of heavy images using Promise.all
-    const imagesToPreload = ["/IMG_2656.webp", "/OG2.webp"];
+    const imagesToPreload = ["/OG2.webp"];
     const preloadImage = (src: string) =>
       new Promise<void>((resolve) => {
         const img = new Image();
@@ -77,25 +77,15 @@ export default function App() {
       imagesLoadedRef.current = true;
     });
 
-    // Idle-Time Preloading for lazy loaded page components and heavy assets
+    // Idle-Time Preloading for lazy loaded page JS chunks only.
+    // Their images are intentionally NOT prefetched here — each page
+    // loads its own images on demand when actually visited.
     const preloadPages = () => {
       Vortex.preload();
       SoccerTeam.preload();
       NoodlePlace.preload();
       NotFound.preload();
       Secret101.preload();
-
-      // Preload heavy portfolio images during idle time so page loads are instant
-      const images = [
-        "/soccer_striker.png",
-        "/stadium_architecture.png",
-        "/kiri_ramen_hero.webp",
-        "/kiri_ramen_interior.webp"
-      ];
-      images.forEach((src) => {
-        const img = new Image();
-        img.src = src;
-      });
     };
 
     if ("requestIdleCallback" in window) {

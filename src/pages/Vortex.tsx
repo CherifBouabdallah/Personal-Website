@@ -1,6 +1,7 @@
 import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from "framer-motion";
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useRouteFonts, GOOGLE_FONTS_HREF } from "../hooks/useRouteFonts";
 
 interface VortexProps {
   isPreview?: boolean;
@@ -9,6 +10,7 @@ interface VortexProps {
 }
 
 export default function Vortex({ isPreview = false, onClose, startUnlocked = false }: VortexProps) {
+  useRouteFonts([GOOGLE_FONTS_HREF]);
   const [isReady, setIsReady] = useState(false);
   const [isLocked, setIsLocked] = useState(true);
   const [isIslandExpanded, setIsIslandExpanded] = useState(false);

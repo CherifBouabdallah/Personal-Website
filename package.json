@@ -15,7 +15,6 @@
     "@tailwindcss/vite": "^4.1.14",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
-    "@types/three": "^0.185.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "@vitejs/plugin-react": "^5.0.4",
@@ -25,8 +24,7 @@
     "postcss": "^8.5.15",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-router-dom": "^7.15.1",
-    "three": "^0.185.0"
+    "react-router-dom": "^7.15.1"
   },
   "devDependencies": {
     "@babel/core": "^8.0.1",
