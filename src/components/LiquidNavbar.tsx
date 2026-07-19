@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { SPRING_NAV, TWEEN_INSTANT, useMotionPrefs } from "../lib/motion";
 
 const SECTIONS = ["home", "portfolio", "contact"];
 
@@ -13,7 +14,7 @@ interface LiquidNavbarProps {
 export default function LiquidNavbar({ className = "", activeSection = "home", setActiveSection }: LiquidNavbarProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const shouldReduceMotion = useReducedMotion();
+  const { reduced } = useMotionPrefs();
 
   // Find the active index
   const activeIndex = SECTIONS.indexOf(activeSection);
@@ -24,9 +25,7 @@ export default function LiquidNavbar({ className = "", activeSection = "home", s
   const [coords, setCoords] = useState<{ left: number; width: number } | null>(null);
 
   // Transition settings based on reduced motion preferences
-  const transition = shouldReduceMotion
-    ? { type: "tween" as const, duration: 0 }
-    : { type: "spring" as const, duration: 0.38, bounce: 0 };
+  const transition = reduced ? TWEEN_INSTANT : SPRING_NAV;
 
   useEffect(() => {
     const updateCoords = () => {

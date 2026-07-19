@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useSpring, useTransform, Variants, AnimatePresence, useScroll } from "framer-motion";
-import React, { useState, useEffect, useRef, useCallback, useMemo, Suspense } from "react";
+import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import Footer from "../components/Footer";
 import {
   Github,
@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 import { TRANSLATIONS } from "../data/translations";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
+import { MaskRiseTitle } from "../components/MaskRiseTitle";
+import { SPRING_MORPH, SPRING_SCROLL, EASE_ENTER, DURATION, useMotionPrefs } from "../lib/motion";
 
 // Lazy load portfolio projects to decouple their heavy chunks from the Portfolio page initial load
 const Vortex = React.lazy(() => import("./Vortex"));
@@ -28,7 +30,7 @@ interface FeaturedProject {
   reverse?: boolean;
 }
 
-// 1. Static project database
+// Static project database
 const FEATURED_PROJECTS: FeaturedProject[] = [
   {
     id: "vortex",
@@ -63,7 +65,7 @@ const FEATURED_PROJECTS: FeaturedProject[] = [
   }
 ];
 
-// 3. Shared Preview: Scaled page thumbnail with unified hover (Memoized)
+// Shared Preview: Scaled page thumbnail with unified hover (Memoized)
 const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hoverLabel = "Open Project" }: {
   onClick: () => void;
   layoutId: string;
@@ -74,6 +76,7 @@ const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hover
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.35);
   const [isHovered, setIsHovered] = useState(false);
+  const { transition } = useMotionPrefs();
 
   useEffect(() => {
     const updateScale = () => {
@@ -107,7 +110,7 @@ const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hover
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       layoutId={layoutId}
-      transition={{ type: "spring", stiffness: 180, damping: 25 }}
+      transition={transition(SPRING_MORPH)}
       whileHover={{ scale: 1.015 }}
       className="w-full aspect-[16/10] border border-theme-text/10 cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-text/40 focus-visible:ring-offset-2 focus-visible:ring-offset-theme-bg"
       style={{ background: bgColor, borderRadius: 20, overflow: "hidden", position: "relative", clipPath: "inset(0 round 20px)" }}
@@ -132,83 +135,7 @@ const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hover
   );
 });
 
-// 4. Morphing Title animation - centered split header (Memoized & character split tree optimized)
-interface MorphingTitleProps {
-  text: string;
-  isReady: boolean;
-}
-
-const MorphingTitle = React.memo(({ text, isReady }: MorphingTitleProps) => {
-  const [hasBeenInView, setHasBeenInView] = useState(false);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-
-  // Use IntersectionObserver to detect when title scrolls into view
-  useEffect(() => {
-    if (!isReady || hasBeenInView) return;
-    const el = titleRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setHasBeenInView(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.3 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [isReady, hasBeenInView]);
-
-  // Memoize character split tree to prevent rebuilding character span objects on re-renders
-  const splitText = useMemo(() => {
-    let charCounter = 0;
-    return text.split(" ").map((word, wordIndex) => {
-      const chars = word.split("").map((char) => {
-        const globalIndex = charCounter++;
-        return { char, globalIndex };
-      });
-      return { wordIndex, chars };
-    });
-  }, [text]);
-
-  const shouldAnimate = isReady && hasBeenInView;
-
-  return (
-    <motion.h1
-      ref={titleRef}
-      className="font-maghfirea text-[clamp(2.3rem,12vw,200px)] text-theme-text flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] px-4 w-full"
-    >
-      {splitText.map(({ wordIndex, chars }) => (
-        <span key={wordIndex} className="inline-block whitespace-nowrap">
-          {chars.map(({ char, globalIndex }, charIndex) => (
-            <span
-              key={charIndex}
-              className="inline-block overflow-hidden"
-              style={{ paddingBottom: "0.08em", marginBottom: "-0.08em" }}
-            >
-              <motion.span
-                className="inline-block"
-                initial={{ opacity: 0, y: 35, filter: "blur(10px)" }}
-                animate={shouldAnimate ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 35, filter: "blur(10px)" }}
-                transition={{
-                  duration: 1.0,
-                  ease: [0.21, 1, 0.36, 1],
-                  delay: globalIndex * 0.05,
-                }}
-              >
-                {char}
-              </motion.span>
-            </span>
-          ))}
-        </span>
-      ))}
-    </motion.h1>
-  );
-});
-
-// 5. Featured Project Card Component (Memoized)
+// Featured Project Card Component (Memoized)
 interface FeaturedCardProps {
   project: FeaturedProject;
   t: any;
@@ -217,22 +144,23 @@ interface FeaturedCardProps {
 }
 
 const FeaturedCard = React.memo(({ project, t, onOpen, getGlassClass }: FeaturedCardProps) => {
+  const { reduced } = useMotionPrefs();
   const handleOpen = useCallback(() => {
     onOpen(project.id);
   }, [project.id, onOpen]);
 
-  const cardRevealVariants: Variants = {
-    hidden: { opacity: 0, y: 35 },
-    visible: (idx: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.9,
-        ease: [0.16, 1, 0.3, 1],
-        delay: idx * 0.12,
+  const cardRevealVariants: Variants = reduced
+    ? {
+        hidden: { opacity: 1 },
+        visible: { opacity: 1, transition: { duration: 0 } },
       }
-    })
-  };
+    : {
+        hidden: { opacity: 0 },
+        visible: (idx: number) => ({
+          opacity: 1,
+          transition: { duration: DURATION.medium, ease: EASE_ENTER, delay: idx * 0.08 },
+        }),
+      };
 
   return (
     <motion.div
@@ -313,7 +241,7 @@ const FeaturedCard = React.memo(({ project, t, onOpen, getGlassClass }: Featured
   );
 });
 
-// 6. Preview Modal Overlay (Memoized)
+// Preview Modal Overlay (Memoized)
 interface PreviewModalProps {
   onClose: () => void;
   layoutId: string;
@@ -324,6 +252,24 @@ interface PreviewModalProps {
 const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: PreviewModalProps) => {
   const [isLayoutComplete, setIsLayoutComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { reduced, transition } = useMotionPrefs();
+  const [isClosing, setIsClosing] = useState(false);
+
+  // Reduced motion skips the staged close (content-fade -> morph -> backdrop-clear)
+  // entirely and closes immediately.
+  const requestClose = () => {
+    if (reduced) {
+      onClose();
+      return;
+    }
+    setIsClosing(true);
+  };
+
+  useEffect(() => {
+    if (!isClosing) return;
+    const timer = setTimeout(onClose, 180);
+    return () => clearTimeout(timer);
+  }, [isClosing, onClose]);
 
   useEffect(() => {
     // Fallback timer: in case onLayoutAnimationComplete doesn't fire for some reason
@@ -346,13 +292,22 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
   const isLightBg = bgColor === "#FAFAF8";
   const textColorClass = isLightBg ? "text-slate-800" : "text-stone-200";
 
+  const modalStage = isClosing
+    ? "closing"
+    : !isLayoutComplete
+    ? "blank"
+    : isLoading
+    ? "loading"
+    : "content";
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={transition({ duration: 0.6, ease: EASE_ENTER })}
       className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 overflow-hidden cursor-pointer"
-      onClick={onClose}
+      onClick={requestClose}
     >
       <div
         className="w-full h-full max-w-[1280px] max-h-[85vh] relative"
@@ -360,7 +315,7 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
       >
         <motion.div
           layoutId={layoutId}
-          transition={{ type: "spring", stiffness: 180, damping: 25 }}
+          transition={transition(SPRING_MORPH)}
           onLayoutAnimationComplete={() => {
             setIsLayoutComplete(true);
           }}
@@ -369,9 +324,17 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
           data-lenis-prevent
         >
           <AnimatePresence mode="wait">
-            {!isLayoutComplete ? (
+            {modalStage === "closing" ? (
+              <motion.div
+                key="closing"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
+                className="w-full h-full"
+              />
+            ) : modalStage === "blank" ? (
               <div key="blank" className="w-full h-full" />
-            ) : isLoading ? (
+            ) : modalStage === "loading" ? (
               <motion.div
                 key="loader"
                 initial={{ opacity: 0 }}
@@ -405,7 +368,7 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
 
         {/* Floating Close Button */}
         <button
-          onClick={onClose}
+          onClick={requestClose}
           className="absolute top-6 right-6 z-[120] w-10 h-10 rounded-full bg-black/60 border border-white/10 hover:bg-white/10 hover:border-white/30 text-white flex items-center justify-center font-mono text-[10px] tracking-wider cursor-pointer transition-all duration-300 shadow-md"
           title="Close Preview (Esc)"
         >
@@ -417,7 +380,7 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
 });
 
 
-// 7. Main Portfolio Component
+// Main Portfolio Component
 interface PortfolioProps {
   lang: "en" | "fr";
   setLang: (l: "en" | "fr") => void;
@@ -438,11 +401,7 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
     offset: ["start start", "end end"]
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    damping: 30,
-    stiffness: 120,
-    mass: 0.8,
-  });
+  const smoothProgress = useSpring(scrollYProgress, SPRING_SCROLL);
 
   useEffect(() => {
     const handleResize = () => {
@@ -515,14 +474,18 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
             style={{ scale: titleScale, opacity: titleOpacity }}
             className="text-center px-6 cursor-default select-none"
           >
-            <MorphingTitle text={headerText} isReady={isReady} />
+            <MaskRiseTitle
+              text={headerText}
+              isReady={isReady}
+              className="font-maghfirea text-[clamp(2.3rem,12vw,200px)] text-theme-text text-center leading-[0.95] px-4 w-full"
+            />
           </motion.div>
 
           <motion.p
             key={`intro-${lang}`}
             initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ duration: 1.4, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 1.4, delay: 0.3, ease: EASE_ENTER }}
             className="font-mono text-[9px] md:text-[11px] tracking-[0.25em] uppercase text-theme-text/60 max-w-sm leading-relaxed mt-6 text-center px-6"
           >
             {t.portfolioIntro}

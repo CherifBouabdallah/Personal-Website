@@ -10,6 +10,7 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 import MainPage from "./pages/MainPage";
 import LiquidNavbar from "./components/LiquidNavbar";
 import Lenis from "lenis";
+import { EASE_ENTER, ARRIVAL_SETTLE_MS, ARRIVAL_CONTRACT_MS, useMotionPrefs } from "./lib/motion";
 
 // Static routes config to prevent recreation on every render
 const SCROLLABLE_ROUTES = new Set(["/", "/vortex", "/portfolio", "/contact", "/soccer-team", "/noodle-place"]);
@@ -33,9 +34,13 @@ const Secret101 = lazyWithPreload(() => import("./pages/Secret101"));
 
 type Language = "en" | "fr";
 
+type PreloaderPhase = "loading" | "settling" | "contracting";
+
 export default function App() {
   const [progress, setProgress] = useState(0);
   const [isSiteReady, setIsSiteReady] = useState(false);
+  const [phase, setPhase] = useState<PreloaderPhase>("loading");
+  const { reduced } = useMotionPrefs();
   const location = useLocation();
 
   const [lang, setLang] = useState<Language>(() => {
@@ -114,9 +119,18 @@ export default function App() {
       }
 
       if (currentProgress >= 100) {
-        timeoutId = window.setTimeout(() => {
-          setIsSiteReady(true);
-        }, 300);
+        if (reduced) {
+          timeoutId = window.setTimeout(() => setIsSiteReady(true), 300);
+        } else {
+          // Arrival: label settles -> bar contracts -> dissolves into the navbar.
+          setPhase("settling");
+          timeoutId = window.setTimeout(() => {
+            setPhase("contracting");
+            timeoutId = window.setTimeout(() => {
+              setIsSiteReady(true);
+            }, ARRIVAL_CONTRACT_MS);
+          }, ARRIVAL_SETTLE_MS);
+        }
         return;
       }
 
@@ -165,14 +179,14 @@ export default function App() {
           <motion.div
             key="preloader"
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: EASE_ENTER }}
             className="fixed inset-0 w-full h-full bg-theme-bg z-[999] flex flex-col items-center justify-center select-none"
           >
             <motion.div
               initial={{ opacity: 0.3 }}
-              animate={{ opacity: [0.3, 0.8, 0.3] }}
-              transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+              animate={phase === "loading" ? { opacity: [0.3, 0.8, 0.3] } : { opacity: 0.8 }}
+              transition={phase === "loading" ? { duration: 2.2, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
               className="font-mono text-xs md:text-sm tracking-[0.45em] uppercase text-theme-text/80 text-center px-4"
             >
               CHERIF BOUABDALLAH
@@ -181,7 +195,10 @@ export default function App() {
               loading ...
             </div>
             {/* Minimalist luxury loading status bar */}
-            <div className="mt-6 w-40 h-[1px] bg-theme-text/10 relative overflow-hidden">
+            <div
+              className="mt-6 h-[1px] bg-theme-text/10 relative overflow-hidden transition-[width] duration-300 ease-out"
+              style={{ width: phase === "contracting" ? "24px" : "160px" }}
+            >
               <div
                 className="absolute top-0 left-0 h-full bg-theme-text/70"
                 style={{ width: `${progress}%` }}
@@ -199,12 +216,7 @@ export default function App() {
             </Routes>
           </Suspense>
         ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full min-h-screen relative flex flex-col items-stretch justify-start"
-          >
+          <div className="w-full min-h-screen relative flex flex-col items-stretch justify-start">
             {/* Liquid Navbar at top middle */}
             <AnimatePresence>
               {showNavbar && (
@@ -213,7 +225,7 @@ export default function App() {
                   initial={{ opacity: 0, y: -15 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -15 }}
-                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.5, ease: EASE_ENTER }}
                   className="fixed top-6 md:top-8 left-0 right-0 z-50 flex justify-center pointer-events-none"
                 >
                   <LiquidNavbar
@@ -267,7 +279,7 @@ export default function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
-          </motion.div>
+          </div>
         )
       )}
       <Analytics />
