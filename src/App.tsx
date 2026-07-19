@@ -12,6 +12,7 @@ import LiquidNavbar from "./components/LiquidNavbar";
 import Lenis from "lenis";
 import { MotionLabProvider, useMotionVariant } from "./motionLab/MotionLabContext";
 import { MotionLabPanel } from "./motionLab/MotionLabPanel";
+import { EASE_ENTER, ARRIVAL_SETTLE_MS, ARRIVAL_CONTRACT_MS, useMotionPrefs } from "./lib/motion";
 
 // Static routes config to prevent recreation on every render
 const SCROLLABLE_ROUTES = new Set(["/", "/vortex", "/portfolio", "/contact", "/soccer-team", "/noodle-place"]);
@@ -43,10 +44,14 @@ export default function App() {
   );
 }
 
+type PreloaderPhase = "loading" | "settling" | "contracting" | "done";
+
 function AppInner() {
   const { variant } = useMotionVariant();
   const [progress, setProgress] = useState(0);
   const [isSiteReady, setIsSiteReady] = useState(false);
+  const [phase, setPhase] = useState<PreloaderPhase>("loading");
+  const { reduced } = useMotionPrefs();
   const location = useLocation();
 
   const [lang, setLang] = useState<Language>(() => {
@@ -125,9 +130,22 @@ function AppInner() {
       }
 
       if (currentProgress >= 100) {
-        timeoutId = window.setTimeout(() => {
-          setIsSiteReady(true);
-        }, 300);
+        if (variant === "b" || reduced) {
+          // Seam-fix baseline: same short hold, then a single coordinated crossfade
+          // (duration/easing now shared with the app fade-in below, so it reads as
+          // one clip instead of two).
+          timeoutId = window.setTimeout(() => setIsSiteReady(true), 300);
+        } else {
+          // Arrival (A/A2): label settles -> bar contracts -> dissolve into the navbar.
+          setPhase("settling");
+          timeoutId = window.setTimeout(() => {
+            setPhase("contracting");
+            timeoutId = window.setTimeout(() => {
+              setPhase("done");
+              setIsSiteReady(true);
+            }, ARRIVAL_CONTRACT_MS);
+          }, ARRIVAL_SETTLE_MS);
+        }
         return;
       }
 
@@ -176,14 +194,14 @@ function AppInner() {
           <motion.div
             key="preloader"
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: EASE_ENTER }}
             className="fixed inset-0 w-full h-full bg-theme-bg z-[999] flex flex-col items-center justify-center select-none"
           >
             <motion.div
               initial={{ opacity: 0.3 }}
-              animate={{ opacity: [0.3, 0.8, 0.3] }}
-              transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+              animate={phase === "loading" ? { opacity: [0.3, 0.8, 0.3] } : { opacity: 0.8 }}
+              transition={phase === "loading" ? { duration: 2.2, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
               className="font-mono text-xs md:text-sm tracking-[0.45em] uppercase text-theme-text/80 text-center px-4"
             >
               CHERIF BOUABDALLAH
@@ -192,7 +210,10 @@ function AppInner() {
               loading ...
             </div>
             {/* Minimalist luxury loading status bar */}
-            <div className="mt-6 w-40 h-[1px] bg-theme-text/10 relative overflow-hidden">
+            <div
+              className="mt-6 h-[1px] bg-theme-text/10 relative overflow-hidden transition-[width] duration-300 ease-out"
+              style={{ width: phase === "contracting" || phase === "done" ? "24px" : "160px" }}
+            >
               <div
                 className="absolute top-0 left-0 h-full bg-theme-text/70"
                 style={{ width: `${progress}%` }}
@@ -211,9 +232,9 @@ function AppInner() {
           </Suspense>
         ) : (
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={variant === "b" ? { opacity: 0 } : false}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            transition={variant === "b" ? { duration: 0.5, ease: EASE_ENTER } : { duration: 0 }}
             className="w-full min-h-screen relative flex flex-col items-stretch justify-start"
           >
             {/* Liquid Navbar at top middle */}
