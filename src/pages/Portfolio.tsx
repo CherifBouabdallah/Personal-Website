@@ -7,7 +7,8 @@ import {
 } from "lucide-react";
 import { TRANSLATIONS } from "../data/translations";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
-import { SPRING_MORPH, SPRING_SCROLL, EASE_ENTER, EASE_ENTER_CHAR, useMotionPrefs } from "../lib/motion";
+import { SPRING_MORPH, SPRING_SCROLL, EASE_ENTER, EASE_ENTER_CHAR, DURATION, useMotionPrefs } from "../lib/motion";
+import { useMotionVariant } from "../motionLab/MotionLabContext";
 
 // Lazy load portfolio projects to decouple their heavy chunks from the Portfolio page initial load
 const Vortex = React.lazy(() => import("./Vortex"));
@@ -144,6 +145,8 @@ const MorphingTitle = React.memo(({ text, isReady }: MorphingTitleProps) => {
   const [hasBeenInView, setHasBeenInView] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const { reduced } = useMotionPrefs();
+  const { variant } = useMotionVariant();
+  const useMaskRise = variant !== "b";
 
   // Use IntersectionObserver to detect when title scrolls into view
   useEffect(() => {
@@ -177,6 +180,24 @@ const MorphingTitle = React.memo(({ text, isReady }: MorphingTitleProps) => {
   }, [text]);
 
   const shouldAnimate = isReady && hasBeenInView;
+
+  if (useMaskRise) {
+    return (
+      <h1
+        ref={titleRef}
+        className="font-maghfirea text-[clamp(2.3rem,12vw,200px)] text-theme-text text-center leading-[0.95] px-4 w-full overflow-hidden"
+      >
+        <motion.span
+          className="inline-block"
+          initial={reduced ? false : { y: "110%" }}
+          animate={reduced ? { opacity: 1 } : shouldAnimate ? { y: "0%" } : { y: "110%" }}
+          transition={reduced ? { duration: 0 } : { duration: 1.0, ease: EASE_ENTER }}
+        >
+          {text}
+        </motion.span>
+      </h1>
+    );
+  }
 
   return (
     <motion.h1
@@ -217,20 +238,32 @@ interface FeaturedCardProps {
 
 const FeaturedCard = React.memo(({ project, t, onOpen, getGlassClass }: FeaturedCardProps) => {
   const { reduced } = useMotionPrefs();
+  const { variant } = useMotionVariant();
   const handleOpen = useCallback(() => {
     onOpen(project.id);
   }, [project.id, onOpen]);
 
-  const cardRevealVariants: Variants = {
-    hidden: reduced ? { opacity: 1 } : { opacity: 0, y: 35 },
-    visible: (idx: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: reduced
-        ? { duration: 0 }
-        : { duration: 0.9, ease: EASE_ENTER, delay: idx * 0.12 },
-    })
-  };
+  const cardRevealVariants: Variants = reduced
+    ? {
+        hidden: { opacity: 1 },
+        visible: { opacity: 1, transition: { duration: 0 } },
+      }
+    : variant === "b"
+    ? {
+        hidden: { opacity: 0, y: 35 },
+        visible: (idx: number) => ({
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.9, ease: EASE_ENTER, delay: idx * 0.12 },
+        }),
+      }
+    : {
+        hidden: { opacity: 0 },
+        visible: (idx: number) => ({
+          opacity: 1,
+          transition: { duration: DURATION.medium, ease: EASE_ENTER, delay: idx * 0.08 },
+        }),
+      };
 
   return (
     <motion.div
