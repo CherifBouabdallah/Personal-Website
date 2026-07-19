@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { TRANSLATIONS } from "../data/translations";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
+import { SPRING_MORPH, SPRING_SCROLL, EASE_ENTER, EASE_ENTER_CHAR, useMotionPrefs } from "../lib/motion";
 
 // Lazy load portfolio projects to decouple their heavy chunks from the Portfolio page initial load
 const Vortex = React.lazy(() => import("./Vortex"));
@@ -74,6 +75,7 @@ const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hover
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.35);
   const [isHovered, setIsHovered] = useState(false);
+  const { transition } = useMotionPrefs();
 
   useEffect(() => {
     const updateScale = () => {
@@ -107,7 +109,7 @@ const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hover
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       layoutId={layoutId}
-      transition={{ type: "spring", stiffness: 180, damping: 25 }}
+      transition={transition(SPRING_MORPH)}
       whileHover={{ scale: 1.015 }}
       className="w-full aspect-[16/10] border border-theme-text/10 cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-text/40 focus-visible:ring-offset-2 focus-visible:ring-offset-theme-bg"
       style={{ background: bgColor, borderRadius: 20, overflow: "hidden", position: "relative", clipPath: "inset(0 round 20px)" }}
@@ -141,6 +143,7 @@ interface MorphingTitleProps {
 const MorphingTitle = React.memo(({ text, isReady }: MorphingTitleProps) => {
   const [hasBeenInView, setHasBeenInView] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
+  const { reduced } = useMotionPrefs();
 
   // Use IntersectionObserver to detect when title scrolls into view
   useEffect(() => {
@@ -190,13 +193,9 @@ const MorphingTitle = React.memo(({ text, isReady }: MorphingTitleProps) => {
             >
               <motion.span
                 className="inline-block"
-                initial={{ opacity: 0, y: 35, filter: "blur(10px)" }}
-                animate={shouldAnimate ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 35, filter: "blur(10px)" }}
-                transition={{
-                  duration: 1.0,
-                  ease: [0.21, 1, 0.36, 1],
-                  delay: globalIndex * 0.05,
-                }}
+                initial={reduced ? false : { opacity: 0, y: 35, filter: "blur(10px)" }}
+                animate={reduced ? { opacity: 1 } : shouldAnimate ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 35, filter: "blur(10px)" }}
+                transition={reduced ? { duration: 0 } : { duration: 1.0, ease: EASE_ENTER_CHAR, delay: globalIndex * 0.05 }}
               >
                 {char}
               </motion.span>
@@ -217,20 +216,19 @@ interface FeaturedCardProps {
 }
 
 const FeaturedCard = React.memo(({ project, t, onOpen, getGlassClass }: FeaturedCardProps) => {
+  const { reduced } = useMotionPrefs();
   const handleOpen = useCallback(() => {
     onOpen(project.id);
   }, [project.id, onOpen]);
 
   const cardRevealVariants: Variants = {
-    hidden: { opacity: 0, y: 35 },
+    hidden: reduced ? { opacity: 1 } : { opacity: 0, y: 35 },
     visible: (idx: number) => ({
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.9,
-        ease: [0.16, 1, 0.3, 1],
-        delay: idx * 0.12,
-      }
+      transition: reduced
+        ? { duration: 0 }
+        : { duration: 0.9, ease: EASE_ENTER, delay: idx * 0.12 },
     })
   };
 
@@ -324,6 +322,7 @@ interface PreviewModalProps {
 const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: PreviewModalProps) => {
   const [isLayoutComplete, setIsLayoutComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { reduced, transition } = useMotionPrefs();
 
   useEffect(() => {
     // Fallback timer: in case onLayoutAnimationComplete doesn't fire for some reason
@@ -360,7 +359,7 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
       >
         <motion.div
           layoutId={layoutId}
-          transition={{ type: "spring", stiffness: 180, damping: 25 }}
+          transition={transition(SPRING_MORPH)}
           onLayoutAnimationComplete={() => {
             setIsLayoutComplete(true);
           }}
@@ -438,11 +437,7 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
     offset: ["start start", "end end"]
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    damping: 30,
-    stiffness: 120,
-    mass: 0.8,
-  });
+  const smoothProgress = useSpring(scrollYProgress, SPRING_SCROLL);
 
   useEffect(() => {
     const handleResize = () => {
