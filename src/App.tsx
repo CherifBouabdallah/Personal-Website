@@ -10,8 +10,6 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 import MainPage from "./pages/MainPage";
 import LiquidNavbar from "./components/LiquidNavbar";
 import Lenis from "lenis";
-import { MotionLabProvider, useMotionVariant } from "./motionLab/MotionLabContext";
-import { MotionLabPanel } from "./motionLab/MotionLabPanel";
 import { EASE_ENTER, ARRIVAL_SETTLE_MS, ARRIVAL_CONTRACT_MS, useMotionPrefs } from "./lib/motion";
 
 // Static routes config to prevent recreation on every render
@@ -36,18 +34,9 @@ const Secret101 = lazyWithPreload(() => import("./pages/Secret101"));
 
 type Language = "en" | "fr";
 
+type PreloaderPhase = "loading" | "settling" | "contracting";
+
 export default function App() {
-  return (
-    <MotionLabProvider>
-      <AppInner />
-    </MotionLabProvider>
-  );
-}
-
-type PreloaderPhase = "loading" | "settling" | "contracting" | "done";
-
-function AppInner() {
-  const { variant } = useMotionVariant();
   const [progress, setProgress] = useState(0);
   const [isSiteReady, setIsSiteReady] = useState(false);
   const [phase, setPhase] = useState<PreloaderPhase>("loading");
@@ -130,18 +119,14 @@ function AppInner() {
       }
 
       if (currentProgress >= 100) {
-        if (variant === "b" || reduced) {
-          // Seam-fix baseline: same short hold, then a single coordinated crossfade
-          // (duration/easing now shared with the app fade-in below, so it reads as
-          // one clip instead of two).
+        if (reduced) {
           timeoutId = window.setTimeout(() => setIsSiteReady(true), 300);
         } else {
-          // Arrival (A/A2): label settles -> bar contracts -> dissolve into the navbar.
+          // Arrival: label settles -> bar contracts -> dissolves into the navbar.
           setPhase("settling");
           timeoutId = window.setTimeout(() => {
             setPhase("contracting");
             timeoutId = window.setTimeout(() => {
-              setPhase("done");
               setIsSiteReady(true);
             }, ARRIVAL_CONTRACT_MS);
           }, ARRIVAL_SETTLE_MS);
@@ -212,7 +197,7 @@ function AppInner() {
             {/* Minimalist luxury loading status bar */}
             <div
               className="mt-6 h-[1px] bg-theme-text/10 relative overflow-hidden transition-[width] duration-300 ease-out"
-              style={{ width: phase === "contracting" || phase === "done" ? "24px" : "160px" }}
+              style={{ width: phase === "contracting" ? "24px" : "160px" }}
             >
               <div
                 className="absolute top-0 left-0 h-full bg-theme-text/70"
@@ -231,12 +216,7 @@ function AppInner() {
             </Routes>
           </Suspense>
         ) : (
-          <motion.div
-            initial={variant === "b" ? { opacity: 0 } : false}
-            animate={{ opacity: 1 }}
-            transition={variant === "b" ? { duration: 0.5, ease: EASE_ENTER } : { duration: 0 }}
-            className="w-full min-h-screen relative flex flex-col items-stretch justify-start"
-          >
+          <div className="w-full min-h-screen relative flex flex-col items-stretch justify-start">
             {/* Liquid Navbar at top middle */}
             <AnimatePresence>
               {showNavbar && (
@@ -245,7 +225,7 @@ function AppInner() {
                   initial={{ opacity: 0, y: -15 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -15 }}
-                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.5, ease: EASE_ENTER }}
                   className="fixed top-6 md:top-8 left-0 right-0 z-50 flex justify-center pointer-events-none"
                 >
                   <LiquidNavbar
@@ -299,12 +279,11 @@ function AppInner() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
-          </motion.div>
+          </div>
         )
       )}
       <Analytics />
       <SpeedInsights />
-      <MotionLabPanel />
     </div>
   );
 }

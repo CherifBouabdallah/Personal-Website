@@ -144,7 +144,7 @@ interface HomeProps {
 
 export default function Home({ lang, setLang }: HomeProps) {
   const navigate = useNavigate();
-  const { reduced } = useMotionPrefs();
+  const { reduced, transition } = useMotionPrefs();
   const [photoshopClicks, setPhotoshopClicks] = useState(0);
   const [isReady, setIsReady] = useState(false);
   const [isInitialMount, setIsInitialMount] = useState(true);
@@ -246,11 +246,7 @@ export default function Home({ lang, setLang }: HomeProps) {
                                 ? { opacity: 1, y: 0, filter: "blur(0px)" }
                                 : { opacity: 0, y: 50, filter: "blur(10px)" }
                             }
-                            transition={
-                              reduced
-                                ? { duration: 0 }
-                                : { duration: 1.0, ease: EASE_ENTER_CHAR, delay: globalIndex * 0.05 }
-                            }
+                            transition={transition({ duration: 1.0, ease: EASE_ENTER_CHAR, delay: globalIndex * 0.05 })}
                           >
                             {char}
                           </motion.span>
@@ -438,11 +434,7 @@ export default function Home({ lang, setLang }: HomeProps) {
                                 ? { opacity: 1, y: 0, filter: "blur(0px)" }
                                 : { opacity: 0, y: 50, filter: "blur(10px)" }
                             }
-                            transition={
-                              reduced
-                                ? { duration: 0 }
-                                : { duration: 1.0, ease: EASE_ENTER_CHAR, delay: globalIndex * 0.05 }
-                            }
+                            transition={transition({ duration: 1.0, ease: EASE_ENTER_CHAR, delay: globalIndex * 0.05 })}
                           >
                             {char}
                           </motion.span>

@@ -11,8 +11,8 @@ export const EASE_ENTER_CHAR = [0.21, 1, 0.36, 1] as const;
 // The one spring reserved for Portfolio's card <-> modal shared-element morph.
 export const SPRING_MORPH = { type: "spring", stiffness: 180, damping: 25 } as const;
 
-// Canonical UI chrome spring (popups, small interactive elements). Resolves the
-// previous drift between {stiffness:380, damping:22} and {stiffness:380, damping:30}.
+// Canonical UI chrome spring for popups and small interactive elements
+// (used by Contact's popup card, replacing an inline {stiffness:380, damping:22}).
 export const SPRING_UI = { type: "spring", stiffness: 380, damping: 26 } as const;
 
 // Canonical scroll-linked reveal spring (previously identical but hand-copied in
@@ -26,9 +26,9 @@ export const SPRING_NAV = { type: "spring", duration: 0.38, bounce: 0 } as const
 // Reduced-motion fallback: an effectively instant tween.
 export const TWEEN_INSTANT = { type: "tween", duration: 0 } as const;
 
-export const DURATION = { short: 0.3, medium: 0.6, long: 1.0 } as const;
+export const DURATION = { medium: 0.6 } as const;
 
-// Timing for the Variant A/A2 preloader "Arrival" sequence.
+// Timing for the preloader "Arrival" sequence.
 export const ARRIVAL_SETTLE_MS = 250;
 export const ARRIVAL_CONTRACT_MS = 350;
 
