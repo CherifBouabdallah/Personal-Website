@@ -2,6 +2,7 @@ import { motion, useMotionValue, useSpring, useTransform, AnimatePresence, useSc
 import { useState, useEffect, useRef, Fragment } from "react";
 import Footer from "../components/Footer";
 import { TRANSLATIONS } from "../data/translations";
+import { SPRING_UI, SPRING_SCROLL, EASE_ENTER_CHAR, useMotionPrefs } from "../lib/motion";
 
 type Language = "en" | "fr";
 
@@ -56,7 +57,7 @@ const popupVariants = {
   initial: { opacity: 0, y: -40, scale: 0.1, filter: "blur(12px)" },
   animate: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" },
   exit: { opacity: 0, y: -30, scale: 0.1, filter: "blur(8px)" },
-  transition: { type: "spring", stiffness: 380, damping: 22 }
+  transition: SPRING_UI,
 } as const;
 
 interface ContactProps {
@@ -64,6 +65,7 @@ interface ContactProps {
 }
 
 export default function Contact({ lang }: ContactProps) {
+  const { reduced } = useMotionPrefs();
   const [isReady, setIsReady] = useState(false);
   const [activePopup, setActivePopup] = useState<"EMAIL" | "GITHUB" | "LINKEDIN" | null>(null);
   const [copiedType, setCopiedType] = useState<"EMAIL" | "GITHUB" | "LINKEDIN" | null>(null);
@@ -131,11 +133,7 @@ export default function Contact({ lang }: ContactProps) {
     offset: ["start end", "end end"]
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    damping: 30,
-    stiffness: 120,
-    mass: 0.8,
-  });
+  const smoothProgress = useSpring(scrollYProgress, SPRING_SCROLL);
 
   const text = "Contact";
 
@@ -190,13 +188,9 @@ export default function Contact({ lang }: ContactProps) {
                         >
                           <motion.span
                             className="inline-block"
-                            initial={{ opacity: 0, y: 35, filter: "blur(10px)" }}
-                            animate={shouldAnimate ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 35, filter: "blur(10px)" }}
-                            transition={{
-                              duration: 1.0,
-                              ease: [0.21, 1, 0.36, 1],
-                              delay: globalIndex * 0.05,
-                            }}
+                            initial={reduced ? false : { opacity: 0, y: 35, filter: "blur(10px)" }}
+                            animate={reduced ? { opacity: 1 } : shouldAnimate ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 35, filter: "blur(10px)" }}
+                            transition={reduced ? { duration: 0 } : { duration: 1.0, ease: EASE_ENTER_CHAR, delay: globalIndex * 0.05 }}
                           >
                             {char}
                           </motion.span>
