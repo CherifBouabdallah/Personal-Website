@@ -10,6 +10,8 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 import MainPage from "./pages/MainPage";
 import LiquidNavbar from "./components/LiquidNavbar";
 import Lenis from "lenis";
+import { MotionLabProvider, useMotionVariant } from "./motionLab/MotionLabContext";
+import { MotionLabPanel } from "./motionLab/MotionLabPanel";
 
 // Static routes config to prevent recreation on every render
 const SCROLLABLE_ROUTES = new Set(["/", "/vortex", "/portfolio", "/contact", "/soccer-team", "/noodle-place"]);
@@ -34,6 +36,15 @@ const Secret101 = lazyWithPreload(() => import("./pages/Secret101"));
 type Language = "en" | "fr";
 
 export default function App() {
+  return (
+    <MotionLabProvider>
+      <AppInner />
+    </MotionLabProvider>
+  );
+}
+
+function AppInner() {
+  const { variant } = useMotionVariant();
   const [progress, setProgress] = useState(0);
   const [isSiteReady, setIsSiteReady] = useState(false);
   const location = useLocation();
@@ -272,6 +283,7 @@ export default function App() {
       )}
       <Analytics />
       <SpeedInsights />
+      <MotionLabPanel />
     </div>
   );
 }
