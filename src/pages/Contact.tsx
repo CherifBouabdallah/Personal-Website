@@ -2,7 +2,8 @@ import { motion, useMotionValue, useSpring, useTransform, AnimatePresence, useSc
 import { useState, useEffect, useRef, Fragment } from "react";
 import Footer from "../components/Footer";
 import { TRANSLATIONS } from "../data/translations";
-import { SPRING_UI, SPRING_SCROLL, EASE_ENTER_CHAR, useMotionPrefs } from "../lib/motion";
+import { SPRING_UI, SPRING_SCROLL, EASE_ENTER, EASE_ENTER_CHAR, DURATION, useMotionPrefs } from "../lib/motion";
+import { useMotionVariant } from "../motionLab/MotionLabContext";
 
 type Language = "en" | "fr";
 
@@ -66,6 +67,7 @@ interface ContactProps {
 
 export default function Contact({ lang }: ContactProps) {
   const { reduced } = useMotionPrefs();
+  const { variant } = useMotionVariant();
   const [isReady, setIsReady] = useState(false);
   const [activePopup, setActivePopup] = useState<"EMAIL" | "GITHUB" | "LINKEDIN" | null>(null);
   const [copiedType, setCopiedType] = useState<"EMAIL" | "GITHUB" | "LINKEDIN" | null>(null);
@@ -171,43 +173,65 @@ export default function Contact({ lang }: ContactProps) {
     <div id="contact" ref={contactRef} className="w-full min-h-screen relative flex flex-col items-center justify-center selection:bg-theme-text selection:text-theme-bg py-20 md:py-28">
         {/* Large Title */}
         <div className="cursor-default select-none pointer-events-none mb-16 md:mb-24">
-          <h1 ref={titleRef} className="font-maghfirea text-[clamp(2.5rem,8vw,5.5rem)] md:text-[clamp(3.5rem,10vw,140px)] text-theme-text flex flex-wrap justify-center gap-x-[0.25em] text-center leading-[0.95] selection:bg-theme-text selection:text-theme-bg px-4 w-full">
-            {(() => {
-              const shouldAnimate = isReady && hasBeenInView;
-              let charCounter = 0;
-              return text.split(" ").map((word, wordIndex, arr) => (
-                <Fragment key={wordIndex}>
-                  <span className="inline-block whitespace-nowrap">
-                    {word.split("").map((char, charIndex) => {
-                      const globalIndex = charCounter++;
-                      return (
-                        <span
-                          key={charIndex}
-                          className="inline-block overflow-hidden"
-                          style={{ paddingBottom: "0.08em", marginBottom: "-0.08em" }}
-                        >
-                          <motion.span
-                            className="inline-block"
-                            initial={reduced ? false : { opacity: 0, y: 35, filter: "blur(10px)" }}
-                            animate={reduced ? { opacity: 1 } : shouldAnimate ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 35, filter: "blur(10px)" }}
-                            transition={reduced ? { duration: 0 } : { duration: 1.0, ease: EASE_ENTER_CHAR, delay: globalIndex * 0.05 }}
+          <h1
+            ref={titleRef}
+            className={`font-maghfirea text-[clamp(2.5rem,8vw,5.5rem)] md:text-[clamp(3.5rem,10vw,140px)] text-theme-text text-center leading-[0.95] selection:bg-theme-text selection:text-theme-bg px-4 w-full ${
+              variant === "a" ? "overflow-hidden" : "flex flex-wrap justify-center gap-x-[0.25em]"
+            }`}
+          >
+            {variant === "a" ? (
+              <motion.span
+                className="inline-block"
+                initial={reduced ? false : { y: "110%" }}
+                animate={reduced ? { opacity: 1 } : (isReady && hasBeenInView) ? { y: "0%" } : { y: "110%" }}
+                transition={reduced ? { duration: 0 } : { duration: 1.0, ease: EASE_ENTER }}
+              >
+                {text}
+              </motion.span>
+            ) : (
+              (() => {
+                const shouldAnimate = isReady && hasBeenInView;
+                let charCounter = 0;
+                return text.split(" ").map((word, wordIndex, arr) => (
+                  <Fragment key={wordIndex}>
+                    <span className="inline-block whitespace-nowrap">
+                      {word.split("").map((char, charIndex) => {
+                        const globalIndex = charCounter++;
+                        return (
+                          <span
+                            key={charIndex}
+                            className="inline-block overflow-hidden"
+                            style={{ paddingBottom: "0.08em", marginBottom: "-0.08em" }}
                           >
-                            {char}
-                          </motion.span>
-                        </span>
-                      );
-                    })}
-                  </span>
-                  {wordIndex < arr.length - 1 && " "}
-                </Fragment>
-              ));
-            })()}
+                            <motion.span
+                              className="inline-block"
+                              initial={reduced ? false : { opacity: 0, y: 35, filter: "blur(10px)" }}
+                              animate={reduced ? { opacity: 1 } : shouldAnimate ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 35, filter: "blur(10px)" }}
+                              transition={reduced ? { duration: 0 } : { duration: 1.0, ease: EASE_ENTER_CHAR, delay: globalIndex * 0.05 }}
+                            >
+                              {char}
+                            </motion.span>
+                          </span>
+                        );
+                      })}
+                    </span>
+                    {wordIndex < arr.length - 1 && " "}
+                  </Fragment>
+                ));
+              })()
+            )}
           </h1>
         </div>
 
         {/* Social Icons Container */}
         <motion.div
-          style={{ opacity: iconsOpacity, y: iconsY, scale: iconsScale }}
+          {...(variant === "a"
+            ? {
+                initial: reduced ? false : { opacity: 0 },
+                animate: { opacity: 1 },
+                transition: reduced ? { duration: 0 } : { duration: DURATION.medium, ease: EASE_ENTER, delay: 0.2 },
+              }
+            : { style: { opacity: iconsOpacity, y: iconsY, scale: iconsScale } })}
           className="flex items-center justify-center gap-6 sm:gap-8 md:gap-14"
         >
           {socials.map((social) => {
