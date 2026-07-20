@@ -3,9 +3,7 @@ import React, { useState, useEffect, useRef, useCallback, Suspense } from "react
 import { ArrowRight } from "lucide-react";
 import { TRANSLATIONS } from "../data/translations";
 import SplitLine from "../components/SplitLine";
-import Grain from "../components/Grain";
-import { BroadsheetFrame } from "../components/BroadsheetFrame";
-import { usePlateStrike, useSectionSnap } from "../hooks/useBroadsheetMotion";
+import { usePlateStrike } from "../hooks/useBroadsheetMotion";
 
 // Lazy load portfolio projects to decouple their heavy chunks from the Portfolio page initial load
 const Vortex = React.lazy(() => import("./Vortex"));
@@ -305,12 +303,10 @@ export default function Portfolio({ lang }: PortfolioProps) {
   const [isReady, setIsReady] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalKey | null>(null);
   const [hoveredId, setHoveredId] = useState<ModalKey | null>(null);
-  const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
 
   const t = TRANSLATIONS[lang];
 
-  useSectionSnap(sectionRef);
   usePlateStrike(titleRef, isReady);
 
   useEffect(() => {
@@ -350,18 +346,15 @@ export default function Portfolio({ lang }: PortfolioProps) {
   return (
     <div
       id="portfolio"
-      ref={sectionRef}
       className="w-full relative bg-theme-text text-theme-bg selection:bg-theme-bg selection:text-theme-text overflow-hidden"
     >
-      <Grain />
-      <BroadsheetFrame folioLeft="N.02" folioRight={t.portfolio} runningHead={t.broadsheetRunningHead} />
 
       <div className="flex flex-col md:flex-row w-full">
         {/* Left: masthead */}
         <div className="w-full md:w-[36%] md:sticky md:top-0 md:h-screen flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-theme-bg/15 py-16 md:py-0 px-6 relative z-10">
           <h2
             ref={titleRef}
-            className="plate-strike font-maghfirea text-[clamp(2.4rem,7vw,5.5rem)] leading-[0.95] text-center select-none"
+            className="plate-strike font-maghfirea text-[clamp(2.4rem,7vw,5.5rem)] leading-[0.95] text-center"
           >
             <SplitLine text={t.portfolioTitle} />
           </h2>

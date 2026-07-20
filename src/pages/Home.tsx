@@ -1,11 +1,8 @@
-import { useState, useEffect, useRef, memo, Fragment } from "react";
+import { useState, useEffect, memo, Fragment } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { TRANSLATIONS } from "../data/translations";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
-import Grain from "../components/Grain";
-import { BroadsheetFrame } from "../components/BroadsheetFrame";
-import { useSectionSnap } from "../hooks/useBroadsheetMotion";
 import { EASE_ENTER, EASE_ENTER_CHAR, useMotionPrefs } from "../lib/motion";
 
 // Inline SVG logos, re-declared locally since there's no shared icon module.
@@ -83,7 +80,6 @@ export default function Home({ lang, setLang }: HomeProps) {
   const navigate = useNavigate();
   const [photoshopClicks, setPhotoshopClicks] = useState(0);
   const [isReady, setIsReady] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
   const { reduced, transition } = useMotionPrefs();
 
   const wordContainer = (delayChildren: number) => ({
@@ -94,8 +90,6 @@ export default function Home({ lang, setLang }: HomeProps) {
     hidden: { opacity: 0, y: reduced ? 0 : 8 },
     visible: { opacity: 1, y: 0, transition: transition({ duration: 0.5, ease: EASE_ENTER }) },
   };
-
-  useSectionSnap(sectionRef);
 
   useEffect(() => {
     let active = true;
@@ -157,54 +151,45 @@ export default function Home({ lang, setLang }: HomeProps) {
   return (
     <div
       id="home"
-      ref={sectionRef}
       className="w-full min-h-screen flex flex-col pt-24 md:pt-32 pb-16 px-6 md:px-16 lg:px-24 xl:px-32 relative bg-theme-bg text-theme-text select-text selection:bg-theme-text selection:text-theme-bg overflow-hidden"
     >
-      <Grain />
-      <BroadsheetFrame folioLeft="N.01" folioRight="HOME" runningHead={t.broadsheetRunningHead} />
 
       <div className="relative z-10 flex-1 flex flex-col justify-center w-full mx-auto max-w-7xl">
-        {/* Masthead strap */}
-        <div className="flex flex-col items-center border-b border-theme-text/15 pb-5 mb-12 md:mb-16">
-          <span className="font-mono text-[9px] md:text-[10px] tracking-[0.35em] uppercase opacity-50 text-center">
-            {t.broadsheetEdition}
-          </span>
-        </div>
-
         {/* Headline — per-character blur/rise reveal */}
-        <h1 className="font-maghfirea text-[clamp(2.4rem,11vw,150px)] text-theme-text leading-[0.92] tracking-[-0.02em] text-center w-full overflow-visible select-none mb-14 md:mb-20">
+        <h1 className="font-maghfirea text-[clamp(2.4rem,11vw,150px)] text-theme-text leading-[0.92] tracking-[-0.02em] text-center w-full overflow-visible mb-14 md:mb-20">
           {(() => {
             let charCounter = 0;
+            const renderChar = (char: string, key: string | number) => {
+              const globalIndex = charCounter++;
+              return (
+                <span
+                  key={key}
+                  className="inline-block overflow-hidden"
+                  style={{ paddingBottom: "0.08em", marginBottom: "-0.08em" }}
+                >
+                  <motion.span
+                    className="inline-block"
+                    initial={reduced ? false : { opacity: 0, y: 35, filter: "blur(10px)" }}
+                    animate={
+                      reduced
+                        ? { opacity: 1 }
+                        : isReady
+                        ? { opacity: 1, y: 0, filter: "blur(0px)" }
+                        : { opacity: 0, y: 50, filter: "blur(10px)" }
+                    }
+                    transition={transition({ duration: 1.0, ease: EASE_ENTER_CHAR, delay: globalIndex * 0.05 })}
+                  >
+                    {char}
+                  </motion.span>
+                </span>
+              );
+            };
             return "Cherif Bouabdallah".split(" ").map((word, wordIndex, arr) => (
               <Fragment key={wordIndex}>
                 <span className="inline-block whitespace-nowrap">
-                  {word.split("").map((char, charIndex) => {
-                    const globalIndex = charCounter++;
-                    return (
-                      <span
-                        key={charIndex}
-                        className="inline-block overflow-hidden"
-                        style={{ paddingBottom: "0.08em", marginBottom: "-0.08em" }}
-                      >
-                        <motion.span
-                          className="inline-block"
-                          initial={reduced ? false : { opacity: 0, y: 35, filter: "blur(10px)" }}
-                          animate={
-                            reduced
-                              ? { opacity: 1 }
-                              : isReady
-                              ? { opacity: 1, y: 0, filter: "blur(0px)" }
-                              : { opacity: 0, y: 50, filter: "blur(10px)" }
-                          }
-                          transition={transition({ duration: 1.0, ease: EASE_ENTER_CHAR, delay: globalIndex * 0.05 })}
-                        >
-                          {char}
-                        </motion.span>
-                      </span>
-                    );
-                  })}
+                  {word.split("").map((char, charIndex) => renderChar(char, charIndex))}
                 </span>
-                {wordIndex < arr.length - 1 && " "}
+                {wordIndex < arr.length - 1 && renderChar(" ", "space")}
               </Fragment>
             ));
           })()}
@@ -226,13 +211,15 @@ export default function Home({ lang, setLang }: HomeProps) {
               className="text-[16px] md:text-[19px] leading-relaxed text-theme-text/90 font-medium"
             >
               {monologueWords.map((word, idx) => (
-                <motion.span
-                  key={idx}
-                  variants={wordVariants}
-                  className={`inline-block mr-1.5 ${word.italic ? "font-serif italic text-theme-muted" : ""}`}
-                >
-                  {word.text}
-                </motion.span>
+                <Fragment key={idx}>
+                  <motion.span
+                    variants={wordVariants}
+                    className={`inline-block ${word.italic ? "font-serif italic text-theme-muted" : ""}`}
+                  >
+                    {word.text}
+                  </motion.span>
+                  {idx < monologueWords.length - 1 && " "}
+                </Fragment>
               ))}
             </motion.p>
 
@@ -245,9 +232,12 @@ export default function Home({ lang, setLang }: HomeProps) {
               className="text-[14px] md:text-[16px] leading-relaxed text-theme-text/50 font-mono"
             >
               {bgParagraphWords.map((word, idx) => (
-                <motion.span key={idx} variants={wordVariants} className="inline-block mr-1">
-                  {word}
-                </motion.span>
+                <Fragment key={idx}>
+                  <motion.span variants={wordVariants} className="inline-block">
+                    {word}
+                  </motion.span>
+                  {idx < bgParagraphWords.length - 1 && " "}
+                </Fragment>
               ))}
             </motion.p>
           </div>
@@ -255,12 +245,12 @@ export default function Home({ lang, setLang }: HomeProps) {
           {/* Sidebar column */}
           <div className="md:col-span-5 md:pl-2 flex flex-col gap-12">
             <div>
-              <div className="font-mono text-[11px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none">
+              <div className="font-mono text-[11px] tracking-[0.3em] uppercase opacity-40 mb-6">
                 {t.coreStack}
               </div>
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <div className="font-mono text-[9px] tracking-[0.2em] uppercase opacity-40 mb-4 select-none border-b border-theme-text/10 pb-2">
+                  <div className="font-mono text-[9px] tracking-[0.2em] uppercase opacity-40 mb-4 border-b border-theme-text/10 pb-2">
                     {t.languages}
                   </div>
                   <div className="flex flex-col gap-3">
@@ -275,7 +265,7 @@ export default function Home({ lang, setLang }: HomeProps) {
                   </div>
                 </div>
                 <div>
-                  <div className="font-mono text-[9px] tracking-[0.2em] uppercase opacity-40 mb-4 select-none border-b border-theme-text/10 pb-2">
+                  <div className="font-mono text-[9px] tracking-[0.2em] uppercase opacity-40 mb-4 border-b border-theme-text/10 pb-2">
                     {t.skills}
                   </div>
                   <div className="flex flex-col gap-3">
@@ -294,7 +284,7 @@ export default function Home({ lang, setLang }: HomeProps) {
             </div>
 
             <div>
-              <div className="font-mono text-[11px] tracking-[0.3em] uppercase opacity-40 mb-6 select-none">
+              <div className="font-mono text-[11px] tracking-[0.3em] uppercase opacity-40 mb-6">
                 {t.gateway}
               </div>
               <div className="flex flex-col gap-0">
@@ -327,11 +317,6 @@ export default function Home({ lang, setLang }: HomeProps) {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Scroll cue — native Tailwind reduced-motion variant, no JS */}
-        <div className="hidden md:flex flex-col items-center gap-2 mt-16 opacity-40 motion-reduce:animate-none animate-bounce select-none pointer-events-none">
-          <span className="font-mono text-[9px] tracking-[0.3em] uppercase">{t.scrollLabel}</span>
         </div>
       </div>
     </div>

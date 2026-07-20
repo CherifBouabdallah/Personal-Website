@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import Home from "./Home";
 import Portfolio from "./Portfolio";
 import Contact from "./Contact";
+import Grain from "../components/Grain";
 
 type Language = "en" | "fr";
 
@@ -85,6 +86,7 @@ export default function MainPage({ lang, setLang, activeSection, setActiveSectio
 
   return (
     <div className="w-full flex flex-col items-stretch justify-start bg-theme-bg">
+      <Grain />
       <Home lang={lang} setLang={setLang} />
       <Portfolio lang={lang} setLang={setLang} />
       <Contact lang={lang} />
