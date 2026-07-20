@@ -1,5 +1,5 @@
 import { useEffect, type RefObject } from "react";
-import { gsap, ScrollTrigger } from "../lib/gsapSetup";
+import { gsap } from "../lib/gsapSetup";
 import { useMotionPrefs } from "../lib/motion";
 
 /**
@@ -45,44 +45,4 @@ export function usePlateStrike(
 
     return () => ctx.revert();
   }, [containerRef, enabled, reduced, stagger, distance]);
-}
-
-/**
- * Desktop-only, reduced-motion-safe: gently pulls scroll toward this
- * section's top edge when a scroll gesture settles mid-transition. Uses a
- * self-contained ScrollTrigger with `snap` on the normal scroll position
- * (no pinning, no spacer, so MainPage's scroll-spy math is untouched) and
- * kills it on unmount / breakpoint change so route changes never leave an
- * orphaned trigger behind.
- */
-export function useSectionSnap(sectionRef: RefObject<HTMLElement | null>) {
-  const { reduced } = useMotionPrefs();
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el || reduced) return;
-
-    const mq = window.matchMedia("(min-width: 768px)");
-    let trigger: ScrollTrigger | null = null;
-
-    const sync = () => {
-      trigger?.kill();
-      trigger = null;
-      if (!mq.matches) return;
-      trigger = ScrollTrigger.create({
-        trigger: el,
-        start: "top bottom",
-        end: "top top",
-        snap: { snapTo: 1, duration: { min: 0.25, max: 0.6 }, delay: 0.15, ease: "power1.inOut" },
-      });
-    };
-
-    sync();
-    mq.addEventListener("change", sync);
-
-    return () => {
-      mq.removeEventListener("change", sync);
-      trigger?.kill();
-    };
-  }, [sectionRef, reduced]);
 }

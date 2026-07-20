@@ -1,11 +1,8 @@
 import { motion, useTransform, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import Footer from "../components/Footer";
-import { TRANSLATIONS } from "../data/translations";
 import SplitLine from "../components/SplitLine";
-import Grain from "../components/Grain";
-import { BroadsheetFrame } from "../components/BroadsheetFrame";
-import { usePlateStrike, useSectionSnap } from "../hooks/useBroadsheetMotion";
+import { usePlateStrike } from "../hooks/useBroadsheetMotion";
 import { SPRING_UI, SPRING_SCROLL, useMotionPrefs } from "../lib/motion";
 
 const GithubIcon = ({ className = "w-5 h-5 md:w-6 md:h-6" }: { className?: string }) => (
@@ -42,7 +39,6 @@ export default function Contact({ lang }: ContactProps) {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const { transition } = useMotionPrefs();
 
-  useSectionSnap(sectionRef);
   usePlateStrike(titleRef, isReady);
 
   useEffect(() => {
@@ -76,7 +72,6 @@ export default function Contact({ lang }: ContactProps) {
     return () => document.removeEventListener("click", handleOutsideClick);
   }, [activePopup]);
 
-  const t = TRANSLATIONS[lang];
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end end"] });
   const smoothProgress = useSpring(scrollYProgress, SPRING_SCROLL);
   const footerOpacity = useTransform(smoothProgress, [0.65, 0.98], [0, 0.35]);
@@ -94,19 +89,11 @@ export default function Contact({ lang }: ContactProps) {
       ref={sectionRef}
       className="w-full min-h-screen relative flex flex-col items-center justify-center selection:bg-theme-text selection:text-theme-bg py-24 md:py-32 bg-theme-bg text-theme-text overflow-hidden"
     >
-      <Grain />
-      <BroadsheetFrame folioLeft="N.03" folioRight={t.contact} runningHead={t.broadsheetRunningHead} />
 
       <div className="relative z-10 flex flex-col items-center w-full max-w-3xl px-6">
-        <div className="flex flex-col items-center border-b border-theme-text/15 pb-5 mb-14 md:mb-20 w-full">
-          <span className="font-mono text-[9px] md:text-[10px] tracking-[0.35em] uppercase opacity-50">
-            {t.broadsheetEdition}
-          </span>
-        </div>
-
         <h1
           ref={titleRef}
-          className="plate-strike font-maghfirea text-[clamp(2.6rem,9vw,140px)] text-theme-text text-center leading-[0.95] w-full overflow-visible select-none mb-16 md:mb-24"
+          className="plate-strike font-maghfirea text-[clamp(2.6rem,9vw,140px)] text-theme-text text-center leading-[0.95] w-full overflow-visible mb-16 md:mb-24"
         >
           <SplitLine text="Contact" />
         </h1>
@@ -131,7 +118,7 @@ export default function Contact({ lang }: ContactProps) {
                   }
                 }}
               >
-                <span className="font-mono text-[9px] tracking-[0.25em] opacity-30 mb-2 select-none">{social.number}</span>
+                <span className="font-mono text-[9px] tracking-[0.25em] opacity-30 mb-2">{social.number}</span>
                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-theme-text/20 flex items-center justify-center text-theme-text/90 bg-theme-text/5 transition-all duration-500 group-hover:bg-theme-text group-hover:text-theme-bg group-hover:scale-105 group-hover:border-theme-text">
                   {social.icon}
                 </div>

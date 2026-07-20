@@ -189,15 +189,9 @@
     contain-intrinsic-size: auto 500px;
   }
 
-  /* Print-inspired page chrome (BroadsheetFrame's rotated running head,
-     the plate-strike headline reveal, and Portfolio's one pre-approved
-     cream exception — see DESIGN.md's Forest Canopy Rule — inverting
-     text-selection colors to match ink-on-paper). */
-  .running-head {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-  }
-
+  /* Print-inspired page chrome (the plate-strike headline reveal, and
+     Portfolio's one pre-approved cream exception — see DESIGN.md's Forest
+     Canopy Rule — inverting text-selection colors to match ink-on-paper). */
   @media (prefers-reduced-motion: no-preference) {
     .plate-strike [data-split-unit] {
       opacity: 0;
