@@ -30,6 +30,12 @@ export interface LanguageTranslations {
   soccerDesc: string;
   ramenLabel: string;
   ramenDesc: string;
+
+  // Broadsheet chrome keys — masthead strap, side-rail marginalia, and the
+  // Portfolio contents-index kicker.
+  broadsheetEdition: string;
+  broadsheetRunningHead: string;
+  broadsheetContentsLabel: string;
 }
 
 export const TRANSLATIONS: Record<"en" | "fr", LanguageTranslations> = {
@@ -107,7 +113,11 @@ export const TRANSLATIONS: Record<"en" | "fr", LanguageTranslations> = {
     webDesignLabel: "Web Design",
     soccerDesc: "A clean, modern one-page website designed for a professional soccer club. Features a light flat theme with bold sporty typography, animated stat counters, interactive squad & fixture tabs, horizontal scroll tickers, and SVG stadium illustrations with draw-on scroll animations.",
     ramenLabel: "Gastronomy & Brand",
-    ramenDesc: "A sensory digital showcase for a premium ramen sanctuary. Fuses wabi-sabi aesthetics with smooth scroll-driven typography reveals, asymmetric bento menu layouts, micro-interactive ingredient drawers, and a warm terracotta and charcoal canvas."
+    ramenDesc: "A sensory digital showcase for a premium ramen sanctuary. Fuses wabi-sabi aesthetics with smooth scroll-driven typography reveals, asymmetric bento menu layouts, micro-interactive ingredient drawers, and a warm terracotta and charcoal canvas.",
+
+    broadsheetEdition: "Forest Sanctuary — Printed Edition",
+    broadsheetRunningHead: "Cherif Bouabdallah · Software & Design",
+    broadsheetContentsLabel: "Contents"
   },
   fr: {
     monologue: [
@@ -189,6 +199,10 @@ export const TRANSLATIONS: Record<"en" | "fr", LanguageTranslations> = {
     webDesignLabel: "Design Web",
     soccerDesc: "Un site web épuré et moderne d'une seule page conçu pour un club de football professionnel. Propose un thème clair et minimaliste avec une typographie sportive audacieuse, des compteurs de statistiques animés, des onglets d'équipe et de rencontres interactifs, des bandeaux de défilement horizontal et des illustrations SVG de stade s'animant au défilement.",
     ramenLabel: "Gastronomie & Image",
-    ramenDesc: "Une vitrine numérique sensorielle pour un temple du ramen haut de gamme. Allie l'esthétique wabi-sabi à des révélations typographiques fluides au défilement, des grilles de menu bento asymétriques, des tiroirs d'ingrédients micro-interactifs et un canevas terre cuite et charbon."
+    ramenDesc: "Une vitrine numérique sensorielle pour un temple du ramen haut de gamme. Allie l'esthétique wabi-sabi à des révélations typographiques fluides au défilement, des grilles de menu bento asymétriques, des tiroirs d'ingrédients micro-interactifs et un canevas terre cuite et charbon.",
+
+    broadsheetEdition: "Forest Sanctuary — Édition Imprimée",
+    broadsheetRunningHead: "Cherif Bouabdallah · Logiciel & Design",
+    broadsheetContentsLabel: "Sommaire"
   }
 };

@@ -11,6 +11,7 @@ import MainPage from "./pages/MainPage";
 import LiquidNavbar from "./components/LiquidNavbar";
 import Lenis from "lenis";
 import { EASE_ENTER, ARRIVAL_SETTLE_MS, ARRIVAL_CONTRACT_MS, useMotionPrefs } from "./lib/motion";
+import { bridgeLenisToScrollTrigger } from "./lib/gsapSetup";
 
 // Static routes config to prevent recreation on every render
 const SCROLLABLE_ROUTES = new Set(["/", "/vortex", "/portfolio", "/contact", "/soccer-team", "/noodle-place"]);
@@ -37,6 +38,10 @@ type Language = "en" | "fr";
 type PreloaderPhase = "loading" | "settling" | "contracting";
 
 export default function App() {
+  return <AppInner />;
+}
+
+function AppInner() {
   const [progress, setProgress] = useState(0);
   const [isSiteReady, setIsSiteReady] = useState(false);
   const [phase, setPhase] = useState<PreloaderPhase>("loading");
@@ -144,17 +149,21 @@ export default function App() {
     };
   }, []);
 
-  // Initialize Lenis smooth scroll on mount / when site is ready
+  // Initialize Lenis smooth scroll on mount / when site is ready. Snappier,
+  // more decisive feel: shorter duration, a confident quint-out curve,
+  // punchier wheel response.
   useEffect(() => {
     if (!isSiteReady) return;
 
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // easeOutExpo
+      duration: 1.0,
+      easing: (t) => 1 - Math.pow(1 - t, 5), // easeOutQuint
+      wheelMultiplier: 1.15,
       smoothWheel: true,
     });
 
     (window as any).__lenis = lenis;
+    bridgeLenisToScrollTrigger();
 
     function raf(time: number) {
       lenis.raf(time);

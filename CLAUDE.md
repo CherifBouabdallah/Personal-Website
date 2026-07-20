@@ -1,42 +1,52 @@
-# CLAUDE.md
+# CLAUDE.md — Project Memory & Guidelines
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project
+## 1. Project Overview & Stack
 
-Cherif Bouabdallah's personal website: a premium, editorial-styled showcase and interactive engineering sandbox (React 19 + TypeScript + Vite + Tailwind v4 + Framer Motion). See `PRODUCT.md` for brand/purpose and `DESIGN.md` for the full design system ("The Forest Sanctuary" — forest green `#223D27` background, warm alabaster `#F6F0DF` text, serif display font *Maghfirea* for statements only, monospace for labels). Read `DESIGN.md` before touching visual styling — it defines hard rules (e.g. background must stay forest green; no neon/glassmorphism/sketchy SVGs; max 24px card rounding).
+Cherif Bouabdallah's personal website: a premium, editorial-styled showcase and interactive engineering sandbox. See `PRODUCT.md` for brand/purpose and `DESIGN.md` for the full design system.
 
-## Commands
+- **Core Stack:** React 19 + TypeScript 5.8 + Vite 8, React Router DOM v7 (SPA, no SSR). Lenis for smooth scrolling.
+- **Styling:** Tailwind CSS v4 (CSS-first config — no `tailwind.config.js`; theme tokens live in `src/index.css`), vanilla CSS custom properties, `lucide-react` icons. Animation via Framer Motion (primary, incl. `layoutId` shared-element morphs) + GSAP/ScrollTrigger (scroll-scrubbed effects driving the print-chrome plate-strike reveal and section snap — see `src/hooks/useBroadsheetMotion.ts`). `LiquidNavbar` itself is pure Framer Motion; there is no GSAP Draggable anywhere in the codebase.
+- **Backend / Automations:** None. Fully static site — no API server, no n8n integrations, no custom systemd services (deploy script only reloads nginx).
+- **Environment:** Dual-boot development (Windows/Debian Linux), running behind Tailscale networks where relevant. Dev server binds `0.0.0.0:3000` so it's reachable across the tailnet.
 
-- `npm run dev` — start Vite dev server on port 3000 (`--host=0.0.0.0`)
-- `npm run build` — production build (`tsc` is not run as part of build; type errors don't fail it)
-- `npm run lint` — type-check only, via `tsc --noEmit` (there is no separate lint/test runner in this repo)
-- `npm run preview` — preview the production build locally
-- `npm run clean` — remove `dist/`
+## 2. Frequent Development Commands
 
-There is no automated test suite (no Jest/Vitest config present). Treat `npm run lint` + manual verification in the browser as the correctness bar.
+- **Dev Server:** `npm run dev` — Vite on port 3000, `--host=0.0.0.0`
+- **Build Command:** `npm run build` — production build to `dist/` (`tsc` is NOT part of the build; type errors don't fail it)
+- **Lint/Format:** `npm run lint` — type-check only (`tsc --noEmit`). There is no ESLint/Prettier config and no test suite; `npm run lint` + manual browser verification is the correctness bar.
+- **Scripts:**
+  - `npm run preview` — serve the production build locally
+  - `npm run clean` — remove `dist/`
+  - `deploy.sh` — production deploy on the target host (see §4)
 
-## Architecture
+## 3. Code Style & Architecture Guardrails
 
-**Routing (`src/App.tsx`)**: A single top-level `App` component owns global state (language, active nav section, preloader progress, Lenis smooth-scroll instance) and passes it down as props — there is no context/store. Routes are split into two groups:
-- `/`, `/portfolio`, `/contact` all render the same `MainPage` (a single long scrollable page with `Home` → `Portfolio` → `Contact` sections); the route only controls which section is scrolled into view on mount (see `MainPage.tsx`). Scroll position is also synced back into the URL via a scroll-spy (`history.replaceState`, no navigation).
-- Sandbox/standalone routes (`/vortex`, `/soccer-team`, `/noodle-place`, `/secret101`, 404) are separate full-page experiences, lazy-loaded with a custom `lazyWithPreload` helper and idle-time-preloaded after initial paint. These routes hide the navbar (`NAVBAR_HIDDEN_ROUTES`) and disable page scroll (`SCROLLABLE_ROUTES`) as needed.
-- `/secret101` is special-cased to render completely outside the normal navbar/layout tree.
+- **Naming Conventions:** PascalCase for component/page files (`LiquidNavbar.tsx`), camelCase `useX` for hooks (`useRouteFonts.ts`), camelCase for functions/variables, lowercase for data/lib modules (`translations.ts`, `motion.ts`).
+- **Design System Rules:** Read `DESIGN.md` before touching visual styling — "The Forest Sanctuary": forest green `#223D27` background (must stay), warm alabaster `#F6F0DF` text, serif display font *Maghfirea* for statements only, monospace for labels. Hard rules: no neon, no glassmorphism, no sketchy SVGs, max 24px card rounding. Prefer stark contrast and clean layouts. Respect `prefers-reduced-motion` when adding new motion (per `PRODUCT.md`).
+- **TypeScript/JavaScript:** Strict modern ESNext/ES2020 target, explicit typing (e.g. `LanguageTranslations` interface types the i18n dictionary). Path alias `@/*` resolves to the **repo root**, not `src/`. Prefer Tailwind theme tokens (`bg-theme-bg`, `text-theme-text`, defined in `src/index.css`) over hardcoded hex values in components.
+- **Directory Mapping:**
+  - `src/App.tsx` — top-level component owning global state (language, nav section, preloader, Lenis instance) passed via props; no context/store
+  - `src/pages/` — route pages: `MainPage.tsx` (single scrollable page for `/`, `/portfolio`, `/contact` with scroll-spy URL sync) plus lazy-loaded standalone sandboxes (`Vortex`, `SoccerTeam`, `NoodlePlace`, `Secret101`, `NotFound`)
+  - `src/components/` — shared UI (`LiquidNavbar`, `HolographicBall`, `MaskRiseTitle`, `Footer`, `LanguageSwitcher`, `BroadsheetFrame` (print-chrome — registration marks, folios, rotated running head), `Grain` (paper texture overlay), `SplitLine` (GSAP-animatable word-split wrapper))
+  - `src/hooks/` — `useRouteFonts.ts` lazily injects per-route webfonts (module-level `Set`, once per session); `useBroadsheetMotion.ts` exports `usePlateStrike` (GSAP letterpress headline reveal, drives `SplitLine`'s `[data-split-unit]`s) and `useSectionSnap` (desktop scroll-snap nudge between sections)
+  - `src/data/translations.ts` — manual `en`/`fr` dictionary; extend the interface and both language entries to add copy (no i18n library)
+  - `src/lib/motion.ts` — shared motion helpers (easing/spring constants, `useMotionPrefs()` — every animated surface should use this instead of calling `useReducedMotion()` directly)
+  - `src/lib/gsapSetup.ts` — registers the ScrollTrigger plugin and bridges it to the app's Lenis instance (`bridgeLenisToScrollTrigger()`, called once from `App.tsx`)
+  - `src/index.css` — Tailwind `@theme` block + `:root` design tokens, plus the print-chrome rules (`.running-head`, `.plate-strike`, Portfolio's inverted-selection exception)
+  - `public/` — static assets: `fonts/Maghfirea.ttf`, webp images, `robots.txt`, `sitemap.xml`
+  - `docs/superpowers/` — plans and design specs; `motion-audits/` — saved page snapshots for motion review
+- **Architecture notes worth knowing before editing:**
+  - **Preloader:** `App` blocks rendering behind a manual progress animation gated on `document.fonts.ready` + a hardcoded image preload list (`/OG2.webp`), independent of React Suspense. Lenis initializes only after it resolves.
+  - **Routing quirks:** sandbox routes are lazy-loaded via a custom `lazyWithPreload` helper and idle-preloaded after first paint; `NAVBAR_HIDDEN_ROUTES` / `SCROLLABLE_ROUTES` control navbar visibility and page scroll; `/secret101` renders entirely outside the navbar/layout tree.
+  - **Build:** manual vendor chunk splitting in `vite.config.ts` (`vendor-react`, `vendor-motion`, `vendor-icons`) for long-lived caching; CSS code-splitting on. `DISABLE_HMR=true` disables HMR *and* file watching (used by agent/AI Studio environments to prevent flicker) — don't remove.
 
-**Preloader**: `App` blocks rendering behind a manual progress animation gated on `document.fonts.ready` and a hardcoded image preload list (`/OG2.webp`), independent of React Suspense. Only after both resolve does the real UI mount and Lenis (smooth scroll) initialize.
+## 4. Deployment & Infrastructure Notes
 
-**Per-route fonts (`src/hooks/useRouteFonts.ts`)**: Global fonts load in `index.html`; page-specific webfonts (e.g. for Vortex, Secret101) are injected lazily via this hook using a module-level `Set` so each stylesheet loads at most once per session, keeping the global font payload small.
+Two independent deployment paths exist — check which is actually current before changing routing/cache behavior:
 
-**i18n (`src/data/translations.ts`)**: Manual `en`/`fr` dictionary typed by `LanguageTranslations`, selected by a single `lang` state lifted in `App` and persisted to `localStorage`. No i18n library — add new copy by extending the interface and both language entries.
+1. **Self-hosted Nginx (Debian):** `deploy.sh`, run manually on the target host. It is **destructive**: `git fetch` + `git reset --hard origin/main` + `git clean -fd` (local changes on the host are wiped), then `npm ci`, `npm run build`, copies `nginx-default.conf` to `/etc/nginx/sites-available/default` (SPA fallback routing), rsyncs `dist/` → `/var/www/html` with `--delete` (zero-downtime sync), and `systemctl reload nginx`.
+2. **Vercel:** `vercel.json` handles SPA rewrites and cache headers (immutable 1-year cache for `/assets/`, 1-week for fonts/images).
 
-**Styling**: Tailwind v4 (CSS-first config, no `tailwind.config.js`) — theme tokens are defined in `src/index.css` via `:root` custom properties (`--theme-bg`, `--theme-text`) mapped into Tailwind's `@theme` block (`--color-theme-bg`, `--color-theme-text`), then used as `bg-theme-bg` / `text-theme-text` utility classes. Prefer extending tokens in `src/index.css` over hardcoding hex values in components.
-
-**Motion**: Framer Motion is the primary animation library (page transitions, navbar, holographic ball). GSAP + Draggable powers physics-based drag kinematics in `LiquidNavbar`. Respect `prefers-reduced-motion` per `PRODUCT.md`'s accessibility requirements when adding new motion.
-
-**Build (`vite.config.ts`)**: Manual vendor chunk splitting (`vendor-react`, `vendor-motion`, `vendor-icons`) to keep long-lived libraries cached across deploys independently of app code; CSS code-splitting is on so per-route styles aren't all loaded up front. `DISABLE_HMR=true` disables file watching entirely — used by AI Studio/agent environments to prevent flicker during automated edits; don't remove this without checking why it was added.
-
-**Path alias**: `@/*` resolves to the repo root (see `tsconfig.json` / `vite.config.ts`), not `src/`.
-
-## Deployment
-
-`deploy.sh` is a manual, destructive deploy script run on the target host: it hard-resets the working tree to `origin/main` (`git reset --hard` + `git clean -fd`), rebuilds, and rsyncs `dist/` over Nginx's web root using `nginx-default.conf` for SPA fallback routing. This is separate from the Vercel deployment implied by `vercel.json` (which handles SPA rewrites and static-asset cache headers for a Vercel-hosted deployment). Don't assume one deployment path implies the other is unused — check which is actually current before changing routing/cache behavior.
+Don't assume one path implies the other is unused.

@@ -1,14 +1,11 @@
-import { motion, useMotionValue, useSpring, useTransform, Variants, AnimatePresence, useScroll } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
-import Footer from "../components/Footer";
-import {
-  Github,
-  ArrowRight
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { TRANSLATIONS } from "../data/translations";
-import { LanguageSwitcher } from "../components/LanguageSwitcher";
-import { MaskRiseTitle } from "../components/MaskRiseTitle";
-import { SPRING_MORPH, SPRING_SCROLL, EASE_ENTER, DURATION, useMotionPrefs } from "../lib/motion";
+import SplitLine from "../components/SplitLine";
+import Grain from "../components/Grain";
+import { BroadsheetFrame } from "../components/BroadsheetFrame";
+import { usePlateStrike, useSectionSnap } from "../hooks/useBroadsheetMotion";
 
 // Lazy load portfolio projects to decouple their heavy chunks from the Portfolio page initial load
 const Vortex = React.lazy(() => import("./Vortex"));
@@ -18,7 +15,7 @@ const NoodlePlace = React.lazy(() => import("./NoodlePlace"));
 // Type declarations
 export type ModalKey = "vortex" | "soccer" | "noodle";
 
-interface FeaturedProject {
+export interface FeaturedProject {
   id: ModalKey;
   number: string;
   title: string;
@@ -31,7 +28,7 @@ interface FeaturedProject {
 }
 
 // Static project database
-const FEATURED_PROJECTS: FeaturedProject[] = [
+export const FEATURED_PROJECTS: FeaturedProject[] = [
   {
     id: "vortex",
     number: "01",
@@ -66,7 +63,7 @@ const FEATURED_PROJECTS: FeaturedProject[] = [
 ];
 
 // Shared Preview: Scaled page thumbnail with unified hover (Memoized)
-const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hoverLabel = "Open Project" }: {
+export const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hoverLabel = "Open Project" }: {
   onClick: () => void;
   layoutId: string;
   bgColor: string;
@@ -76,7 +73,6 @@ const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hover
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.35);
   const [isHovered, setIsHovered] = useState(false);
-  const { transition } = useMotionPrefs();
 
   useEffect(() => {
     const updateScale = () => {
@@ -110,7 +106,7 @@ const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hover
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       layoutId={layoutId}
-      transition={transition(SPRING_MORPH)}
+      transition={{ type: "spring", stiffness: 180, damping: 25 }}
       whileHover={{ scale: 1.015 }}
       className="w-full aspect-[16/10] border border-theme-text/10 cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-text/40 focus-visible:ring-offset-2 focus-visible:ring-offset-theme-bg"
       style={{ background: bgColor, borderRadius: 20, overflow: "hidden", position: "relative", clipPath: "inset(0 round 20px)" }}
@@ -135,112 +131,6 @@ const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hover
   );
 });
 
-// Featured Project Card Component (Memoized)
-interface FeaturedCardProps {
-  project: FeaturedProject;
-  t: any;
-  onOpen: (key: ModalKey) => void;
-  getGlassClass: () => string;
-}
-
-const FeaturedCard = React.memo(({ project, t, onOpen, getGlassClass }: FeaturedCardProps) => {
-  const { reduced } = useMotionPrefs();
-  const handleOpen = useCallback(() => {
-    onOpen(project.id);
-  }, [project.id, onOpen]);
-
-  const cardRevealVariants: Variants = reduced
-    ? {
-        hidden: { opacity: 1 },
-        visible: { opacity: 1, transition: { duration: 0 } },
-      }
-    : {
-        hidden: { opacity: 0 },
-        visible: (idx: number) => ({
-          opacity: 1,
-          transition: { duration: DURATION.medium, ease: EASE_ENTER, delay: idx * 0.08 },
-        }),
-      };
-
-  return (
-    <motion.div
-      custom={parseInt(project.number, 10)}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-40px" }}
-      variants={cardRevealVariants}
-      className="col-span-12 defer-render"
-    >
-      <div className={`glass-square ${getGlassClass()} p-6 md:p-10 flex flex-col lg:flex-row ${project.reverse ? "lg:flex-row-reverse" : ""} gap-8 lg:gap-12 items-center text-left overflow-hidden relative group`}>
-        {/* Text Description Column */}
-        <div className="flex-1 flex flex-col justify-center min-h-[280px]">
-          <div>
-            {/* Metadata Header */}
-            <div className="flex justify-between items-center mb-6 border-b border-theme-text/10 pb-4">
-              <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-45">
-                {project.number} / {t.featuredProjectLabel}
-              </span>
-            </div>
-
-            <h2 className="font-maghfirea text-[clamp(1.8rem,4vw,3rem)] text-theme-text tracking-wide mb-4 leading-tight">
-              {project.title}
-            </h2>
-
-            <p className="font-mono text-[10px] md:text-[12px] leading-relaxed text-theme-text/70 mb-6">
-              {t[project.descriptionKey]}
-            </p>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={handleOpen}
-              className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text text-theme-bg font-mono text-[10px] font-bold tracking-widest hover:bg-theme-text/90 active:scale-[0.98] transition-all duration-200 cursor-pointer"
-            >
-              {t.openProjectLabel}
-              <ArrowRight size={12} strokeWidth={2.5} />
-            </button>
-
-            {project.showGithub && (
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-theme-text/5 hover:bg-theme-text/10 text-theme-text border border-theme-text/15 font-mono text-[10px] font-bold tracking-widest active:scale-[0.98] transition-all duration-200"
-              >
-                <Github size={12} />
-                {t.sourceCodeLabel}
-              </a>
-            )}
-          </div>
-        </div>
-
-        {/* Preview Column — vertically centered */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-[520px]">
-            <ProjectPreview
-              onClick={handleOpen}
-              layoutId={project.layoutId}
-              bgColor={project.bgColor}
-              hoverLabel={t.openProjectHover}
-            >
-              <Suspense fallback={null}>
-                {project.id === "vortex" ? (
-                  <Vortex isPreview={true} />
-                ) : project.id === "soccer" ? (
-                  <SoccerTeam isPreview={true} isCardPreview={true} />
-                ) : (
-                  <NoodlePlace isPreview={true} isCardPreview={true} />
-                )}
-              </Suspense>
-            </ProjectPreview>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-});
-
 // Preview Modal Overlay (Memoized)
 interface PreviewModalProps {
   onClose: () => void;
@@ -249,27 +139,9 @@ interface PreviewModalProps {
   children: React.ReactNode;
 }
 
-const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: PreviewModalProps) => {
+export const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: PreviewModalProps) => {
   const [isLayoutComplete, setIsLayoutComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { reduced, transition } = useMotionPrefs();
-  const [isClosing, setIsClosing] = useState(false);
-
-  // Reduced motion skips the staged close (content-fade -> morph -> backdrop-clear)
-  // entirely and closes immediately.
-  const requestClose = () => {
-    if (reduced) {
-      onClose();
-      return;
-    }
-    setIsClosing(true);
-  };
-
-  useEffect(() => {
-    if (!isClosing) return;
-    const timer = setTimeout(onClose, 180);
-    return () => clearTimeout(timer);
-  }, [isClosing, onClose]);
 
   useEffect(() => {
     // Fallback timer: in case onLayoutAnimationComplete doesn't fire for some reason
@@ -292,22 +164,13 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
   const isLightBg = bgColor === "#FAFAF8";
   const textColorClass = isLightBg ? "text-slate-800" : "text-stone-200";
 
-  const modalStage = isClosing
-    ? "closing"
-    : !isLayoutComplete
-    ? "blank"
-    : isLoading
-    ? "loading"
-    : "content";
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={transition({ duration: 0.6, ease: EASE_ENTER })}
       className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 overflow-hidden cursor-pointer"
-      onClick={requestClose}
+      onClick={onClose}
     >
       <div
         className="w-full h-full max-w-[1280px] max-h-[85vh] relative"
@@ -315,7 +178,7 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
       >
         <motion.div
           layoutId={layoutId}
-          transition={transition(SPRING_MORPH)}
+          transition={{ type: "spring", stiffness: 180, damping: 25 }}
           onLayoutAnimationComplete={() => {
             setIsLayoutComplete(true);
           }}
@@ -324,17 +187,9 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
           data-lenis-prevent
         >
           <AnimatePresence mode="wait">
-            {modalStage === "closing" ? (
-              <motion.div
-                key="closing"
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 0 }}
-                transition={{ duration: 0.18 }}
-                className="w-full h-full"
-              />
-            ) : modalStage === "blank" ? (
+            {!isLayoutComplete ? (
               <div key="blank" className="w-full h-full" />
-            ) : modalStage === "loading" ? (
+            ) : isLoading ? (
               <motion.div
                 key="loader"
                 initial={{ opacity: 0 }}
@@ -368,7 +223,7 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
 
         {/* Floating Close Button */}
         <button
-          onClick={requestClose}
+          onClick={onClose}
           className="absolute top-6 right-6 z-[120] w-10 h-10 rounded-full bg-black/60 border border-white/10 hover:bg-white/10 hover:border-white/30 text-white flex items-center justify-center font-mono text-[10px] tracking-wider cursor-pointer transition-all duration-300 shadow-md"
           title="Close Preview (Esc)"
         >
@@ -379,56 +234,98 @@ const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: Previ
   );
 });
 
+const BG_COLOR: Record<ModalKey, string> = {
+  vortex: "#141212",
+  soccer: "#FAFAF8",
+  noodle: "#121212",
+};
 
-// Main Portfolio Component
+// Contents-index metadata not carried by FeaturedProject — reuses existing
+// translated category labels rather than adding new ones.
+type CategoryKey = "sandboxLabel" | "webDesignLabel" | "ramenLabel";
+const PLATE_META: Record<ModalKey, { year: string; categoryKey: CategoryKey }> = {
+  vortex: { year: "2024", categoryKey: "sandboxLabel" },
+  soccer: { year: "2023", categoryKey: "webDesignLabel" },
+  noodle: { year: "2024", categoryKey: "ramenLabel" },
+};
+
+function ProjectBody({ id, isCardPreview = false, startUnlocked = false }: { id: ModalKey; isCardPreview?: boolean; startUnlocked?: boolean }) {
+  if (id === "vortex") return <Vortex isPreview startUnlocked={startUnlocked} />;
+  if (id === "soccer") return <SoccerTeam isPreview isCardPreview={isCardPreview} />;
+  return <NoodlePlace isPreview isCardPreview={isCardPreview} />;
+}
+
+interface IndexRowProps {
+  project: FeaturedProject;
+  t: (typeof TRANSLATIONS)["en"];
+  isHovered: boolean;
+  onHover: (id: ModalKey | null) => void;
+  onOpen: (id: ModalKey) => void;
+}
+
+const IndexRow = React.memo(({ project, t, isHovered, onHover, onOpen }: IndexRowProps) => {
+  const meta = PLATE_META[project.id];
+  const handleOpen = useCallback(() => onOpen(project.id), [project.id, onOpen]);
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label={`${t.openProjectLabel}: ${project.title}`}
+      onMouseEnter={() => onHover(project.id)}
+      onMouseLeave={() => onHover(null)}
+      onFocus={() => onHover(project.id)}
+      onBlur={() => onHover(null)}
+      onClick={handleOpen}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleOpen();
+        }
+      }}
+      className={`group grid grid-cols-[2.5rem_1fr] md:grid-cols-[3.5rem_1fr_auto] items-baseline gap-3 md:gap-8 py-6 md:py-7 border-b border-theme-bg/15 cursor-pointer transition-colors duration-300 focus-visible:outline-none ${isHovered ? "bg-theme-bg/[0.04]" : ""}`}
+    >
+      <span className="font-mono text-[11px] tracking-[0.2em] opacity-50">{project.number}</span>
+      <h3 className="font-maghfirea text-[clamp(1.5rem,4.2vw,3rem)] leading-none tracking-tight transition-transform duration-500 ease-out group-hover:translate-x-2">
+        {project.title}
+      </h3>
+      <span className="col-span-2 md:col-span-1 font-mono text-[9px] tracking-[0.25em] uppercase opacity-45 md:text-right whitespace-nowrap">
+        {meta.year} · {t[meta.categoryKey]}
+      </span>
+    </div>
+  );
+});
+
 interface PortfolioProps {
   lang: "en" | "fr";
   setLang: (l: "en" | "fr") => void;
 }
 
-export default function Portfolio({ lang, setLang }: PortfolioProps) {
+export default function Portfolio({ lang }: PortfolioProps) {
   const [isReady, setIsReady] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalKey | null>(null);
-
-  const getGlassClass = useCallback(() => "glass-deep-blur", []);
+  const [hoveredId, setHoveredId] = useState<ModalKey | null>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
 
   const t = TRANSLATIONS[lang];
 
-  const portfolioRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: portfolioRef,
-    offset: ["start start", "end end"]
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, SPRING_SCROLL);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  useSectionSnap(sectionRef);
+  usePlateStrike(titleRef, isReady);
 
   useEffect(() => {
     document.fonts.ready.then(() => setIsReady(true));
   }, []);
 
-  // Unified ESC key listener to close preview modals
   useEffect(() => {
     if (!activeModal) return;
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setActiveModal(null);
-      }
+      if (e.key === "Escape") setActiveModal(null);
     };
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
   }, [activeModal]);
 
-  // Lock background scroll when modal is active
   useEffect(() => {
     const lenis = (window as any).__lenis;
     if (activeModal) {
@@ -444,131 +341,105 @@ export default function Portfolio({ lang, setLang }: PortfolioProps) {
     };
   }, [activeModal]);
 
-  const headerText = t.portfolioTitle;
+  const handleOpen = useCallback((key: ModalKey) => setActiveModal(key), []);
+  const handleClose = useCallback(() => setActiveModal(null), []);
 
-  const titleScale = isMobile ? 0.8 : 0.55;
-  const titleOpacity = 1;
-
-  const inviteOpacity = useTransform(smoothProgress, [0, 0.1], [1, 0]);
-  const inviteY = useTransform(smoothProgress, [0, 0.1], ["0px", "15px"]);
-
-  // Stable callbacks for modal operations to prevent child re-renders
-  const handleOpen = useCallback((key: ModalKey) => {
-    setActiveModal(key);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setActiveModal(null);
-  }, []);
+  const hoveredProject = hoveredId ? FEATURED_PROJECTS.find((p) => p.id === hoveredId) ?? null : null;
+  const activeProject = activeModal ? FEATURED_PROJECTS.find((p) => p.id === activeModal)! : null;
 
   return (
-    <div id="portfolio" ref={portfolioRef} className="w-full bg-theme-bg text-theme-text border-t-80 border-theme-text relative selection:bg-theme-text selection:text-theme-bg">
+    <div
+      id="portfolio"
+      ref={sectionRef}
+      className="w-full relative bg-theme-text text-theme-bg selection:bg-theme-bg selection:text-theme-text overflow-hidden"
+    >
+      <Grain />
+      <BroadsheetFrame folioLeft="N.02" folioRight={t.portfolio} runningHead={t.broadsheetRunningHead} />
 
-      {/* Split Layout */}
       <div className="flex flex-col md:flex-row w-full">
-
-        {/* Left Column: Sticky Title */}
-        <div className="w-full md:w-[38%] md:sticky md:top-0 md:h-screen flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-theme-text/10 py-16 md:py-0 relative">
-
-          <motion.div
-            style={{ scale: titleScale, opacity: titleOpacity }}
-            className="text-center px-6 cursor-default select-none"
+        {/* Left: masthead */}
+        <div className="w-full md:w-[36%] md:sticky md:top-0 md:h-screen flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-theme-bg/15 py-16 md:py-0 px-6 relative z-10">
+          <h2
+            ref={titleRef}
+            className="plate-strike font-maghfirea text-[clamp(2.4rem,7vw,5.5rem)] leading-[0.95] text-center select-none"
           >
-            <MaskRiseTitle
-              text={headerText}
-              isReady={isReady}
-              className="font-maghfirea text-[clamp(2.3rem,12vw,200px)] text-theme-text text-center leading-[0.95] px-4 w-full"
-            />
-          </motion.div>
-
-          <motion.p
-            key={`intro-${lang}`}
-            initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ duration: 1.4, delay: 0.3, ease: EASE_ENTER }}
-            className="font-mono text-[9px] md:text-[11px] tracking-[0.25em] uppercase text-theme-text/60 max-w-sm leading-relaxed mt-6 text-center px-6"
-          >
+            <SplitLine text={t.portfolioTitle} />
+          </h2>
+          <p className="font-mono text-[9px] md:text-[11px] tracking-[0.25em] uppercase opacity-60 max-w-sm leading-relaxed mt-6 text-center px-6">
             {t.portfolioIntro}
-          </motion.p>
-
-          <motion.div
-            style={{ opacity: inviteOpacity, y: inviteY }}
-            className="hidden md:flex absolute bottom-12 left-1/2 -translate-x-1/2 flex-col items-center gap-2.5 pointer-events-auto"
-          >
-            <div className="flex flex-col items-center justify-center gap-2">
-              <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-theme-text/60">
-                {t.scrollLabel}
-              </span>
-              <div className="w-[1.5px] h-[22px] bg-theme-text/20 relative overflow-hidden">
-                <motion.div
-                  animate={{ y: ["-100%", "100%"] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0 bg-theme-text/80 h-full w-full"
-                  style={{ originY: 0 }}
-                />
-              </div>
-            </div>
-          </motion.div>
+          </p>
+          <span className="font-mono text-[9px] tracking-[0.35em] uppercase opacity-40 mt-10 border-t border-theme-bg/15 pt-4">
+            {t.broadsheetContentsLabel}
+          </span>
         </div>
 
-        {/* Right Column: Scrollable Projects */}
-        <div className="w-full md:w-[62%]">
+        {/* Right: numbered contents index + margin preview */}
+        <div className="w-full md:w-[64%] px-6 md:px-12 lg:px-16 py-16 md:py-24 relative z-10">
           {isReady && (
-            <div className="flex flex-col">
-              {FEATURED_PROJECTS.map((project) => (
-                <div
-                  key={project.id}
-                  className="min-h-[80vh] md:min-h-screen flex items-center justify-center p-6 md:p-10 lg:p-16"
-                >
-                  <FeaturedCard
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-10 md:gap-14 items-start">
+              <div className="flex flex-col border-t border-theme-bg/15">
+                {FEATURED_PROJECTS.map((project) => (
+                  <IndexRow
+                    key={project.id}
                     project={project}
                     t={t}
+                    isHovered={hoveredId === project.id}
+                    onHover={setHoveredId}
                     onOpen={handleOpen}
-                    getGlassClass={getGlassClass}
                   />
-                </div>
-              ))}
+                ))}
+              </div>
+
+              <div className="hidden md:block sticky top-32">
+                <AnimatePresence mode="wait">
+                  {hoveredProject ? (
+                    <motion.div
+                      key={hoveredProject.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                    >
+                      <ProjectPreview
+                        onClick={() => handleOpen(hoveredProject.id)}
+                        layoutId={hoveredProject.layoutId}
+                        bgColor={hoveredProject.bgColor}
+                        hoverLabel={t.openProjectHover}
+                      >
+                        <Suspense fallback={null}>
+                          <ProjectBody id={hoveredProject.id} isCardPreview={hoveredProject.id !== "vortex"} />
+                        </Suspense>
+                      </ProjectPreview>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="empty"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="w-full aspect-[16/10] border border-theme-bg/15 flex items-center justify-center"
+                    >
+                      <span className="font-mono text-[9px] tracking-[0.3em] uppercase opacity-30">
+                        {t.broadsheetContentsLabel}
+                      </span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           )}
         </div>
-
       </div>
 
-      {/* Shared Overlay Modal for Project Previews */}
       <AnimatePresence>
-        {activeModal && (
-          <PreviewModal
-            onClose={handleClose}
-            layoutId={
-              activeModal === "vortex"
-                ? "vortex-sandbox-card"
-                : activeModal === "soccer"
-                ? "soccer-team-card"
-                : activeModal === "noodle"
-                ? "noodle-place-card"
-                : "sf-animation-card"
-            }
-            bgColor={
-              activeModal === "vortex"
-                ? "#141212"
-                : activeModal === "soccer"
-                ? "#FAFAF8"
-                : "#121212"
-            }
-          >
+        {activeModal && activeProject && (
+          <PreviewModal onClose={handleClose} layoutId={activeProject.layoutId} bgColor={BG_COLOR[activeModal]}>
             <Suspense fallback={<div className="w-full h-full flex items-center justify-center font-mono text-[9px] tracking-[0.2em] text-theme-text/30">loading preview...</div>}>
-              {activeModal === "vortex" ? (
-                <Vortex isPreview={true} startUnlocked={true} />
-              ) : activeModal === "soccer" ? (
-                <SoccerTeam isPreview={true} />
-              ) : (
-                <NoodlePlace isPreview={true} />
-              )}
+              <ProjectBody id={activeModal} startUnlocked />
             </Suspense>
           </PreviewModal>
         )}
       </AnimatePresence>
-
     </div>
   );
 }
