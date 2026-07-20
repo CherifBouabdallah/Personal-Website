@@ -3,7 +3,6 @@ import { motion, Variants } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { TRANSLATIONS } from "../data/translations";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
-import { EASE_ENTER_CHAR, useMotionPrefs } from "../lib/motion";
 
 // SVG Logos for Core Stack
 const JavaLogo = memo(() => (
@@ -144,7 +143,6 @@ interface HomeProps {
 
 export default function Home({ lang, setLang }: HomeProps) {
   const navigate = useNavigate();
-  const { reduced, transition } = useMotionPrefs();
   const [photoshopClicks, setPhotoshopClicks] = useState(0);
   const [isReady, setIsReady] = useState(false);
   const [isInitialMount, setIsInitialMount] = useState(true);
@@ -238,15 +236,13 @@ export default function Home({ lang, setLang }: HomeProps) {
                         >
                           <motion.span
                             className="inline-block"
-                            initial={reduced ? false : { opacity: 0, y: 35, filter: "blur(10px)" }}
-                            animate={
-                              reduced
-                                ? { opacity: 1 }
-                                : isReady
-                                ? { opacity: 1, y: 0, filter: "blur(0px)" }
-                                : { opacity: 0, y: 50, filter: "blur(10px)" }
-                            }
-                            transition={transition({ duration: 1.0, ease: EASE_ENTER_CHAR, delay: globalIndex * 0.05 })}
+                            initial={{ opacity: 0, y: 35, filter: "blur(10px)" }}
+                            animate={isReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 50, filter: "blur(10px)" }}
+                            transition={{
+                              duration: 1.0,
+                              ease: [0.21, 1, 0.36, 1],
+                              delay: globalIndex * 0.05,
+                            }}
                           >
                             {char}
                           </motion.span>
@@ -426,15 +422,13 @@ export default function Home({ lang, setLang }: HomeProps) {
                         >
                           <motion.span
                             className="inline-block"
-                            initial={reduced ? false : { opacity: 0, y: 50, filter: "blur(10px)" }}
-                            animate={
-                              reduced
-                                ? { opacity: 1 }
-                                : isReady
-                                ? { opacity: 1, y: 0, filter: "blur(0px)" }
-                                : { opacity: 0, y: 50, filter: "blur(10px)" }
-                            }
-                            transition={transition({ duration: 1.0, ease: EASE_ENTER_CHAR, delay: globalIndex * 0.05 })}
+                            initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+                            animate={isReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 50, filter: "blur(10px)" }}
+                            transition={{
+                              duration: 1.0,
+                              ease: [0.21, 1, 0.36, 1],
+                              delay: globalIndex * 0.05,
+                            }}
                           >
                             {char}
                           </motion.span>

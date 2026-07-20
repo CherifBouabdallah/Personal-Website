@@ -1,0 +1,67 @@
+/* Direction A — Nocturne. Scoped under [data-craft="a"] so it never bleeds
+   into the other directions or the shipped "current" site. */
+
+[data-craft="a"] .craft-a-drift {
+  animation: craft-a-ambient-drift 42s ease-in-out infinite;
+}
+
+[data-craft="a"] .craft-a-drift-slow {
+  animation: craft-a-ambient-drift-slow 60s ease-in-out infinite;
+}
+
+@keyframes craft-a-ambient-drift {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.08); }
+}
+
+@keyframes craft-a-ambient-drift-slow {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 1; }
+  50% { transform: translate3d(2vw, -2vh, 0); opacity: 0.7; }
+}
+
+[data-craft="a"] .craft-a-mote {
+  animation-name: craft-a-mote-drift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+/* Round-trip, not one-way — 100% returns to the 0% position so the loop
+   never snaps. Reads as dust hovering/drifting in place, not falling upward
+   off-screen. */
+@keyframes craft-a-mote-drift {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(0.8vw, -4vh, 0); }
+  50%  { transform: translate3d(-0.4vw, -7vh, 0); }
+  75%  { transform: translate3d(-0.9vw, -3vh, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-craft="a"] .craft-a-drift,
+  [data-craft="a"] .craft-a-drift-slow,
+  [data-craft="a"] .craft-a-mote {
+    animation: none;
+  }
+}
+
+/* Cards become tonal panels lit from the room rather than glass — consistent
+   with the atmosphere doing the work instead of a blur that has nothing to
+   sit over. */
+[data-craft="a"] .glass-square.glass-deep-blur {
+  background: rgba(28, 51, 31, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(246, 240, 223, 0.1);
+  box-shadow: inset 0 1px 0 rgba(246, 240, 223, 0.06) !important;
+}
+
+[data-craft="a"] .glass-square.glass-deep-blur:hover {
+  background: rgba(31, 56, 35, 0.65);
+  border-color: rgba(246, 240, 223, 0.22);
+}
+
+/* The spotlight moment: while a project modal is open, the room dims around
+   it so the opened card reads as lit rather than merely on top. */
+[data-craft="a"] .craft-a-spotlight-dim {
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}

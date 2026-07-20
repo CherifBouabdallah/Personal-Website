@@ -11,6 +11,9 @@ import MainPage from "./pages/MainPage";
 import LiquidNavbar from "./components/LiquidNavbar";
 import Lenis from "lenis";
 import { EASE_ENTER, ARRIVAL_SETTLE_MS, ARRIVAL_CONTRACT_MS, useMotionPrefs } from "./lib/motion";
+import { CraftProvider } from "./craft/CraftContext";
+import { CraftPanel } from "./craft/CraftPanel";
+import { bridgeLenisToScrollTrigger } from "./craft/shared/gsapSetup";
 
 // Static routes config to prevent recreation on every render
 const SCROLLABLE_ROUTES = new Set(["/", "/vortex", "/portfolio", "/contact", "/soccer-team", "/noodle-place"]);
@@ -37,6 +40,15 @@ type Language = "en" | "fr";
 type PreloaderPhase = "loading" | "settling" | "contracting";
 
 export default function App() {
+  return (
+    <CraftProvider>
+      <AppInner />
+      <CraftPanel />
+    </CraftProvider>
+  );
+}
+
+function AppInner() {
   const [progress, setProgress] = useState(0);
   const [isSiteReady, setIsSiteReady] = useState(false);
   const [phase, setPhase] = useState<PreloaderPhase>("loading");
@@ -155,6 +167,7 @@ export default function App() {
     });
 
     (window as any).__lenis = lenis;
+    bridgeLenisToScrollTrigger();
 
     function raf(time: number) {
       lenis.raf(time);

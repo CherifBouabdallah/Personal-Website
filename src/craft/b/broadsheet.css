@@ -1,0 +1,27 @@
+/* Direction B — Broadsheet. Every rule scoped under [data-craft="b"] so it
+   never bleeds into the other directions or the shipped "current" site. */
+
+[data-craft="b"] .craft-b-running-head {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+/* Plate-strike headlines: hide the split units up front so there's no flash
+   of fully-visible text before the GSAP timeline (usePlateStrike) hides and
+   re-reveals them. Scoped to prefers-reduced-motion: no-preference so
+   reduced-motion visitors simply see the final text immediately — mirroring
+   MaskRiseTitle's `initial={reduced ? false : ...}` convention rather than
+   hiding-then-JS-showing for everyone. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-craft="b"] .craft-b-plate-strike [data-split-unit] {
+    opacity: 0;
+  }
+}
+
+/* Portfolio's one pre-approved cream exception (see DESIGN.md's Forest
+   Canopy Rule) — invert the text-selection colors to match ink-on-paper
+   rather than the site-wide alabaster-on-forest selection. */
+[data-craft="b"] #portfolio ::selection {
+  background: var(--color-theme-bg);
+  color: var(--color-theme-text);
+}
