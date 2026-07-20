@@ -1,25 +1,8 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useCraftVariant } from "../craft/CraftContext";
-import CurrentHome from "./Home";
-import CurrentPortfolio from "./Portfolio";
-import CurrentContact from "./Contact";
-import HomeA from "../craft/a/Home";
-import PortfolioA from "../craft/a/Portfolio";
-import ContactA from "../craft/a/Contact";
-import HomeB from "../craft/b/Home";
-import PortfolioB from "../craft/b/Portfolio";
-import ContactB from "../craft/b/Contact";
-import HomeC from "../craft/c/Home";
-import PortfolioC from "../craft/c/Portfolio";
-import ContactC from "../craft/c/Contact";
-
-const VARIANT_PAGES = {
-  current: { Home: CurrentHome, Portfolio: CurrentPortfolio, Contact: CurrentContact },
-  a: { Home: HomeA, Portfolio: PortfolioA, Contact: ContactA },
-  b: { Home: HomeB, Portfolio: PortfolioB, Contact: ContactB },
-  c: { Home: HomeC, Portfolio: PortfolioC, Contact: ContactC },
-} as const;
+import Home from "./Home";
+import Portfolio from "./Portfolio";
+import Contact from "./Contact";
 
 type Language = "en" | "fr";
 
@@ -32,8 +15,6 @@ interface MainPageProps {
 
 export default function MainPage({ lang, setLang, activeSection, setActiveSection }: MainPageProps) {
   const location = useLocation();
-  const { variant } = useCraftVariant();
-  const { Home, Portfolio, Contact } = VARIANT_PAGES[variant];
 
   // Scroll to section on mount based on pathname or hash
   useEffect(() => {

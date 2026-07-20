@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Cherif Bouabdallah's personal website: a premium, editorial-styled showcase and interactive engineering sandbox. See `PRODUCT.md` for brand/purpose and `DESIGN.md` for the full design system.
 
 - **Core Stack:** React 19 + TypeScript 5.8 + Vite 8, React Router DOM v7 (SPA, no SSR). Lenis for smooth scrolling.
-- **Styling:** Tailwind CSS v4 (CSS-first config — no `tailwind.config.js`; theme tokens live in `src/index.css`), vanilla CSS custom properties, `lucide-react` icons. Animation via Framer Motion (primary, incl. `layoutId` shared-element morphs) + GSAP/ScrollTrigger (scroll-scrubbed and pinned effects, currently used only in the `src/craft/` variant trees — see below). `LiquidNavbar` itself is pure Framer Motion; there is no GSAP Draggable anywhere in the codebase.
+- **Styling:** Tailwind CSS v4 (CSS-first config — no `tailwind.config.js`; theme tokens live in `src/index.css`), vanilla CSS custom properties, `lucide-react` icons. Animation via Framer Motion (primary, incl. `layoutId` shared-element morphs) + GSAP/ScrollTrigger (scroll-scrubbed effects driving the print-chrome plate-strike reveal and section snap — see `src/hooks/useBroadsheetMotion.ts`). `LiquidNavbar` itself is pure Framer Motion; there is no GSAP Draggable anywhere in the codebase.
 - **Backend / Automations:** None. Fully static site — no API server, no n8n integrations, no custom systemd services (deploy script only reloads nginx).
 - **Environment:** Dual-boot development (Windows/Debian Linux), running behind Tailscale networks where relevant. Dev server binds `0.0.0.0:3000` so it's reachable across the tailnet.
 
@@ -29,12 +29,12 @@ Cherif Bouabdallah's personal website: a premium, editorial-styled showcase and 
 - **Directory Mapping:**
   - `src/App.tsx` — top-level component owning global state (language, nav section, preloader, Lenis instance) passed via props; no context/store
   - `src/pages/` — route pages: `MainPage.tsx` (single scrollable page for `/`, `/portfolio`, `/contact` with scroll-spy URL sync) plus lazy-loaded standalone sandboxes (`Vortex`, `SoccerTeam`, `NoodlePlace`, `Secret101`, `NotFound`)
-  - `src/components/` — shared UI (`LiquidNavbar`, `HolographicBall`, `MaskRiseTitle`, `Footer`, `LanguageSwitcher`)
-  - `src/hooks/` — `useRouteFonts.ts` lazily injects per-route webfonts (module-level `Set`, once per session)
+  - `src/components/` — shared UI (`LiquidNavbar`, `HolographicBall`, `MaskRiseTitle`, `Footer`, `LanguageSwitcher`, `BroadsheetFrame` (print-chrome — registration marks, folios, rotated running head), `Grain` (paper texture overlay), `SplitLine` (GSAP-animatable word-split wrapper))
+  - `src/hooks/` — `useRouteFonts.ts` lazily injects per-route webfonts (module-level `Set`, once per session); `useBroadsheetMotion.ts` exports `usePlateStrike` (GSAP letterpress headline reveal, drives `SplitLine`'s `[data-split-unit]`s) and `useSectionSnap` (desktop scroll-snap nudge between sections)
   - `src/data/translations.ts` — manual `en`/`fr` dictionary; extend the interface and both language entries to add copy (no i18n library)
   - `src/lib/motion.ts` — shared motion helpers (easing/spring constants, `useMotionPrefs()` — every animated surface should use this instead of calling `useReducedMotion()` directly)
-  - `src/craft/` — dev-only art-direction variant system. `CraftContext.tsx` provides `useCraftVariant()` (`"current" | "a" | "b" | "c"`, mirrored onto `<html data-craft>`, hard-locked to `"current"` outside `import.meta.env.DEV`); `CraftPanel.tsx` is the floating dev-only switcher. `src/pages/MainPage.tsx` dispatches Home/Portfolio/Contact to the matching tree. Each variant (`a/`, `b/`, `c/`) is an isolated full rewrite of Home/Portfolio/Contact — they reuse pristine `src/pages/Portfolio.tsx`'s exported `FEATURED_PROJECTS`/`ProjectPreview`/`PreviewModal` (the `layoutId` card↔modal morph) rather than forking it, plus shared helpers in `src/craft/shared/` (`gsapSetup.ts`, `Grain.tsx`, `SplitLine.tsx`, `useAtmosphere.ts`). `current` (the shipped site) must stay behaviorally identical to `main`'s `src/pages/*`.
-  - `src/index.css` — Tailwind `@theme` block + `:root` design tokens
+  - `src/lib/gsapSetup.ts` — registers the ScrollTrigger plugin and bridges it to the app's Lenis instance (`bridgeLenisToScrollTrigger()`, called once from `App.tsx`)
+  - `src/index.css` — Tailwind `@theme` block + `:root` design tokens, plus the print-chrome rules (`.running-head`, `.plate-strike`, Portfolio's inverted-selection exception)
   - `public/` — static assets: `fonts/Maghfirea.ttf`, webp images, `robots.txt`, `sitemap.xml`
   - `docs/superpowers/` — plans and design specs; `motion-audits/` — saved page snapshots for motion review
 - **Architecture notes worth knowing before editing:**

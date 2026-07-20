@@ -31,8 +31,8 @@ export interface LanguageTranslations {
   ramenLabel: string;
   ramenDesc: string;
 
-  // Broadsheet (craft variant B) keys — masthead strap, side-rail marginalia,
-  // and the Portfolio contents-index kicker.
+  // Broadsheet chrome keys — masthead strap, side-rail marginalia, and the
+  // Portfolio contents-index kicker.
   broadsheetEdition: string;
   broadsheetRunningHead: string;
   broadsheetContentsLabel: string;

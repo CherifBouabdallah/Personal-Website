@@ -1,6 +1,6 @@
 import { useEffect, type RefObject } from "react";
-import { gsap, ScrollTrigger } from "../shared/gsapSetup";
-import { useMotionPrefs } from "../../lib/motion";
+import { gsap, ScrollTrigger } from "../lib/gsapSetup";
+import { useMotionPrefs } from "../lib/motion";
 
 /**
  * The "plate strike" headline reveal: split-line units drop in from above and
@@ -52,8 +52,8 @@ export function usePlateStrike(
  * section's top edge when a scroll gesture settles mid-transition. Uses a
  * self-contained ScrollTrigger with `snap` on the normal scroll position
  * (no pinning, no spacer, so MainPage's scroll-spy math is untouched) and
- * kills it on unmount / breakpoint change so switching craft variants never
- * leaves an orphaned trigger behind.
+ * kills it on unmount / breakpoint change so route changes never leave an
+ * orphaned trigger behind.
  */
 export function useSectionSnap(sectionRef: RefObject<HTMLElement | null>) {
   const { reduced } = useMotionPrefs();
