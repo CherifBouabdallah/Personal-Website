@@ -203,6 +203,30 @@
     color: var(--color-theme-text);
   }
 
+  /* Portfolio hover-thumbnail freeze: kills every CSS-keyframe loop in the
+     mounted live page (dither shaders opt out separately via their own
+     `animate` prop) so the thumbnail costs nothing while idle. */
+  .frozen-preview,
+  .frozen-preview *,
+  .frozen-preview *::before,
+  .frozen-preview *::after {
+    animation: none !important;
+  }
+
+  /* Portfolio preview skeleton: shimmering placeholder shown while the
+     lazy project chunk mounts, before the real content fades in. Colors
+     come from --skeleton-base/--skeleton-highlight set inline per project. */
+  .skeleton-shimmer {
+    background-image: linear-gradient(90deg, var(--skeleton-base) 0%, var(--skeleton-highlight) 50%, var(--skeleton-base) 100%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  }
+
+  @keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
 /* Accessibility: respect user preference for reduced motion */
 @media (prefers-reduced-motion: reduce) {
   * {

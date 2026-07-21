@@ -2,14 +2,16 @@ import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useRouteFonts, GOOGLE_FONTS_HREF } from "../hooks/useRouteFonts";
+import BackToPortfolioButton from "../components/BackToPortfolioButton";
 
 interface VortexProps {
   isPreview?: boolean;
   onClose?: () => void;
   startUnlocked?: boolean;
+  isCardPreview?: boolean;
 }
 
-export default function Vortex({ isPreview = false, onClose, startUnlocked = false }: VortexProps) {
+export default function Vortex({ isPreview = false, onClose, startUnlocked = false, isCardPreview = false }: VortexProps) {
   useRouteFonts([GOOGLE_FONTS_HREF]);
   const [isReady, setIsReady] = useState(false);
   const [isLocked, setIsLocked] = useState(true);
@@ -151,7 +153,8 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
 
 
   return (
-    <div className="w-full relative flex flex-col items-center min-h-screen bg-[#141212] text-[#FDFBF7] vortex-font-sans overflow-x-hidden pb-24">
+    <div className={`w-full relative flex flex-col items-center min-h-screen bg-[#141212] text-[#FDFBF7] vortex-font-sans overflow-x-hidden pb-24${isCardPreview ? " frozen-preview" : ""}`}>
+      {!isPreview && <BackToPortfolioButton />}
       {/* Background Override Overlay */}
       <div className={`${isPreview ? 'absolute' : 'fixed'} inset-0 z-0 bg-[#141212] pointer-events-none`} />
 

@@ -1,6 +1,5 @@
 import { motion, useScroll, useTransform, useInView, useSpring, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   Clock,
@@ -8,12 +7,12 @@ import {
   Droplet,
   Users,
   Compass,
-  ArrowLeft,
   ChevronLeft,
   ChevronRight,
   CheckCircle
 } from "lucide-react";
 import { useRouteFonts, FONTSHARE_HREF } from "../hooks/useRouteFonts";
+import BackToPortfolioButton from "../components/BackToPortfolioButton";
 
 interface NoodlePlaceProps {
   isPreview?: boolean;
@@ -75,7 +74,6 @@ function DoubleBezelCard({ children, className = "", onClick, whileHover }: {
 
 export default function NoodlePlace({ isPreview = false, isCardPreview = false }: NoodlePlaceProps) {
   useRouteFonts([FONTSHARE_HREF]);
-  const navigate = useNavigate();
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -216,18 +214,7 @@ export default function NoodlePlace({ isPreview = false, isCardPreview = false }
         }}
       />
 
-      {/* Standalone Back Button (rendered only in Portfolio context or full viewport) */}
-      {!isPreview && (
-        <div className="fixed top-6 left-6 z-50">
-          <button
-            onClick={() => navigate("/portfolio")}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-[#F4F1EA]/80 hover:text-[#F4F1EA] hover:bg-white/10 transition-all duration-300 font-mono text-[9px] tracking-widest uppercase cursor-pointer"
-          >
-            <ArrowLeft size={10} />
-            Back to Showcase
-          </button>
-        </div>
-      )}
+      {!isPreview && <BackToPortfolioButton />}
 
       {/* Floating Island Navigation bar */}
       <nav className="absolute top-6 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-[600px] flex items-center justify-between py-3 px-6 rounded-full border border-white/5 bg-white/2 backdrop-blur-md">

@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
-import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, Maximize2 } from "lucide-react";
 import { TRANSLATIONS } from "../data/translations";
 import SplitLine from "../components/SplitLine";
 import { usePlateStrike } from "../hooks/useBroadsheetMotion";
@@ -129,15 +130,92 @@ export const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children
   );
 });
 
+// Per-project skeleton palette. Must match BG_COLOR[variant] exactly — the
+// skeleton fades out over that same container background (its opacity
+// animates to 0), so any mismatch shows up as a muddy cross-fade blend.
+const SKELETON_PALETTE: Record<ModalKey, { bg: string; base: string; highlight: string }> = {
+  vortex: { bg: "#141212", base: "rgba(255,255,255,0.06)", highlight: "rgba(255,255,255,0.14)" },
+  soccer: { bg: "#F4EFE4", base: "rgba(13,12,10,0.06)", highlight: "rgba(160,124,62,0.22)" },
+  noodle: { bg: "#121212", base: "rgba(255,255,255,0.06)", highlight: "rgba(200,90,50,0.18)" },
+};
+
+const skeletonVars = (variant: ModalKey) => ({
+  ["--skeleton-base" as string]: SKELETON_PALETTE[variant].base,
+  ["--skeleton-highlight" as string]: SKELETON_PALETTE[variant].highlight,
+});
+
+// Skeleton screen shown while the lazy project chunk loads, shaped after
+// each project's actual layout instead of one generic placeholder.
+function PreviewSkeleton({ variant }: { variant: ModalKey }) {
+  const wrapperClass = "absolute inset-0 w-full h-full overflow-hidden select-none";
+  const style = { background: SKELETON_PALETTE[variant].bg, ...skeletonVars(variant) };
+  const shared = { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.25, ease: "easeOut" as const } };
+
+  if (variant === "vortex") {
+    // Mirrors Vortex's own shape: top nav bar, centered headline, the big
+    // rounded "mac window" mockup, then a row of feature cards.
+    return (
+      <motion.div {...shared} className={wrapperClass} style={style}>
+        <div className="skeleton-shimmer absolute top-0 left-0 right-0 h-16" />
+        <div className="flex flex-col items-center gap-6 p-6 md:p-10 pt-24 h-full">
+          <div className="skeleton-shimmer h-7 w-56 rounded-full" />
+          <div className="skeleton-shimmer h-7 w-36 rounded-full" />
+          <div className="flex-1 w-full max-w-3xl skeleton-shimmer rounded-[32px]" />
+          <div className="grid grid-cols-4 gap-4 w-full max-w-3xl h-16">
+            {[0, 1, 2, 3].map((i) => <div key={i} className="skeleton-shimmer rounded-2xl" />)}
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (variant === "soccer") {
+    // Mirrors Olympus FC's editorial hero: kicker rule, big headline block,
+    // a thick rule, then a three-column stat strip.
+    return (
+      <motion.div {...shared} className={wrapperClass} style={style}>
+        <div className="flex flex-col gap-6 p-6 md:p-12 pt-20 h-full">
+          <div className="skeleton-shimmer h-3 w-48 rounded-full" />
+          <div className="skeleton-shimmer h-16 md:h-24 w-full max-w-2xl rounded-lg" />
+          <div className="skeleton-shimmer h-16 md:h-20 w-3/4 max-w-xl rounded-lg" />
+          <div className="skeleton-shimmer h-1.5 w-full max-w-md mt-2" />
+          <div className="grid grid-cols-3 gap-6 flex-1 items-end pb-6">
+            {[0, 1, 2].map((i) => <div key={i} className="skeleton-shimmer h-2/3 rounded-lg" />)}
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // noodle: two-column hero (copy left, square hero image right), plus the
+  // floating island nav pill.
+  return (
+    <motion.div {...shared} className={wrapperClass} style={style}>
+      <div className="skeleton-shimmer absolute top-6 left-1/2 -translate-x-1/2 w-1/2 max-w-xs h-9 rounded-full" />
+      <div className="grid grid-cols-2 gap-8 items-center p-6 md:p-12 h-full">
+        <div className="flex flex-col gap-4">
+          <div className="skeleton-shimmer h-3 w-40 rounded-full" />
+          <div className="skeleton-shimmer h-10 w-full rounded-lg" />
+          <div className="skeleton-shimmer h-10 w-3/4 rounded-lg" />
+          <div className="skeleton-shimmer h-10 w-32 rounded-full mt-4" />
+        </div>
+        <div className="skeleton-shimmer aspect-square rounded-[2.5rem]" />
+      </div>
+    </motion.div>
+  );
+}
+
 // Preview Modal Overlay (Memoized)
 interface PreviewModalProps {
   onClose: () => void;
+  onExpand: () => void;
   layoutId: string;
   bgColor: string;
+  variant: ModalKey;
   children: React.ReactNode;
 }
 
-export const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }: PreviewModalProps) => {
+export const PreviewModal = React.memo(({ onClose, onExpand, layoutId, bgColor, variant, children }: PreviewModalProps) => {
   const [isLayoutComplete, setIsLayoutComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -159,15 +237,12 @@ export const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }
     }
   }, [isLayoutComplete]);
 
-  const isLightBg = bgColor === "#FAFAF8";
-  const textColorClass = isLightBg ? "text-slate-800" : "text-stone-200";
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 overflow-hidden cursor-pointer"
+      className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4 md:p-8 overflow-hidden cursor-pointer"
       onClick={onClose}
     >
       <div
@@ -188,23 +263,7 @@ export const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }
             {!isLayoutComplete ? (
               <div key="blank" className="w-full h-full" />
             ) : isLoading ? (
-              <motion.div
-                key="loader"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
-                className="absolute inset-0 w-full h-full flex flex-col items-center justify-center select-none p-6"
-              >
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
-                  className={`w-8 h-8 rounded-full border-2 border-t-transparent ${isLightBg ? 'border-[#12224A]' : 'border-orange-500'}`}
-                />
-                <div className={`mt-6 font-mono text-[9px] tracking-[0.25em] uppercase ${textColorClass} opacity-60 text-center`}>
-                  // INITIALIZING PROJECT PREVIEW
-                </div>
-              </motion.div>
+              <PreviewSkeleton key="skeleton" variant={variant} />
             ) : (
               <motion.div
                 key="content"
@@ -218,6 +277,15 @@ export const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }
             )}
           </AnimatePresence>
         </motion.div>
+
+        {/* Floating "open full page" button — leaves the preview and navigates to the real route */}
+        <button
+          onClick={onExpand}
+          className="absolute top-6 left-6 z-[120] w-10 h-10 rounded-full bg-black/60 border border-white/10 hover:bg-white/10 hover:border-white/30 text-white flex items-center justify-center cursor-pointer transition-all duration-300 shadow-md"
+          title="Open full page"
+        >
+          <Maximize2 size={14} />
+        </button>
 
         {/* Floating Close Button */}
         <button
@@ -248,10 +316,18 @@ const PLATE_META: Record<ModalKey, { year: string; categoryKey: CategoryKey }> =
 };
 
 function ProjectBody({ id, isCardPreview = false, startUnlocked = false }: { id: ModalKey; isCardPreview?: boolean; startUnlocked?: boolean }) {
-  if (id === "vortex") return <Vortex isPreview startUnlocked={startUnlocked} />;
+  if (id === "vortex") return <Vortex isPreview startUnlocked={startUnlocked} isCardPreview={isCardPreview} />;
   if (id === "soccer") return <SoccerTeam isPreview isCardPreview={isCardPreview} />;
   return <NoodlePlace isPreview isCardPreview={isCardPreview} />;
 }
+
+// Standalone route for each project — the "open full page" button navigates
+// here, leaving the preview for the real page instead of trying to fake it.
+const ROUTE_PATH: Record<ModalKey, string> = {
+  vortex: "/vortex",
+  soccer: "/soccer-team",
+  noodle: "/noodle-place",
+};
 
 interface IndexRowProps {
   project: FeaturedProject;
@@ -300,6 +376,7 @@ interface PortfolioProps {
 }
 
 export default function Portfolio({ lang }: PortfolioProps) {
+  const navigate = useNavigate();
   const [isReady, setIsReady] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalKey | null>(null);
   const [hoveredId, setHoveredId] = useState<ModalKey | null>(null);
@@ -339,6 +416,12 @@ export default function Portfolio({ lang }: PortfolioProps) {
 
   const handleOpen = useCallback((key: ModalKey) => setActiveModal(key), []);
   const handleClose = useCallback(() => setActiveModal(null), []);
+  const handleExpand = useCallback(() => {
+    if (!activeModal) return;
+    const path = ROUTE_PATH[activeModal];
+    setActiveModal(null);
+    navigate(path);
+  }, [activeModal, navigate]);
 
   const hoveredProject = hoveredId ? FEATURED_PROJECTS.find((p) => p.id === hoveredId) ?? null : null;
   const activeProject = activeModal ? FEATURED_PROJECTS.find((p) => p.id === activeModal)! : null;
@@ -400,7 +483,7 @@ export default function Portfolio({ lang }: PortfolioProps) {
                         hoverLabel={t.openProjectHover}
                       >
                         <Suspense fallback={null}>
-                          <ProjectBody id={hoveredProject.id} isCardPreview={hoveredProject.id !== "vortex"} />
+                          <ProjectBody id={hoveredProject.id} isCardPreview />
                         </Suspense>
                       </ProjectPreview>
                     </motion.div>
@@ -426,8 +509,14 @@ export default function Portfolio({ lang }: PortfolioProps) {
 
       <AnimatePresence>
         {activeModal && activeProject && (
-          <PreviewModal onClose={handleClose} layoutId={activeProject.layoutId} bgColor={BG_COLOR[activeModal]}>
-            <Suspense fallback={<div className="w-full h-full flex items-center justify-center font-mono text-[9px] tracking-[0.2em] text-theme-text/30">loading preview...</div>}>
+          <PreviewModal
+            onClose={handleClose}
+            onExpand={handleExpand}
+            layoutId={activeProject.layoutId}
+            bgColor={BG_COLOR[activeModal]}
+            variant={activeModal}
+          >
+            <Suspense fallback={null}>
               <ProjectBody id={activeModal} startUnlocked />
             </Suspense>
           </PreviewModal>

@@ -7,6 +7,7 @@ import SplitLine from "../components/SplitLine";
 import { usePlateStrike } from "../hooks/useBroadsheetMotion";
 import { gsap, ScrollTrigger } from "../lib/gsapSetup";
 import DitherField from "../components/DitherField";
+import BackToPortfolioButton from "../components/BackToPortfolioButton";
 
 // ---------------------------------------------------------------- tokens
 // Luxury matchday-programme palette:
@@ -464,6 +465,7 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
       className="relative w-full min-h-screen overflow-x-hidden bg-[#F4EFE4] text-[#0D0C0A] selection:bg-[#A07C3E] selection:text-[#F4EFE4]"
       style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
     >
+      {!isPreview && <BackToPortfolioButton />}
       {/* global paper noise */}
       <div
         aria-hidden
