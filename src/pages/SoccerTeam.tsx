@@ -290,44 +290,25 @@ function useScrollFx(rootRef: React.RefObject<HTMLDivElement | null>, enabled: b
   }, [rootRef, enabled, reduced]);
 }
 
-/**
- * "Sticky section layout" curtains: every [data-pin-under] section pins when
- * its bottom meets the viewport bottom (pinSpacing: false), so the section
- * that follows it in the DOM rises from the bottom edge and covers it like a
- * curtain — instead of both scrolling together.
- */
-function useCurtains(rootRef: React.RefObject<HTMLDivElement | null>, enabled: boolean) {
-  const { reduced } = useMotionPrefs();
-  useEffect(() => {
-    if (!enabled || reduced) return;
-    const el = rootRef.current;
-    if (!el) return;
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>("[data-pin-under]").forEach((section) => {
-        ScrollTrigger.create({
-          trigger: section,
-          start: "bottom bottom",
-          end: () => `+=${window.innerHeight}`,
-          pin: true,
-          pinSpacing: false,
-        });
-      });
-    }, el);
-    return () => ctx.revert();
-  }, [rootRef, enabled, reduced]);
-}
+
 
 /**
  * Pin-and-reveal for the featured player section: pins the section for one
  * viewport of scroll and reveals its content across that pinned range,
  * instead of a plain scroll-into-view fade — the "sticky intro" pattern.
  */
-function useFeaturedPin(sectionRef: React.RefObject<HTMLElement | null>, enabled: boolean) {
+function useFeaturedPin(
+  pinnedRef: React.RefObject<HTMLElement | null>,
+  sectionRef: React.RefObject<HTMLElement | null>,
+  enabled: boolean
+) {
   const { reduced } = useMotionPrefs();
   useEffect(() => {
     if (!enabled || reduced) return;
+    const pinnedSection = pinnedRef.current;
     const section = sectionRef.current;
-    if (!section) return;
+    if (!pinnedSection || !section) return;
+
     const kicker = section.querySelector<HTMLElement>("[data-feat-kicker]");
     const numeral = section.querySelector<HTMLElement>("[data-feat-numeral]");
     const name = section.querySelector<HTMLElement>("[data-feat-name]");
@@ -336,12 +317,41 @@ function useFeaturedPin(sectionRef: React.RefObject<HTMLElement | null>, enabled
     if (!kicker || !numeral || !name || !portrait || !stats) return;
 
     const ctx = gsap.context(() => {
+      // 1. Freeze/pin the preceding intro section ONLY while the card section is sliding up over it
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top bottom",
+        end: "top top",
+        pin: pinnedSection,
+        pinSpacing: false,
+        invalidateOnRefresh: true,
+      });
+
       gsap.set(kicker, { opacity: 0, y: 20 });
       gsap.set(numeral, { opacity: 0, y: 80 });
       gsap.set(name, { opacity: 0, y: 24 });
       gsap.set(portrait, { clipPath: "inset(0% 0% 100% 0%)" });
       gsap.set(stats, { opacity: 0, y: 24 });
 
+      // 2. Extra-rounded dynamic corner flattening (3.5rem / 56px -> 0rem) as card approaches top: 0
+      gsap.fromTo(
+        section,
+        { borderTopLeftRadius: "3.5rem", borderTopRightRadius: "3.5rem" },
+        {
+          borderTopLeftRadius: "0rem",
+          borderTopRightRadius: "0rem",
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top bottom",
+            end: "top top",
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        }
+      );
+
+      // 3. Interior content reveal timeline for the card section
       gsap.timeline({
         scrollTrigger: {
           trigger: section,
@@ -349,6 +359,8 @@ function useFeaturedPin(sectionRef: React.RefObject<HTMLElement | null>, enabled
           end: () => `+=${window.innerHeight}`,
           pin: true,
           scrub: 0.6,
+          anticipatePin: 1,
+          refreshPriority: 1,
         },
       })
         .to(kicker, { opacity: 1, y: 0, duration: 0.15 })
@@ -356,9 +368,17 @@ function useFeaturedPin(sectionRef: React.RefObject<HTMLElement | null>, enabled
         .to(portrait, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.4, ease: "power2.out" }, "<")
         .to(name, { opacity: 1, y: 0, duration: 0.2 }, "-=0.15")
         .to(stats, { opacity: 1, y: 0, duration: 0.2 }, "-=0.1");
-    }, section);
-    return () => ctx.revert();
-  }, [sectionRef, enabled, reduced]);
+    });
+
+    ScrollTrigger.refresh();
+    (window as any).__lenis?.resize();
+
+    return () => {
+      ctx.revert();
+      ScrollTrigger.refresh();
+      (window as any).__lenis?.resize();
+    };
+  }, [pinnedRef, sectionRef, enabled, reduced]);
 }
 
 /**
@@ -397,25 +417,33 @@ function useMarquee(
 
 // ---------------------------------------------------------------- data
 const SQUAD = [
-  { group: "Goalkeepers", players: [
-    { n: 1, name: "Álvaro Montero", pos: "Goalkeeper", nat: "COL" },
-  ]},
-  { group: "Defenders", players: [
-    { n: 2, name: "James O'Brien", pos: "Right-Back", nat: "IRL" },
-    { n: 3, name: "Yuto Nakamura", pos: "Left-Back", nat: "JPN" },
-    { n: 4, name: "Lucas Delvaux", pos: "Centre-Back", nat: "BEL" },
-    { n: 5, name: "Karim Hadj", pos: "Centre-Back", nat: "ALG" },
-  ]},
-  { group: "Midfielders", players: [
-    { n: 6, name: "André Ferreira", pos: "Defensive Mid", nat: "POR" },
-    { n: 8, name: "Sami El-Masri", pos: "Central Mid", nat: "EGY" },
-    { n: 10, name: "Nils Eriksen", pos: "Attacking Mid", nat: "NOR" },
-  ]},
-  { group: "Forwards", players: [
-    { n: 7, name: "Diego Vargas", pos: "Right Wing", nat: "ARG" },
-    { n: 9, name: "Luca Moretti", pos: "Striker", nat: "ITA" },
-    { n: 11, name: "Moussa Diallo", pos: "Left Wing", nat: "SEN" },
-  ]},
+  {
+    group: "Goalkeepers", players: [
+      { n: 1, name: "Álvaro Montero", pos: "Goalkeeper", nat: "COL" },
+    ]
+  },
+  {
+    group: "Defenders", players: [
+      { n: 2, name: "James O'Brien", pos: "Right-Back", nat: "IRL" },
+      { n: 3, name: "Yuto Nakamura", pos: "Left-Back", nat: "JPN" },
+      { n: 4, name: "Lucas Delvaux", pos: "Centre-Back", nat: "BEL" },
+      { n: 5, name: "Karim Hadj", pos: "Centre-Back", nat: "ALG" },
+    ]
+  },
+  {
+    group: "Midfielders", players: [
+      { n: 6, name: "André Ferreira", pos: "Defensive Mid", nat: "POR" },
+      { n: 8, name: "Sami El-Masri", pos: "Central Mid", nat: "EGY" },
+      { n: 10, name: "Nils Eriksen", pos: "Attacking Mid", nat: "NOR" },
+    ]
+  },
+  {
+    group: "Forwards", players: [
+      { n: 7, name: "Diego Vargas", pos: "Right Wing", nat: "ARG" },
+      { n: 9, name: "Luca Moretti", pos: "Striker", nat: "ITA" },
+      { n: 11, name: "Moussa Diallo", pos: "Left Wing", nat: "SEN" },
+    ]
+  },
 ];
 
 const FIXTURES = [
@@ -450,20 +478,29 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
   // disabled in the Portfolio modal, where the page scrolls inside a div.
   const gsapReveals = fontsReady && !isPreview && !isCardPreview;
 
+  const heroRef = useRef<HTMLDivElement>(null);
+  const manifestoRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const pinnedTeamRef = useRef<HTMLElement>(null);
+  const featuredRef = useRef<HTMLElement>(null);
+  const marqueeRef = useRef<HTMLDivElement>(null);
+
   useRuleDraw(rootRef, gsapReveals);
   useScrollFx(rootRef, gsapReveals);
-  useCurtains(rootRef, gsapReveals);
-  const heroRef = useRef<HTMLDivElement>(null);
   usePlateStrike(heroRef, gsapReveals, { stagger: 0.08, distance: -40 });
-  const manifestoRef = useRef<HTMLDivElement>(null);
   usePlateStrike(manifestoRef, gsapReveals, { stagger: 0.06 });
-  const ctaRef = useRef<HTMLDivElement>(null);
   usePlateStrike(ctaRef, gsapReveals, { stagger: 0.07 });
-  const featuredRef = useRef<HTMLElement>(null);
-  useFeaturedPin(featuredRef, gsapReveals);
-
-  const marqueeRef = useRef<HTMLDivElement>(null);
+  useFeaturedPin(pinnedTeamRef, featuredRef, gsapReveals);
   useMarquee(marqueeRef, !reduced && !isCardPreview, gsapReveals);
+
+  useEffect(() => {
+    if (!gsapReveals) return;
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+      (window as any).__lenis?.resize();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [gsapReveals]);
 
   return (
     <div
@@ -670,7 +707,7 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
         </section>
 
         {/* ---------------------------------------------- 02 · first team */}
-        <section data-pin-under className="relative z-10 bg-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
+        <section ref={pinnedTeamRef} className="relative z-10 bg-[#F4EFE4] min-h-screen py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
           <Rule weight={4} className="absolute top-0 left-0" />
           <div className="max-w-6xl mx-auto">
             <div className="flex items-end justify-between gap-6">
@@ -709,8 +746,16 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
           </div>
         </section>
 
-        {/* ---------------------------------------------- featured №9 (rises over the squad, then pins to reveal) */}
-        <section ref={featuredRef} className="relative z-20 bg-[#14261E] text-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
+        {/* ---------------------------------------------- featured №9 (rises over the squad, then flattens rounded corners & pins to reveal) */}
+        <section
+          ref={featuredRef}
+          className="relative z-20 bg-[#14261E] text-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden shadow-2xl rounded-t-[3.5rem] will-change-[border-radius,transform]"
+          style={{
+            borderTopLeftRadius: "3.5rem",
+            borderTopRightRadius: "3.5rem",
+            transform: "translateZ(0)",
+          }}
+        >
           <Texture style={TEXTURE.vlinesGold} />
           <div className="relative max-w-6xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -752,7 +797,7 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
         </section>
 
         {/* ---------------------------------------------- 03 · fixtures */}
-        <section data-pin-under className="relative z-10 bg-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
+        <section className="relative z-10 bg-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
           <Texture style={TEXTURE.diag} />
           <div className="relative max-w-6xl mx-auto">
             <SectionIndex n="03" label="Fixtures" />
@@ -790,7 +835,6 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
           </div>
         </section>
 
-        {/* ---------------------------------------------- records (rises over the ledger) */}
         <section className="relative z-20 bg-[#0D0C0A] text-[#F4EFE4] py-24 md:py-32 px-6 md:px-8 lg:px-12 overflow-hidden">
           <div aria-hidden className="absolute inset-0 opacity-30">
             <DitherField animate={!isCardPreview && !reduced} speed={0.35} pixelSize={3.5} dot ink={GOLD} paper={INK} />
@@ -819,7 +863,7 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
         </section>
 
         {/* ---------------------------------------------- 04 · the arena */}
-        <section data-pin-under className="relative z-10 bg-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
+        <section className="relative z-10 bg-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
           <Texture style={TEXTURE.grid} />
           <div className="relative max-w-6xl mx-auto">
             <SectionIndex n="04" label="The Arena" />

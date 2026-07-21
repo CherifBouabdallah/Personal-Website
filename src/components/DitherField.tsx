@@ -8,7 +8,11 @@ import { useEffect, useRef } from "react";
 const VERT = "attribute vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }";
 
 const FRAG = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
 precision mediump float;
+#endif
 uniform vec2 u_res;
 uniform float u_time;
 uniform float u_pixel;
@@ -89,7 +93,10 @@ export default function DitherField({ animate = true, pixelSize = 2.5, speed = 1
       if (!shader) return null;
       gl.shaderSource(shader, src);
       gl.compileShader(shader);
-      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return null;
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error("Shader compilation failed:", gl.getShaderInfoLog(shader));
+        return null;
+      }
       return shader;
     };
     const vs = compile(gl.VERTEX_SHADER, VERT);
@@ -99,7 +106,10 @@ export default function DitherField({ animate = true, pixelSize = 2.5, speed = 1
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
     gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error("Program linking failed:", gl.getProgramInfoLog(program));
+      return;
+    }
     gl.useProgram(program);
 
     const buffer = gl.createBuffer();
@@ -165,7 +175,10 @@ export default function DitherField({ animate = true, pixelSize = 2.5, speed = 1
       ro.disconnect();
       io.disconnect();
       document.removeEventListener("visibilitychange", onVis);
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      if (buffer) gl.deleteBuffer(buffer);
+      if (program) gl.deleteProgram(program);
+      if (vs) gl.deleteShader(vs);
+      if (fs) gl.deleteShader(fs);
     };
   }, [animate, pixelSize, speed, ink, paper, dot]);
 
