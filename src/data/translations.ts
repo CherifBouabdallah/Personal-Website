@@ -118,7 +118,7 @@ export const TRANSLATIONS: Record<"en" | "fr", LanguageTranslations> = {
     sandboxLabel: "Creative Tech",
     vortexDesc: "An interactive digital gallery and OS mockup created to display high-performance frontend micro-interactions. Includes a ticking clock thread, custom responsive Dynamic Island widgets, parametric control docks, gooey physics morph filter elements, and custom Framer Motion spring sliders.",
     webDesignLabel: "Web Design",
-    soccerDesc: "A clean, modern one-page website designed for a professional soccer club. Features a light flat theme with bold sporty typography, animated stat counters, interactive squad & fixture tabs, horizontal scroll tickers, and SVG stadium illustrations with draw-on scroll animations.",
+    soccerDesc: "A ground-up monochrome redesign study for a professional football club. Pure black-and-white editorial design: oversized serif typography, a live WebGL dither field, a masthead-style squad index with full-row inversions, inverted stat bands, and print-inspired rules, textures and drop caps throughout.",
     ramenLabel: "Gastronomy & Brand",
     ramenDesc: "A sensory digital showcase for a premium ramen sanctuary. Fuses wabi-sabi aesthetics with smooth scroll-driven typography reveals, asymmetric bento menu layouts, micro-interactive ingredient drawers, and a warm terracotta and charcoal canvas.",
 
@@ -214,7 +214,7 @@ export const TRANSLATIONS: Record<"en" | "fr", LanguageTranslations> = {
     sandboxLabel: "Tech Créative",
     vortexDesc: "Une galerie numérique interactive et une maquette d'OS conçues pour illustrer des micro-interactions frontend haute performance. Comprend une horloge dynamique, des widgets Dynamic Island réactifs, des docks de contrôle paramétriques, des filtres de morphing physique et des curseurs Framer Motion avec ressorts physiques.",
     webDesignLabel: "Design Web",
-    soccerDesc: "Un site web épuré et moderne d'une seule page conçu pour un club de football professionnel. Propose un thème clair et minimaliste avec une typographie sportive audacieuse, des compteurs de statistiques animés, des onglets d'équipe et de rencontres interactifs, des bandeaux de défilement horizontal et des illustrations SVG de stade s'animant au défilement.",
+    soccerDesc: "Une étude de refonte monochrome conçue de zéro pour un club de football professionnel. Design éditorial en noir et blanc pur : typographie serif surdimensionnée, fond tramé WebGL animé, effectif présenté façon ours de magazine avec inversion des lignes au survol, bandeaux de statistiques inversés, et filets, textures et lettrines inspirés de l'imprimé.",
     ramenLabel: "Gastronomie & Image",
     ramenDesc: "Une vitrine numérique sensorielle pour un temple du ramen haut de gamme. Allie l'esthétique wabi-sabi à des révélations typographiques fluides au défilement, des grilles de menu bento asymétriques, des tiroirs d'ingrédients micro-interactifs et un canevas terre cuite et charbon.",
 

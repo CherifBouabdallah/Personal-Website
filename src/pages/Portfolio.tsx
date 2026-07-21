@@ -234,7 +234,7 @@ export const PreviewModal = React.memo(({ onClose, layoutId, bgColor, children }
 
 const BG_COLOR: Record<ModalKey, string> = {
   vortex: "#141212",
-  soccer: "#FAFAF8",
+  soccer: "#FFFFFF",
   noodle: "#121212",
 };
 
