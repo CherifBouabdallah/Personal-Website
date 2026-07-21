@@ -287,6 +287,8 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
   usePlateStrike(heroRef, gsapReveals, { stagger: 0.08, distance: -40 });
   const manifestoRef = useRef<HTMLDivElement>(null);
   usePlateStrike(manifestoRef, gsapReveals, { stagger: 0.06 });
+  const ctaRef = useRef<HTMLDivElement>(null);
+  usePlateStrike(ctaRef, gsapReveals, { stagger: 0.07 });
 
   return (
     <div
@@ -692,6 +694,42 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ---------------------------------------------- final cta */}
+        <Rule weight={8} />
+        <section className="relative bg-black text-white py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
+          <div aria-hidden className="pointer-events-none absolute inset-0"
+            style={{ backgroundImage: "radial-gradient(circle at top center, #ffffff, transparent 70%)", opacity: 0.05 }} />
+          <div ref={ctaRef} className="relative max-w-4xl mx-auto text-center">
+            <h2 className="text-6xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight uppercase font-bold" style={DISPLAY}>
+              <SplitLine text="Join the First Eleven" />
+            </h2>
+            <p className="mt-8 text-lg leading-relaxed text-white/70 max-w-[48ch] mx-auto">
+              Season 2026–27 registration of interest. Early access to fixtures, programmes and season tickets.
+            </p>
+
+            <form onSubmit={dead} className="mt-12 max-w-md mx-auto text-left">
+              <label htmlFor="olympus-email" className="block text-[11px] tracking-[0.3em] uppercase text-white/60" style={MONO}>
+                Email address
+              </label>
+              <div className="mt-3 flex items-stretch gap-4">
+                <input
+                  id="olympus-email" type="email" placeholder="name@example.com"
+                  className="flex-1 min-w-0 bg-transparent border-b-2 border-white px-1 py-3 text-base placeholder:italic placeholder:text-white/40 focus:outline-none focus:border-b-4 focus-visible:border-b-4"
+                  style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
+                />
+                <button type="submit"
+                  className="bg-white text-black px-8 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border border-white hover:bg-black hover:text-white transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-white focus-visible:outline-offset-[3px] cursor-pointer"
+                  style={MONO}>
+                  Register <span aria-hidden>→</span>
+                </button>
+              </div>
+              <p className="mt-4 text-[10px] tracking-[0.2em] uppercase text-white/40" style={MONO}>
+                * A design study — no data is collected, nothing is sent
+              </p>
+            </form>
           </div>
         </section>
       </main>
