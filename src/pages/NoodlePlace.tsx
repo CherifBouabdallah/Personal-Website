@@ -306,7 +306,7 @@ export default function NoodlePlace({ isPreview = false, isCardPreview = false }
             <div className="bg-white/5 border border-white/10 p-2.5 rounded-[2.5rem] w-full max-w-[420px] aspect-square overflow-hidden shadow-2xl">
               <div className="w-full h-full rounded-[calc(2.5rem-0.625rem)] overflow-hidden relative group">
                 <img
-                  src="/kiri_ramen_hero.webp"
+                  src="/images/noodle-place/kiri_ramen_hero.webp"
                   alt="Steaming bowl of Kiri Tonkotsu Ramen"
                   width={1024}
                   height={1024}
@@ -516,7 +516,7 @@ export default function NoodlePlace({ isPreview = false, isCardPreview = false }
                 <div className="mt-6 flex-1 flex items-end">
                   <div className="w-full h-24 rounded-xl overflow-hidden relative">
                     <img
-                      src="/kiri_ramen_interior.webp"
+                      src="/images/noodle-place/kiri_ramen_interior.webp"
                       alt="Counter detail"
                       width={1024}
                       height={1024}
@@ -581,7 +581,7 @@ export default function NoodlePlace({ isPreview = false, isCardPreview = false }
         {/* Dynamic backdrop image scroll layer */}
         <div className="absolute inset-0 z-0 opacity-15 grayscale pointer-events-none">
           <img
-            src="/kiri_ramen_interior.webp"
+            src="/images/noodle-place/kiri_ramen_interior.webp"
             alt="Intimate Ramen bar"
             width={1024}
             height={1024}

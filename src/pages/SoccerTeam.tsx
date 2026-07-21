@@ -93,9 +93,25 @@ function SectionIndex({ n, label }: { n: string; label: string }) {
   );
 }
 
-function ImagePlaceholder({ description, treatment = "GRAYSCALE · HIGH CONTRAST", aspect = "4 / 5", inverted = false, className = "" }: {
-  description: string; treatment?: string; aspect?: string; inverted?: boolean; className?: string;
+function ImagePlaceholder({ src, alt, description, treatment = "GRAYSCALE · HIGH CONTRAST", aspect = "4 / 5", inverted = false, className = "" }: {
+  src?: string; alt?: string; description: string; treatment?: string; aspect?: string; inverted?: boolean; className?: string;
 }) {
+  if (src) {
+    return (
+      <div
+        className={`relative overflow-hidden border-2 ${inverted ? "border-[#D8BC80] bg-[#0F1E17]" : "border-[#0D0C0A] bg-[#EDE6D6]"} ${className}`}
+        style={{ aspectRatio: aspect }}
+      >
+        <img
+          src={src}
+          alt={alt ?? description}
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      </div>
+    );
+  }
+
   return (
     <div
       className={`relative overflow-hidden border-2 ${inverted ? "border-[#D8BC80] bg-[#0F1E17]" : "border-[#0D0C0A] bg-[#EDE6D6]"} ${className}`}
@@ -145,66 +161,6 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
   }, [target, reduced]);
 
   return <span ref={ref} className="tabular-nums">{count}{suffix}</span>;
-}
-
-/**
- * "Shape blur" adaptation: two stacked copies of the child — a dimmed base
- * and a full layer masked by a soft-edged circle that lerps toward the
- * mouse pointer. Touch and disabled cases render the child plainly.
- */
-function CursorRevealPanel({ children, disabled = false }: { children: React.ReactNode; disabled?: boolean }) {
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const state = useRef({ x: 50, y: 50, tx: 50, ty: 50, raf: 0, active: false });
-
-  const stop = () => { cancelAnimationFrame(state.current.raf); state.current.active = false; };
-  useEffect(() => stop, []);
-
-  if (disabled) return <div>{children}</div>;
-
-  const tick = () => {
-    const s = state.current;
-    s.x += (s.tx - s.x) * 0.12;
-    s.y += (s.ty - s.y) * 0.12;
-    const el = overlayRef.current;
-    if (el) {
-      el.style.setProperty("--mx", `${s.x}%`);
-      el.style.setProperty("--my", `${s.y}%`);
-    }
-    if (Math.abs(s.tx - s.x) + Math.abs(s.ty - s.y) > 0.1 || s.active) {
-      s.raf = requestAnimationFrame(tick);
-    }
-  };
-
-  return (
-    <div
-      className="relative"
-      onPointerMove={(e) => {
-        if (e.pointerType !== "mouse") return;
-        const rect = e.currentTarget.getBoundingClientRect();
-        const s = state.current;
-        s.tx = ((e.clientX - rect.left) / rect.width) * 100;
-        s.ty = ((e.clientY - rect.top) / rect.height) * 100;
-        if (!s.active) { s.active = true; s.raf = requestAnimationFrame(tick); }
-      }}
-      onPointerLeave={(e) => { if (e.pointerType === "mouse") stop(); }}
-    >
-      {/* dimmed base — always visible so touch/no-hover still sees content */}
-      <div className="opacity-40" aria-hidden>{children}</div>
-      {/* full layer revealed through a soft cursor-following mask */}
-      <div
-        ref={overlayRef}
-        className="absolute inset-0"
-        style={{
-          ["--mx" as string]: "50%",
-          ["--my" as string]: "50%",
-          maskImage: "radial-gradient(circle 200px at var(--mx) var(--my), black 35%, transparent 75%)",
-          WebkitMaskImage: "radial-gradient(circle 200px at var(--mx) var(--my), black 35%, transparent 75%)",
-        }}
-      >
-        {children}
-      </div>
-    </div>
-  );
 }
 
 // ponytail: default 3 layers (was 5) — backdrop-filter stacks are the main scroll cost
@@ -769,14 +725,14 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
               </div>
 
               <div className="lg:col-span-6" data-feat-portrait>
-                <CursorRevealPanel disabled={reduced || isCardPreview}>
-                  <ImagePlaceholder
-                    inverted
-                    description="Full-body studio portrait of striker Luca Moretti, black & white, dark background"
-                    treatment="GRAYSCALE · HIGH CONTRAST · DARK SET"
-                    aspect="4 / 5"
-                  />
-                </CursorRevealPanel>
+                <ImagePlaceholder
+                  inverted
+                  src="/images/soccer-team/no9.webp"
+                  alt="Luca Moretti, Olympus FC striker, mid-air overhead kick"
+                  description="Full-body studio portrait of striker Luca Moretti, black & white, dark background"
+                  treatment="GRAYSCALE · HIGH CONTRAST · DARK SET"
+                  aspect="4 / 5"
+                />
               </div>
             </div>
 
@@ -868,17 +824,17 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
           <div className="relative max-w-6xl mx-auto">
             <SectionIndex n="04" label="The Arena" />
             <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-              {/* image: the ONE sanctioned slow hover (border thickens, content scales, 300ms) */}
+              {/* image: the ONE sanctioned slow hover (border thickens, 300ms) */}
               <div className="lg:col-span-7 group" data-wipe>
                 <div className="border-2 border-[#0D0C0A] group-hover:border-4 group-hover:-m-[2px] transition-all duration-100 overflow-hidden">
-                  <div className="transition-transform duration-300 group-hover:scale-105">
-                    <ImagePlaceholder
-                      description="Aerial black & white photograph of the stadium's retractable geometric steel roof"
-                      treatment="GRAYSCALE · ARCHITECTURAL · AERIAL"
-                      aspect="16 / 10"
-                      className="border-0"
-                    />
-                  </div>
+                  <ImagePlaceholder
+                    src="/images/soccer-team/stadium.webp"
+                    alt="Aerial view of Olympus Arena at dusk during a match"
+                    description="Aerial black & white photograph of the stadium's retractable geometric steel roof"
+                    treatment="GRAYSCALE · ARCHITECTURAL · AERIAL"
+                    aspect="16 / 10"
+                    className="border-0"
+                  />
                 </div>
               </div>
 
