@@ -194,6 +194,8 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
   useRuleDraw(rootRef, gsapReveals);
   const heroRef = useRef<HTMLDivElement>(null);
   usePlateStrike(heroRef, gsapReveals, { stagger: 0.08, distance: -40 });
+  const manifestoRef = useRef<HTMLDivElement>(null);
+  usePlateStrike(manifestoRef, gsapReveals, { stagger: 0.06 });
 
   return (
     <div
@@ -351,6 +353,50 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             <div className="absolute inset-y-0 right-0 w-24"><GradualBlur direction="right" /></div>
           </div>
           <Rule weight={4} className="absolute bottom-0" />
+        </section>
+
+        {/* ---------------------------------------------- 01 · the club */}
+        <section className="relative py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
+          <Texture style={TEXTURE.grid} />
+          <div className="relative max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
+              <div className="lg:col-span-5" ref={manifestoRef}>
+                <SectionIndex n="01" label="The Club" />
+                <h2 className="mt-6 text-5xl md:text-6xl lg:text-7xl leading-[1.02] tracking-tight" style={DISPLAY}>
+                  <SplitLine text="Discipline is a style." />
+                </h2>
+                <Rule weight={2} animated className="mt-8 max-w-[120px]" />
+              </div>
+
+              <div className="lg:col-span-7 text-lg leading-relaxed max-w-[62ch]">
+                <p>
+                  <span aria-hidden className="float-left mr-4 mt-1 flex h-16 w-16 items-center justify-center border-2 border-black text-5xl font-bold leading-none" style={DISPLAY}>F</span>
+                  <span aria-hidden>ounded</span><span className="sr-only">Founded</span> in 2018, Olympus was built on a
+                  refusal: that athletic ambition and visual restraint could not share a crest. The club plays in black and
+                  white because the game, reduced to its essence, is geometry — lines held, angles closed, space created
+                  and denied.
+                </p>
+                <p className="mt-6">
+                  Every department of the club answers to the same standard. The pitch is measured, the press is
+                  choreographed, the badge is set in serif. Nothing decorative survives unless it works.
+                </p>
+              </div>
+            </div>
+
+            {/* pull quote */}
+            <motion.figure
+              variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
+              className="mt-20 md:mt-28 border-t border-b border-black py-12 md:py-16 relative"
+            >
+              <span aria-hidden className="absolute -top-2 left-0 text-8xl md:text-9xl leading-none opacity-10 select-none" style={DISPLAY}>“</span>
+              <blockquote className="italic text-3xl md:text-4xl lg:text-5xl leading-tight max-w-4xl mx-auto text-center" style={DISPLAY}>
+                We do not chase the ball. We move the geometry until the ball arrives.
+              </blockquote>
+              <figcaption className="mt-8 text-center text-[11px] tracking-[0.3em] uppercase text-[#525252]" style={MONO}>
+                R. Vallgren — Head Coach
+              </figcaption>
+            </motion.figure>
+          </div>
         </section>
       </main>
 
