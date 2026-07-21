@@ -5,40 +5,48 @@ import { useRouteFonts, MONOCHROME_FONTS_HREF } from "../hooks/useRouteFonts";
 import { useMotionPrefs, EASE_ENTER } from "../lib/motion";
 import SplitLine from "../components/SplitLine";
 import { usePlateStrike } from "../hooks/useBroadsheetMotion";
-import { gsap } from "../lib/gsapSetup";
+import { gsap, ScrollTrigger } from "../lib/gsapSetup";
 import DitherField from "../components/DitherField";
 
 // ---------------------------------------------------------------- tokens
+// Luxury matchday-programme palette:
+//   paper  #F4EFE4  warm ivory        ink   #0D0C0A  warm near-black
+//   pine   #14261E  deep green        gold  #A07C3E  antique gold (on light)
+//   champ  #D8BC80  champagne gold (on dark)
+//   muted  #6E6555  secondary text    hair  #DAD1BD  hairlines on light
 const DISPLAY = { fontFamily: "'Playfair Display', Georgia, serif" } as const;
 const MONO = { fontFamily: "'JetBrains Mono', monospace" } as const;
+
+const INK = "#0D0C0A";
+const CHAMP = "#D8BC80";
 
 const NOISE_BG =
   "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
 
-// RNRN.txt required textures — rendered as absolutely-positioned overlays.
-const TEXTURE: Record<"lines" | "grid" | "diag" | "vlinesWhite", React.CSSProperties> = {
+// Layered print textures — rendered as absolutely-positioned overlays.
+const TEXTURE: Record<"lines" | "grid" | "diag" | "vlinesGold", React.CSSProperties> = {
   lines: {
     backgroundImage:
-      "repeating-linear-gradient(0deg, transparent, transparent 1px, #000 1px, #000 2px)",
+      "repeating-linear-gradient(0deg, transparent, transparent 1px, #0D0C0A 1px, #0D0C0A 2px)",
     backgroundSize: "100% 4px",
-    opacity: 0.015,
+    opacity: 0.02,
   },
   grid: {
     backgroundImage:
-      "linear-gradient(#00000008 1px, transparent 1px), linear-gradient(90deg, #00000008 1px, transparent 1px)",
+      "linear-gradient(#0D0C0A08 1px, transparent 1px), linear-gradient(90deg, #0D0C0A08 1px, transparent 1px)",
     backgroundSize: "40px 40px",
     opacity: 0.4,
   },
   diag: {
     backgroundImage:
-      "repeating-linear-gradient(45deg, transparent, transparent 40px, #00000010 40px, #00000010 42px)",
+      "repeating-linear-gradient(45deg, transparent, transparent 40px, #0D0C0A10 40px, #0D0C0A10 42px)",
     opacity: 0.5,
   },
-  vlinesWhite: {
+  vlinesGold: {
     backgroundImage:
-      "repeating-linear-gradient(90deg, transparent, transparent 1px, #fff 1px, #fff 2px)",
+      "repeating-linear-gradient(90deg, transparent, transparent 1px, #D8BC80 1px, #D8BC80 2px)",
     backgroundSize: "4px 100%",
-    opacity: 0.03,
+    opacity: 0.05,
   },
 };
 
@@ -55,14 +63,21 @@ const fadeUp: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE_ENTER } },
 };
 
-function Rule({ weight = 4, className = "", animated = false }: {
-  weight?: 1 | 2 | 4 | 8; className?: string; animated?: boolean;
+const RULE_TONE = {
+  ink: "bg-[#0D0C0A]",
+  gold: "bg-[#A07C3E]",
+  champagne: "bg-[#D8BC80]",
+  paper: "bg-[#F4EFE4]",
+} as const;
+
+function Rule({ weight = 4, tone = "ink", className = "", animated = false }: {
+  weight?: 1 | 2 | 4 | 8; tone?: keyof typeof RULE_TONE; className?: string; animated?: boolean;
 }) {
   return (
     <div
       aria-hidden
       data-rule={animated || undefined}
-      className={`w-full bg-black origin-left ${className}`}
+      className={`w-full origin-left ${RULE_TONE[tone]} ${className}`}
       style={{ height: weight }}
     />
   );
@@ -70,7 +85,8 @@ function Rule({ weight = 4, className = "", animated = false }: {
 
 function SectionIndex({ n, label }: { n: string; label: string }) {
   return (
-    <p className="text-[11px] tracking-[0.25em] uppercase text-[#525252]" style={MONO}>
+    <p className="flex items-center gap-3 text-[11px] tracking-[0.25em] uppercase text-[#6E6555]" style={MONO}>
+      <span aria-hidden className="block w-2 h-2 bg-[#A07C3E]" />
       {n} — {label}
     </p>
   );
@@ -81,20 +97,20 @@ function ImagePlaceholder({ description, treatment = "GRAYSCALE · HIGH CONTRAST
 }) {
   return (
     <div
-      className={`relative overflow-hidden border-2 ${inverted ? "border-white bg-black" : "border-black bg-[#F5F5F5]"} ${className}`}
+      className={`relative overflow-hidden border-2 ${inverted ? "border-[#D8BC80] bg-[#0F1E17]" : "border-[#0D0C0A] bg-[#EDE6D6]"} ${className}`}
       style={{ aspectRatio: aspect }}
     >
       <svg aria-hidden className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
-        <line x1="0" y1="0" x2="100%" y2="100%" stroke={inverted ? "#3F3F3F" : "#D4D4D4"} strokeWidth="1" />
-        <line x1="100%" y1="0" x2="0" y2="100%" stroke={inverted ? "#3F3F3F" : "#D4D4D4"} strokeWidth="1" />
+        <line x1="0" y1="0" x2="100%" y2="100%" stroke={inverted ? "#3A4A3F" : "#D5CCB8"} strokeWidth="1" />
+        <line x1="100%" y1="0" x2="0" y2="100%" stroke={inverted ? "#3A4A3F" : "#D5CCB8"} strokeWidth="1" />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center p-6">
-        <div className={`border px-4 py-3 text-center max-w-[36ch] ${inverted ? "border-white bg-black text-white" : "border-black bg-white"}`}>
+        <div className={`border px-4 py-3 text-center max-w-[36ch] ${inverted ? "border-[#D8BC80] bg-[#14261E] text-[#F4EFE4]" : "border-[#0D0C0A] bg-[#F4EFE4]"}`}>
           <p className="text-[10px] font-bold tracking-[0.25em] uppercase" style={MONO}>[ image ]</p>
-          <p className={`mt-2 text-[10px] leading-relaxed uppercase tracking-wider ${inverted ? "text-[#A3A3A3]" : "text-[#525252]"}`} style={MONO}>
+          <p className={`mt-2 text-[10px] leading-relaxed uppercase tracking-wider ${inverted ? "text-[#B9A97E]" : "text-[#6E6555]"}`} style={MONO}>
             {description}
           </p>
-          <p className={`mt-2 text-[9px] tracking-[0.2em] ${inverted ? "text-[#A3A3A3]" : "text-[#525252]"}`} style={MONO}>{treatment}</p>
+          <p className={`mt-2 text-[9px] tracking-[0.2em] ${inverted ? "text-[#B9A97E]" : "text-[#6E6555]"}`} style={MONO}>{treatment}</p>
         </div>
       </div>
     </div>
@@ -227,6 +243,86 @@ function useRuleDraw(rootRef: React.RefObject<HTMLDivElement | null>, enabled: b
   }, [rootRef, enabled, reduced]);
 }
 
+/**
+ * Scroll choreography (window scroller only):
+ *  - [data-drift="N"]    vertical parallax, N px each way, scrubbed
+ *  - [data-drift-x="N"]  horizontal drift in xPercent, scrubbed (bg words)
+ *  - [data-wipe]         clip-path wipe reveal, once
+ *  - [data-hero-drift]   hero content recedes and fades as it scrolls out
+ */
+function useScrollFx(rootRef: React.RefObject<HTMLDivElement | null>, enabled: boolean) {
+  const { reduced } = useMotionPrefs();
+  useEffect(() => {
+    if (!enabled || reduced) return;
+    const el = rootRef.current;
+    if (!el) return;
+    const ctx = gsap.context(() => {
+      gsap.utils.toArray<HTMLElement>("[data-drift]").forEach((node) => {
+        const amount = parseFloat(node.dataset.drift || "60");
+        gsap.fromTo(node, { y: amount }, {
+          y: -amount, ease: "none",
+          scrollTrigger: { trigger: node.parentElement ?? node, start: "top bottom", end: "bottom top", scrub: true },
+        });
+      });
+      gsap.utils.toArray<HTMLElement>("[data-drift-x]").forEach((node) => {
+        const amount = parseFloat(node.dataset.driftX || "12");
+        gsap.fromTo(node, { xPercent: amount }, {
+          xPercent: -amount, ease: "none",
+          scrollTrigger: { trigger: node.parentElement ?? node, start: "top bottom", end: "bottom top", scrub: true },
+        });
+      });
+      gsap.utils.toArray<HTMLElement>("[data-wipe]").forEach((node) => {
+        gsap.fromTo(node, { clipPath: "inset(0% 100% 0% 0%)" }, {
+          clipPath: "inset(0% 0% 0% 0%)", duration: 1.1, ease: "power4.inOut",
+          scrollTrigger: { trigger: node, start: "top 80%", once: true },
+        });
+      });
+      const hero = el.querySelector<HTMLElement>("[data-hero-drift]");
+      if (hero) {
+        gsap.to(hero, {
+          yPercent: -10, opacity: 0.35, ease: "none",
+          scrollTrigger: { trigger: hero.closest("section"), start: "top top", end: "bottom top", scrub: true },
+        });
+      }
+    }, el);
+    return () => ctx.revert();
+  }, [rootRef, enabled, reduced]);
+}
+
+/**
+ * Endless marquee driven by GSAP; when velocityReactive, scroll speed
+ * multiplies the marquee's timeScale, which then eases back to 1.
+ */
+function useMarquee(
+  trackRef: React.RefObject<HTMLDivElement | null>,
+  enabled: boolean,
+  velocityReactive: boolean,
+) {
+  useEffect(() => {
+    if (!enabled) return;
+    const track = trackRef.current;
+    if (!track) return;
+    const tween = gsap.to(track, { xPercent: -50, ease: "none", duration: 30, repeat: -1 });
+    let st: ScrollTrigger | undefined;
+    const proxy = { ts: 1 };
+    if (velocityReactive) {
+      st = ScrollTrigger.create({
+        onUpdate(self) {
+          const v = gsap.utils.clamp(1, 6, Math.abs(self.getVelocity()) / 700);
+          if (v > proxy.ts) {
+            proxy.ts = v;
+            gsap.to(proxy, {
+              ts: 1, duration: 1.4, ease: "power2.out", overwrite: true,
+              onUpdate: () => tween.timeScale(proxy.ts),
+            });
+          }
+        },
+      });
+    }
+    return () => { st?.kill(); tween.kill(); };
+  }, [trackRef, enabled, velocityReactive]);
+}
+
 // ---------------------------------------------------------------- data
 const SQUAD = [
   { group: "Goalkeepers", players: [
@@ -278,11 +374,12 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
     return () => { alive = false; };
   }, []);
 
-  // GSAP reveals only make sense against the window scroller — disabled in
-  // the Portfolio modal, where the page scrolls inside a div.
+  // GSAP scroll reveals only make sense against the window scroller —
+  // disabled in the Portfolio modal, where the page scrolls inside a div.
   const gsapReveals = fontsReady && !isPreview && !isCardPreview;
 
   useRuleDraw(rootRef, gsapReveals);
+  useScrollFx(rootRef, gsapReveals);
   const heroRef = useRef<HTMLDivElement>(null);
   usePlateStrike(heroRef, gsapReveals, { stagger: 0.08, distance: -40 });
   const manifestoRef = useRef<HTMLDivElement>(null);
@@ -290,16 +387,15 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
   const ctaRef = useRef<HTMLDivElement>(null);
   usePlateStrike(ctaRef, gsapReveals, { stagger: 0.07 });
 
+  const marqueeRef = useRef<HTMLDivElement>(null);
+  useMarquee(marqueeRef, !reduced && !isCardPreview, gsapReveals);
+
   return (
     <div
       ref={rootRef}
-      className="relative w-full min-h-screen overflow-x-hidden bg-white text-black selection:bg-black selection:text-white"
+      className="relative w-full min-h-screen overflow-x-hidden bg-[#F4EFE4] text-[#0D0C0A] selection:bg-[#A07C3E] selection:text-[#F4EFE4]"
       style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
     >
-      <style>{`
-        @keyframes olympus-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-      `}</style>
-
       {/* global paper noise */}
       <div
         aria-hidden
@@ -308,10 +404,10 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
       />
 
       {/* ------------------------------------------------ header */}
-      <header className={`${isPreview ? "absolute" : "fixed"} top-0 left-0 w-full z-50 bg-white border-b border-black`}>
+      <header className={`${isPreview ? "absolute" : "fixed"} top-0 left-0 w-full z-50 bg-[#F4EFE4] border-b border-[#0D0C0A]`}>
         <div className="max-w-6xl mx-auto px-6 md:px-8 lg:px-12 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5 select-none">
-            <span aria-hidden className="block w-2 h-2 bg-black" />
+            <span aria-hidden className="block w-2 h-2 bg-[#A07C3E]" />
             <span className="text-lg font-bold tracking-tight" style={DISPLAY}>Olympus FC</span>
           </div>
 
@@ -321,7 +417,7 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                 key={item}
                 href="#"
                 onClick={dead}
-                className="text-[10px] tracking-[0.25em] uppercase border-b border-transparent hover:border-black focus-visible:border-black focus-visible:outline-none transition-none py-2"
+                className="text-[10px] tracking-[0.25em] uppercase border-b border-transparent hover:border-[#A07C3E] focus-visible:border-[#A07C3E] focus-visible:outline-none transition-none py-2"
                 style={MONO}
               >
                 {item}
@@ -333,14 +429,14 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             <button
               type="button"
               onClick={() => { if (onClose) onClose(); else navigate("/portfolio"); }}
-              className="text-[10px] tracking-[0.25em] uppercase underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-black focus-visible:outline-offset-2 min-h-[44px] px-2 cursor-pointer"
+              className="text-[10px] tracking-[0.25em] uppercase underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#0D0C0A] focus-visible:outline-offset-2 min-h-[44px] px-2 cursor-pointer"
               style={MONO}
             >
               {onClose ? "Close" : "Back"}
             </button>
             <button
               type="button"
-              className="hidden sm:flex items-center gap-2 bg-black text-white px-5 min-h-[44px] text-[10px] tracking-[0.25em] uppercase font-medium border border-black hover:bg-white hover:text-black transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-black focus-visible:outline-offset-[3px] cursor-pointer"
+              className="hidden sm:flex items-center gap-2 bg-[#0D0C0A] text-[#F4EFE4] px-5 min-h-[44px] text-[10px] tracking-[0.25em] uppercase font-medium border border-[#0D0C0A] hover:bg-[#A07C3E] hover:text-[#0D0C0A] hover:border-[#A07C3E] transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#0D0C0A] focus-visible:outline-offset-[3px] cursor-pointer"
               style={MONO}
             >
               Season Tickets <span aria-hidden>→</span>
@@ -351,23 +447,23 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
 
       <main className="relative z-10">
         {/* ---------------------------------------------- 00 · hero */}
-        <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden pt-16">
-          {/* dither field band, behind content */}
-          <div aria-hidden className="absolute inset-x-0 bottom-0 top-1/3 opacity-[0.55]">
-            <DitherField animate={!isCardPreview && !reduced} speed={0.4} />
-            {/* fade the field's top edge into the page */}
-            <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-white to-transparent" />
+        <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden pt-16 bg-[#0D0C0A] text-[#F4EFE4]">
+          {/* full-bleed champagne dither field */}
+          <div aria-hidden className="absolute inset-0 opacity-90">
+            <DitherField animate={!isCardPreview && !reduced} speed={0.5} pixelSize={3} ink={CHAMP} paper={INK} />
           </div>
-          <Texture style={TEXTURE.lines} />
+          {/* legibility gradients over the field */}
+          <div aria-hidden className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[#0D0C0A] to-transparent" />
+          <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[#0D0C0A]/80 via-[#0D0C0A]/30 to-transparent" />
 
-          <div ref={heroRef} className="relative max-w-6xl mx-auto w-full px-6 md:px-8 lg:px-12 py-24">
+          <div ref={heroRef} data-hero-drift className="relative max-w-6xl mx-auto w-full px-6 md:px-8 lg:px-12 py-24">
             {/* kicker */}
             <div className="flex items-center gap-4">
-              <span aria-hidden className="h-px w-12 bg-black" />
-              <p className="text-[11px] tracking-[0.3em] uppercase" style={MONO}>
+              <span aria-hidden className="h-px w-12 bg-[#D8BC80]" />
+              <p className="text-[11px] tracking-[0.3em] uppercase text-[#D8BC80]" style={MONO}>
                 Est. 2018 — Athletic Club — Division I
               </p>
-              <span aria-hidden className="h-px flex-1 bg-black" />
+              <span aria-hidden className="h-px flex-1 bg-[#D8BC80]/40" />
             </div>
 
             {/* headline */}
@@ -377,26 +473,26 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             >
               <SplitLine text="OLYMPUS" />
             </h1>
-            <p className="mt-2 md:text-right italic text-[clamp(1.75rem,5vw,4rem)] leading-none" style={DISPLAY}>
+            <p className="mt-2 md:text-right italic text-[clamp(1.75rem,5vw,4rem)] leading-none text-[#D8BC80]" style={DISPLAY}>
               <SplitLine text="Football Club" />
             </p>
 
-            {/* RNRN hero punctuation: thick rule terminated by a bordered square */}
+            {/* thick rule terminated by a bordered square */}
             <div className="mt-10 flex items-center gap-3">
-              <Rule weight={4} animated className="flex-1" />
-              <span aria-hidden className="block w-3 h-3 border-2 border-black shrink-0" />
+              <Rule weight={4} tone="champagne" animated className="flex-1" />
+              <span aria-hidden className="block w-3 h-3 border-2 border-[#D8BC80] shrink-0" />
             </div>
 
             {/* meta + CTAs */}
             <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-10 items-end">
               <div className="flex flex-wrap items-center gap-4">
                 <button type="button"
-                  className="flex items-center gap-2 bg-black text-white px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border border-black hover:bg-white hover:text-black transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-black focus-visible:outline-offset-[3px] cursor-pointer"
+                  className="flex items-center gap-2 bg-[#D8BC80] text-[#0D0C0A] px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border border-[#D8BC80] hover:bg-[#F4EFE4] hover:border-[#F4EFE4] transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#D8BC80] focus-visible:outline-offset-[3px] cursor-pointer"
                   style={MONO}>
                   Match Programme <span aria-hidden>→</span>
                 </button>
                 <button type="button"
-                  className="px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border-2 border-black hover:bg-black hover:text-white transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-black focus-visible:outline-offset-[3px] cursor-pointer"
+                  className="px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border-2 border-[#F4EFE4]/70 text-[#F4EFE4] hover:bg-[#F4EFE4] hover:text-[#0D0C0A] transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#F4EFE4] focus-visible:outline-offset-[3px] cursor-pointer"
                   style={MONO}>
                   The Squad
                 </button>
@@ -412,8 +508,8 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                   ["Kick-off", "21:00 — Olympus Arena"],
                   ["Position", "1st — Division I"],
                 ].map(([k, v]) => (
-                  <motion.div key={k} variants={fadeUp} className="flex justify-between gap-6 border-t border-[#E5E5E5] py-3 last:border-b">
-                    <dt className="text-[#525252]">{k}</dt>
+                  <motion.div key={k} variants={fadeUp} className="flex justify-between gap-6 border-t border-[#F4EFE4]/20 py-3 last:border-b">
+                    <dt className="text-[#F4EFE4]/50">{k}</dt>
                     <dd className="text-right font-medium">{v}</dd>
                   </motion.div>
                 ))}
@@ -423,19 +519,16 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
         </section>
 
         {/* ---------------------------------------------- marquee */}
-        <section aria-hidden className="relative bg-black text-white overflow-hidden select-none">
-          <Rule weight={4} className="absolute top-0" />
+        <section aria-hidden className="relative bg-[#14261E] text-[#D8BC80] overflow-hidden select-none">
+          <Rule weight={4} tone="gold" className="absolute top-0" />
           <div className="py-6 overflow-hidden relative">
-            <div
-              className="flex w-max whitespace-nowrap will-change-transform"
-              style={(reduced || isCardPreview) ? undefined : { animation: "olympus-marquee 28s linear infinite" }}
-            >
+            <div ref={marqueeRef} className="flex w-max whitespace-nowrap will-change-transform">
               {[0, 1].map((copy) => (
                 <div key={copy} className="flex items-center">
                   {["Olympus FC", "Est. MMXVIII", "Fortuna Audaces Iuvat", "The Unbeaten Treble"].map((text) => (
                     <span key={text} className="flex items-center">
                       <span className="px-8 text-2xl md:text-3xl uppercase font-bold tracking-tight" style={DISPLAY}>{text}</span>
-                      <span className="block w-2 h-2 bg-white" />
+                      <span className="block w-2 h-2 bg-[#D8BC80]" />
                     </span>
                   ))}
                 </div>
@@ -445,12 +538,23 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             <div className="absolute inset-y-0 left-0 w-24"><GradualBlur direction="left" /></div>
             <div className="absolute inset-y-0 right-0 w-24"><GradualBlur direction="right" /></div>
           </div>
-          <Rule weight={4} className="absolute bottom-0" />
+          <Rule weight={4} tone="gold" className="absolute bottom-0" />
         </section>
 
         {/* ---------------------------------------------- 01 · the club */}
-        <section className="relative py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
+        <section className="relative py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
           <Texture style={TEXTURE.grid} />
+          {/* outlined background word, drifting horizontally on scroll */}
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-6 overflow-hidden">
+            <p
+              data-drift-x="8"
+              className="whitespace-nowrap text-center uppercase font-black leading-none text-[20vw]"
+              style={{ ...DISPLAY, color: "transparent", WebkitTextStroke: "1px rgba(160, 124, 62, 0.28)" }}
+            >
+              Gloria
+            </p>
+          </div>
+
           <div className="relative max-w-6xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
               <div className="lg:col-span-5" ref={manifestoRef}>
@@ -458,16 +562,16 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                 <h2 className="mt-6 text-5xl md:text-6xl lg:text-7xl leading-[1.02] tracking-tight" style={DISPLAY}>
                   <SplitLine text="Discipline is a style." />
                 </h2>
-                <Rule weight={2} animated className="mt-8 max-w-[120px]" />
+                <Rule weight={2} tone="gold" animated className="mt-8 max-w-[120px]" />
               </div>
 
               <div className="lg:col-span-7 text-lg leading-relaxed max-w-[62ch]">
                 <p>
-                  <span aria-hidden className="float-left mr-4 mt-1 flex h-16 w-16 items-center justify-center border-2 border-black text-5xl font-bold leading-none" style={DISPLAY}>F</span>
+                  <span aria-hidden className="float-left mr-4 mt-1 flex h-16 w-16 items-center justify-center border-2 border-[#A07C3E] text-5xl font-bold leading-none text-[#A07C3E]" style={DISPLAY}>F</span>
                   <span aria-hidden>ounded</span><span className="sr-only">Founded</span> in 2018, Olympus was built on a
-                  refusal: that athletic ambition and visual restraint could not share a crest. The club plays in black and
-                  white because the game, reduced to its essence, is geometry — lines held, angles closed, space created
-                  and denied.
+                  refusal: that athletic ambition and visual restraint could not share a crest. The club plays in ivory,
+                  pine and gold because the game, reduced to its essence, is geometry — lines held, angles closed, space
+                  created and denied.
                 </p>
                 <p className="mt-6">
                   Every department of the club answers to the same standard. The pitch is measured, the press is
@@ -479,13 +583,13 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             {/* pull quote */}
             <motion.figure
               variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
-              className="mt-20 md:mt-28 border-t border-b border-black py-12 md:py-16 relative"
+              className="mt-20 md:mt-28 border-t border-b border-[#0D0C0A] py-12 md:py-16 relative"
             >
-              <span aria-hidden className="absolute -top-2 left-0 text-8xl md:text-9xl leading-none opacity-10 select-none" style={DISPLAY}>“</span>
+              <span aria-hidden className="absolute -top-2 left-0 text-8xl md:text-9xl leading-none text-[#A07C3E] opacity-30 select-none" style={DISPLAY}>“</span>
               <blockquote className="italic text-3xl md:text-4xl lg:text-5xl leading-tight max-w-4xl mx-auto text-center" style={DISPLAY}>
                 We do not chase the ball. We move the geometry until the ball arrives.
               </blockquote>
-              <figcaption className="mt-8 text-center text-[11px] tracking-[0.3em] uppercase text-[#525252]" style={MONO}>
+              <figcaption className="mt-8 text-center text-[11px] tracking-[0.3em] uppercase text-[#6E6555]" style={MONO}>
                 R. Vallgren — Head Coach
               </figcaption>
             </motion.figure>
@@ -501,27 +605,27 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                 <SectionIndex n="02" label="First Team" />
                 <h2 className="mt-6 text-5xl md:text-6xl lg:text-7xl tracking-tight" style={DISPLAY}>The Eleven</h2>
               </div>
-              <p className="hidden md:block text-[11px] tracking-[0.2em] uppercase text-[#525252] pb-2" style={MONO}>Season 2026–27</p>
+              <p className="hidden md:block text-[11px] tracking-[0.2em] uppercase text-[#6E6555] pb-2" style={MONO}>Season 2026–27</p>
             </div>
 
             <div className="mt-16">
               {SQUAD.map(({ group, players }) => (
                 <div key={group} className="mt-12 first:mt-0">
-                  <div className="flex items-baseline justify-between border-b-2 border-black pb-3">
+                  <div className="flex items-baseline justify-between border-b-2 border-[#0D0C0A] pb-3">
                     <h3 className="text-[11px] tracking-[0.3em] uppercase font-bold" style={MONO}>{group}</h3>
-                    <span className="text-[11px] tracking-[0.2em] text-[#525252]" style={MONO}>/ {players.length}</span>
+                    <span className="text-[11px] tracking-[0.2em] text-[#6E6555]" style={MONO}>/ {players.length}</span>
                   </div>
                   <motion.ul variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
                     {players.map((p) => (
                       <motion.li key={p.n} variants={fadeUp}>
-                        <div className="group grid grid-cols-[3rem_1fr_auto] md:grid-cols-[5rem_1fr_10rem_4rem_3rem] items-center gap-4 border-b border-black py-5 px-2 -mx-2 hover:bg-black hover:text-white transition-none cursor-default">
-                          <span className="text-lg md:text-xl tabular-nums text-[#525252] group-hover:text-white" style={MONO}>
+                        <div className="group grid grid-cols-[3rem_1fr_auto] md:grid-cols-[5rem_1fr_10rem_4rem_3rem] items-center gap-4 border-b border-[#0D0C0A] py-5 px-2 -mx-2 hover:bg-[#14261E] hover:text-[#F4EFE4] transition-none cursor-default">
+                          <span className="text-lg md:text-xl tabular-nums text-[#6E6555] group-hover:text-[#D8BC80]" style={MONO}>
                             {String(p.n).padStart(2, "0")}
                           </span>
                           <span className="text-2xl md:text-3xl tracking-tight" style={DISPLAY}>{p.name}</span>
-                          <span className="hidden md:block text-[11px] tracking-[0.2em] uppercase text-[#525252] group-hover:text-white" style={MONO}>{p.pos}</span>
+                          <span className="hidden md:block text-[11px] tracking-[0.2em] uppercase text-[#6E6555] group-hover:text-[#F4EFE4]/70" style={MONO}>{p.pos}</span>
                           <span className="text-[11px] tracking-[0.2em] justify-self-end md:justify-self-start" style={MONO}>{p.nat}</span>
-                          <span aria-hidden className="hidden md:block justify-self-end text-xl">→</span>
+                          <span aria-hidden className="hidden md:block justify-self-end text-xl group-hover:text-[#D8BC80]">→</span>
                         </div>
                       </motion.li>
                     ))}
@@ -533,18 +637,18 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
         </section>
 
         {/* ---------------------------------------------- featured №9 */}
-        <section className="relative bg-black text-white py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
-          <Texture style={TEXTURE.vlinesWhite} />
+        <section className="relative bg-[#14261E] text-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
+          <Texture style={TEXTURE.vlinesGold} />
           <div className="relative max-w-6xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               <div className="lg:col-span-6 relative">
-                <p className="text-[11px] tracking-[0.3em] uppercase text-white/60" style={MONO}>Featured — Striker</p>
-                <div aria-hidden className="leading-[0.75] font-black text-[clamp(10rem,28vw,22rem)] select-none -ml-4" style={DISPLAY}>9</div>
+                <p className="text-[11px] tracking-[0.3em] uppercase text-[#D8BC80]" style={MONO}>Featured — Striker</p>
+                <div aria-hidden data-drift="50" className="leading-[0.75] font-black text-[clamp(10rem,28vw,22rem)] select-none -ml-4 text-[#D8BC80]" style={DISPLAY}>9</div>
                 <h2 className="mt-4 text-4xl md:text-5xl tracking-tight" style={DISPLAY}>Luca Moretti</h2>
-                <p className="mt-3 text-[11px] tracking-[0.3em] uppercase text-white/60" style={MONO}>№ 9 — Striker — Italy</p>
+                <p className="mt-3 text-[11px] tracking-[0.3em] uppercase text-[#D8BC80]/80" style={MONO}>№ 9 — Striker — Italy</p>
               </div>
 
-              <div className="lg:col-span-6">
+              <div className="lg:col-span-6" data-wipe>
                 <CursorRevealPanel disabled={reduced || isCardPreview}>
                   <ImagePlaceholder
                     inverted
@@ -557,15 +661,15 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             </div>
 
             {/* stat strip */}
-            <div className="mt-16 grid grid-cols-3 border-t border-b border-white/40 divide-x divide-white/40 text-center">
+            <div className="mt-16 grid grid-cols-3 border-t border-b border-[#D8BC80]/40 divide-x divide-[#D8BC80]/40 text-center">
               {[
                 { target: 24, label: "Goals" },
                 { target: 12, label: "Assists" },
                 { target: 32, label: "Matches" },
               ].map(({ target, label }) => (
                 <div key={label} className="py-8">
-                  <p className="text-4xl md:text-5xl font-bold" style={DISPLAY}><Counter target={target} /></p>
-                  <p className="mt-2 text-[11px] tracking-[0.3em] uppercase text-white/60" style={MONO}>{label}</p>
+                  <p className="text-4xl md:text-5xl font-bold text-[#D8BC80]" style={DISPLAY}><Counter target={target} /></p>
+                  <p className="mt-2 text-[11px] tracking-[0.3em] uppercase text-[#F4EFE4]/60" style={MONO}>{label}</p>
                 </div>
               ))}
             </div>
@@ -579,26 +683,26 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             <SectionIndex n="03" label="Fixtures" />
             <h2 className="mt-6 text-5xl md:text-6xl lg:text-7xl tracking-tight" style={DISPLAY}>The Ledger</h2>
 
-            <motion.ul variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="mt-16 border-t border-black">
+            <motion.ul variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="mt-16 border-t border-[#0D0C0A]">
               {FIXTURES.map((f) => {
                 const olympusHome = f.home === "Olympus FC";
                 return (
                   <motion.li key={`${f.home}-${f.away}`} variants={fadeUp}>
-                    <div className="group grid grid-cols-1 md:grid-cols-[6rem_1fr_auto] items-center gap-4 md:gap-8 border-b border-black hover:border-b-[3px] hover:-mb-[2px] py-8 transition-none">
-                      <div style={MONO} className="text-[11px] tracking-[0.25em] uppercase text-[#525252]">
+                    <div className="group grid grid-cols-1 md:grid-cols-[6rem_1fr_auto] items-center gap-4 md:gap-8 border-b border-[#0D0C0A] hover:border-b-[3px] hover:-mb-[2px] py-8 transition-none">
+                      <div style={MONO} className="text-[11px] tracking-[0.25em] uppercase text-[#6E6555]">
                         {f.date}
                         <span className="block mt-1 text-[10px] normal-case tracking-[0.15em]">{f.venue}</span>
                       </div>
                       <p className="text-2xl md:text-4xl tracking-tight" style={DISPLAY}>
                         <span className={olympusHome ? "font-bold" : ""}>{f.home}</span>
-                        <span className="italic text-[#525252] mx-3 text-xl md:text-2xl">vs</span>
+                        <span className="italic text-[#A07C3E] mx-3 text-xl md:text-2xl">vs</span>
                         <span className={!olympusHome ? "font-bold" : ""}>{f.away}</span>
                       </p>
                       {f.score ? (
-                        <p className="text-4xl md:text-5xl font-bold tabular-nums justify-self-start md:justify-self-end" style={DISPLAY}>{f.score}</p>
+                        <p className="text-4xl md:text-5xl font-bold tabular-nums justify-self-start md:justify-self-end text-[#A07C3E]" style={DISPLAY}>{f.score}</p>
                       ) : (
                         <button type="button"
-                          className="justify-self-start md:justify-self-end text-[11px] tracking-[0.25em] uppercase border-2 border-black px-6 py-3 min-h-[44px] hover:bg-black hover:text-white transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-black focus-visible:outline-offset-[3px] cursor-pointer"
+                          className="justify-self-start md:justify-self-end text-[11px] tracking-[0.25em] uppercase border-2 border-[#0D0C0A] px-6 py-3 min-h-[44px] hover:bg-[#14261E] hover:text-[#F4EFE4] hover:border-[#14261E] transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#0D0C0A] focus-visible:outline-offset-[3px] cursor-pointer"
                           style={MONO}>
                           Reserve <span aria-hidden>→</span>
                         </button>
@@ -612,10 +716,10 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
         </section>
 
         {/* ---------------------------------------------- records */}
-        <section className="relative bg-black text-white py-24 md:py-32 px-6 md:px-8 lg:px-12 overflow-hidden">
-          <Texture style={TEXTURE.vlinesWhite} />
+        <section className="relative bg-[#0D0C0A] text-[#F4EFE4] py-24 md:py-32 px-6 md:px-8 lg:px-12 overflow-hidden">
+          <Texture style={TEXTURE.vlinesGold} />
           <div className="relative max-w-6xl mx-auto">
-            <div className="grid grid-cols-2 lg:grid-cols-4 lg:divide-x divide-white/30 text-center">
+            <div className="grid grid-cols-2 lg:grid-cols-4 lg:divide-x divide-[#D8BC80]/30 text-center">
               {[
                 { target: 48, label: "Played" },
                 { target: 34, label: "Wins" },
@@ -623,14 +727,14 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                 { target: 3, suffix: "×", label: "Titles" },
               ].map(({ target, suffix, label }) => (
                 <div key={label} className="py-10 px-4">
-                  <p className="text-7xl md:text-8xl font-bold leading-none" style={DISPLAY}>
+                  <p className="text-7xl md:text-8xl font-bold leading-none text-[#D8BC80]" style={DISPLAY}>
                     <Counter target={target} suffix={suffix} />
                   </p>
-                  <p className="mt-4 text-[11px] tracking-[0.35em] uppercase text-white/60" style={MONO}>{label}</p>
+                  <p className="mt-4 text-[11px] tracking-[0.35em] uppercase text-[#F4EFE4]/60" style={MONO}>{label}</p>
                 </div>
               ))}
             </div>
-            <p className="mt-12 pt-8 border-t border-white/30 text-center text-[11px] tracking-[0.3em] uppercase text-white/60" style={MONO}>
+            <p className="mt-12 pt-8 border-t border-[#D8BC80]/30 text-center text-[11px] tracking-[0.3em] uppercase text-[#F4EFE4]/60" style={MONO}>
               Unbeaten Treble — Domestic League · Continental Cup · Super Cup — 2023
             </p>
           </div>
@@ -643,8 +747,8 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             <SectionIndex n="04" label="The Arena" />
             <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
               {/* image: the ONE sanctioned slow hover (border thickens, content scales, 300ms) */}
-              <div className="lg:col-span-7 group">
-                <div className="border-2 border-black group-hover:border-4 group-hover:-m-[2px] transition-all duration-100 overflow-hidden">
+              <div className="lg:col-span-7 group" data-wipe>
+                <div className="border-2 border-[#0D0C0A] group-hover:border-4 group-hover:-m-[2px] transition-all duration-100 overflow-hidden">
                   <div className="transition-transform duration-300 group-hover:scale-105">
                     <ImagePlaceholder
                       description="Aerial black & white photograph of the stadium's retractable geometric steel roof"
@@ -669,8 +773,8 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                     ["Pitch", "Hybrid"],
                     ["Roof", "Retractable"],
                   ].map(([k, v]) => (
-                    <div key={k} className="flex justify-between border-t border-[#E5E5E5] last:border-b py-3 text-[11px] tracking-[0.2em] uppercase">
-                      <dt className="text-[#525252]">{k}</dt>
+                    <div key={k} className="flex justify-between border-t border-[#DAD1BD] last:border-b py-3 text-[11px] tracking-[0.2em] uppercase">
+                      <dt className="text-[#6E6555]">{k}</dt>
                       <dd className="font-medium tabular-nums">{v}</dd>
                     </div>
                   ))}
@@ -685,11 +789,11 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                 { year: "2023", title: "The Unbeaten Treble", text: "League, continental cup and super cup lifted in a single season without a defeat." },
                 { year: "2025", title: "Digital Arena Integration", text: "Real-time analytics, full-stadium connectivity, and physical-to-virtual matchday sensing." },
               ].map(({ year, title, text }) => (
-                <div key={year} className="grid grid-cols-1 md:grid-cols-[10rem_1fr] gap-4 md:gap-12 border-t border-black last:border-b py-10 items-baseline">
-                  <p className="text-5xl md:text-6xl font-bold tabular-nums" style={DISPLAY}>{year}</p>
+                <div key={year} className="grid grid-cols-1 md:grid-cols-[10rem_1fr] gap-4 md:gap-12 border-t border-[#0D0C0A] last:border-b py-10 items-baseline">
+                  <p className="text-5xl md:text-6xl font-bold tabular-nums text-[#A07C3E]" style={DISPLAY}>{year}</p>
                   <div>
                     <h3 className="text-[12px] tracking-[0.3em] uppercase font-bold" style={MONO}>{title}</h3>
-                    <p className="mt-3 text-base leading-relaxed max-w-[62ch] text-[#525252]">{text}</p>
+                    <p className="mt-3 text-base leading-relaxed max-w-[62ch] text-[#6E6555]">{text}</p>
                   </div>
                 </div>
               ))}
@@ -698,35 +802,35 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
         </section>
 
         {/* ---------------------------------------------- final cta */}
-        <Rule weight={8} />
-        <section className="relative bg-black text-white py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
+        <Rule weight={8} tone="gold" />
+        <section className="relative bg-[#0D0C0A] text-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
           <div aria-hidden className="pointer-events-none absolute inset-0"
-            style={{ backgroundImage: "radial-gradient(circle at top center, #ffffff, transparent 70%)", opacity: 0.05 }} />
+            style={{ backgroundImage: "radial-gradient(circle at top center, #D8BC80, transparent 70%)", opacity: 0.08 }} />
           <div ref={ctaRef} className="relative max-w-4xl mx-auto text-center">
             <h2 className="text-6xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight uppercase font-bold" style={DISPLAY}>
               <SplitLine text="Join the First Eleven" />
             </h2>
-            <p className="mt-8 text-lg leading-relaxed text-white/70 max-w-[48ch] mx-auto">
+            <p className="mt-8 text-lg leading-relaxed text-[#F4EFE4]/70 max-w-[48ch] mx-auto">
               Season 2026–27 registration of interest. Early access to fixtures, programmes and season tickets.
             </p>
 
             <form onSubmit={dead} className="mt-12 max-w-md mx-auto text-left">
-              <label htmlFor="olympus-email" className="block text-[11px] tracking-[0.3em] uppercase text-white/60" style={MONO}>
+              <label htmlFor="olympus-email" className="block text-[11px] tracking-[0.3em] uppercase text-[#D8BC80]" style={MONO}>
                 Email address
               </label>
               <div className="mt-3 flex items-stretch gap-4">
                 <input
                   id="olympus-email" type="email" placeholder="name@example.com"
-                  className="flex-1 min-w-0 bg-transparent border-b-2 border-white px-1 py-3 text-base placeholder:italic placeholder:text-white/40 focus:outline-none focus:border-b-4 focus-visible:border-b-4"
+                  className="flex-1 min-w-0 bg-transparent border-b-2 border-[#F4EFE4]/70 px-1 py-3 text-base placeholder:italic placeholder:text-[#F4EFE4]/40 focus:outline-none focus:border-b-4 focus:border-[#D8BC80] focus-visible:border-b-4"
                   style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
                 />
                 <button type="submit"
-                  className="bg-white text-black px-8 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border border-white hover:bg-black hover:text-white transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-white focus-visible:outline-offset-[3px] cursor-pointer"
+                  className="bg-[#D8BC80] text-[#0D0C0A] px-8 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border border-[#D8BC80] hover:bg-[#F4EFE4] hover:border-[#F4EFE4] transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#D8BC80] focus-visible:outline-offset-[3px] cursor-pointer"
                   style={MONO}>
                   Register <span aria-hidden>→</span>
                 </button>
               </div>
-              <p className="mt-4 text-[10px] tracking-[0.2em] uppercase text-white/40" style={MONO}>
+              <p className="mt-4 text-[10px] tracking-[0.2em] uppercase text-[#F4EFE4]/40" style={MONO}>
                 * A design study — no data is collected, nothing is sent
               </p>
             </form>
@@ -741,22 +845,22 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
       )}
 
       {/* ------------------------------------------------ footer */}
-      <footer className="relative border-t border-black py-12 px-6 md:px-8 lg:px-12">
+      <footer className="relative border-t border-[#0D0C0A] py-12 px-6 md:px-8 lg:px-12">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <div className="flex items-center gap-2.5">
-            <span aria-hidden className="block w-2 h-2 bg-black" />
+            <span aria-hidden className="block w-2 h-2 bg-[#A07C3E]" />
             <span className="text-base font-bold tracking-tight" style={DISPLAY}>Olympus FC</span>
           </div>
           <div className="flex items-center gap-8">
             {["Privacy", "Terms", "Press"].map((item) => (
               <a key={item} href="#" onClick={dead}
-                className="text-[10px] tracking-[0.25em] uppercase border-b border-transparent hover:border-black focus-visible:border-black focus-visible:outline-none py-2"
+                className="text-[10px] tracking-[0.25em] uppercase border-b border-transparent hover:border-[#A07C3E] focus-visible:border-[#A07C3E] focus-visible:outline-none py-2"
                 style={MONO}>
                 {item}
               </a>
             ))}
           </div>
-          <p className="text-[10px] tracking-[0.2em] uppercase text-[#525252]" style={MONO}>
+          <p className="text-[10px] tracking-[0.2em] uppercase text-[#6E6555]" style={MONO}>
             © {new Date().getFullYear()} Olympus FC — A design study
           </p>
         </div>

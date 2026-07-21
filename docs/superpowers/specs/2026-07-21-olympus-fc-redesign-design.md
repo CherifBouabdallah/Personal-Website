@@ -5,6 +5,8 @@
 **Design system source:** `RNRN.txt` (repo root) — "Minimalist Monochrome"
 **Status:** Approved for planning. Implementation plan: `docs/superpowers/plans/2026-07-21-olympus-fc-redesign-plan.md`
 
+> **Revision (2026-07-21, post-implementation):** at the owner's direction the strict monochrome rule was relaxed to a luxury palette — ivory `#F4EFE4`, ink `#0D0C0A`, deep pine `#14261E`, antique gold `#A07C3E` (light surfaces), champagne `#D8BC80` (dark surfaces). The hero became a full-bleed ink section with the dither field in champagne gold; scroll choreography was extended with a scroll-velocity-reactive marquee, scrubbed parallax drifts (`data-drift`/`data-drift-x`), and clip-path wipe reveals (`data-wipe`). RNRN's "no parallax" rule was consciously overridden by the owner's request for scroll animations.
+
 ## 1. Goal
 
 Rebuild the Olympus FC showcase page from the ground up as a **pure black-and-white editorial piece** — a luxury matchday programme / fashion-magazine treatment of a football club. It exists purely to showcase design & engineering skill (an "awwwards-style" piece). Every button/link is decorative and does nothing, except the existing Back/Close chrome. All imagery is placeholder boxes with a caption describing the intended image; the owner fills them in later.

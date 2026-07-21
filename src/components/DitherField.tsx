@@ -39,6 +39,9 @@ float bayer4(vec2 cell) {
   return (b + 0.5) / 16.0;
 }
 
+uniform vec3 u_ink;
+uniform vec3 u_paper;
+
 void main() {
   vec2 cell = floor(gl_FragCoord.xy / u_pixel);
   vec2 uv = (cell * u_pixel) / u_res;
@@ -46,18 +49,25 @@ void main() {
   float v = fbm(uv * 3.0 + vec2(u_time * 0.06, u_time * 0.03));
   v = smoothstep(0.35, 0.75, v);
   float ink = step(bayer4(cell), v);
-  gl_FragColor = vec4(vec3(ink), 1.0);
+  gl_FragColor = vec4(mix(u_paper, u_ink, ink), 1.0);
 }
 `;
+
+const hexToRgb = (hex: string): [number, number, number] => {
+  const n = parseInt(hex.slice(1), 16);
+  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+};
 
 interface DitherFieldProps {
   animate?: boolean;
   pixelSize?: number; // CSS px per dither cell
   speed?: number;
+  ink?: string;   // hex color of the dither dots
+  paper?: string; // hex color of the field behind them
   className?: string;
 }
 
-export default function DitherField({ animate = true, pixelSize = 2.5, speed = 1, className = "" }: DitherFieldProps) {
+export default function DitherField({ animate = true, pixelSize = 2.5, speed = 1, ink = "#000000", paper = "#FFFFFF", className = "" }: DitherFieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -94,6 +104,8 @@ export default function DitherField({ animate = true, pixelSize = 2.5, speed = 1
     const uRes = gl.getUniformLocation(program, "u_res");
     const uTime = gl.getUniformLocation(program, "u_time");
     const uPixel = gl.getUniformLocation(program, "u_pixel");
+    gl.uniform3fv(gl.getUniformLocation(program, "u_ink"), hexToRgb(ink));
+    gl.uniform3fv(gl.getUniformLocation(program, "u_paper"), hexToRgb(paper));
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const resize = () => {
@@ -145,7 +157,7 @@ export default function DitherField({ animate = true, pixelSize = 2.5, speed = 1
       document.removeEventListener("visibilitychange", onVis);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
-  }, [animate, pixelSize, speed]);
+  }, [animate, pixelSize, speed, ink, paper]);
 
   return <canvas ref={canvasRef} aria-hidden className={`block h-full w-full ${className}`} />;
 }
