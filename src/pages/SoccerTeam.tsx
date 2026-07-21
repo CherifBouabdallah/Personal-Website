@@ -608,6 +608,31 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             </motion.ul>
           </div>
         </section>
+
+        {/* ---------------------------------------------- records */}
+        <section className="relative bg-black text-white py-24 md:py-32 px-6 md:px-8 lg:px-12 overflow-hidden">
+          <Texture style={TEXTURE.vlinesWhite} />
+          <div className="relative max-w-6xl mx-auto">
+            <div className="grid grid-cols-2 lg:grid-cols-4 lg:divide-x divide-white/30 text-center">
+              {[
+                { target: 48, label: "Played" },
+                { target: 34, label: "Wins" },
+                { target: 87, label: "Goals" },
+                { target: 3, suffix: "×", label: "Titles" },
+              ].map(({ target, suffix, label }) => (
+                <div key={label} className="py-10 px-4">
+                  <p className="text-7xl md:text-8xl font-bold leading-none" style={DISPLAY}>
+                    <Counter target={target} suffix={suffix} />
+                  </p>
+                  <p className="mt-4 text-[11px] tracking-[0.35em] uppercase text-white/60" style={MONO}>{label}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-12 pt-8 border-t border-white/30 text-center text-[11px] tracking-[0.3em] uppercase text-white/60" style={MONO}>
+              Unbeaten Treble — Domestic League · Continental Cup · Super Cup — 2023
+            </p>
+          </div>
+        </section>
       </main>
 
       {!isPreview && !isCardPreview && (
