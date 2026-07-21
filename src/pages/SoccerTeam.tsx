@@ -6,6 +6,7 @@ import { useMotionPrefs, EASE_ENTER } from "../lib/motion";
 import SplitLine from "../components/SplitLine";
 import { usePlateStrike } from "../hooks/useBroadsheetMotion";
 import { gsap } from "../lib/gsapSetup";
+import DitherField from "../components/DitherField";
 
 // ---------------------------------------------------------------- tokens
 const DISPLAY = { fontFamily: "'Playfair Display', Georgia, serif" } as const;
@@ -129,6 +130,25 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
   return <span ref={ref} className="tabular-nums">{count}{suffix}</span>;
 }
 
+/** Draws every [data-rule] in from the left on scroll, once. Window scroller only. */
+function useRuleDraw(rootRef: React.RefObject<HTMLDivElement | null>, enabled: boolean) {
+  const { reduced } = useMotionPrefs();
+  useEffect(() => {
+    if (!enabled || reduced) return;
+    const el = rootRef.current;
+    if (!el) return;
+    const ctx = gsap.context(() => {
+      gsap.utils.toArray<HTMLElement>("[data-rule]").forEach((rule) => {
+        gsap.fromTo(rule, { scaleX: 0 }, {
+          scaleX: 1, duration: 0.8, ease: "power3.out",
+          scrollTrigger: { trigger: rule, start: "top 92%", once: true },
+        });
+      });
+    }, el);
+    return () => ctx.revert();
+  }, [rootRef, enabled, reduced]);
+}
+
 // ---------------------------------------------------------------- page
 interface SoccerTeamProps {
   isPreview?: boolean;
@@ -152,6 +172,10 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
   // GSAP reveals only make sense against the window scroller — disabled in
   // the Portfolio modal, where the page scrolls inside a div.
   const gsapReveals = fontsReady && !isPreview && !isCardPreview;
+
+  useRuleDraw(rootRef, gsapReveals);
+  const heroRef = useRef<HTMLDivElement>(null);
+  usePlateStrike(heroRef, gsapReveals, { stagger: 0.08, distance: -40 });
 
   return (
     <div
@@ -209,7 +233,77 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
       </header>
 
       <main className="relative z-10">
-        {/* SECTIONS — inserted in spec order */}
+        {/* ---------------------------------------------- 00 · hero */}
+        <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden pt-16">
+          {/* dither field band, behind content */}
+          <div aria-hidden className="absolute inset-x-0 bottom-0 top-1/3 opacity-[0.55]">
+            <DitherField animate={!isCardPreview && !reduced} speed={0.4} />
+            {/* fade the field's top edge into the page */}
+            <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-white to-transparent" />
+          </div>
+          <Texture style={TEXTURE.lines} />
+
+          <div ref={heroRef} className="relative max-w-6xl mx-auto w-full px-6 md:px-8 lg:px-12 py-24">
+            {/* kicker */}
+            <div className="flex items-center gap-4">
+              <span aria-hidden className="h-px w-12 bg-black" />
+              <p className="text-[11px] tracking-[0.3em] uppercase" style={MONO}>
+                Est. 2018 — Athletic Club — Division I
+              </p>
+              <span aria-hidden className="h-px flex-1 bg-black" />
+            </div>
+
+            {/* headline */}
+            <h1
+              className="mt-8 font-black uppercase leading-[0.85] tracking-tighter text-[clamp(4rem,17vw,15rem)]"
+              style={DISPLAY}
+            >
+              <SplitLine text="OLYMPUS" />
+            </h1>
+            <p className="mt-2 md:text-right italic text-[clamp(1.75rem,5vw,4rem)] leading-none" style={DISPLAY}>
+              <SplitLine text="Football Club" />
+            </p>
+
+            {/* RNRN hero punctuation: thick rule terminated by a bordered square */}
+            <div className="mt-10 flex items-center gap-3">
+              <Rule weight={4} animated className="flex-1" />
+              <span aria-hidden className="block w-3 h-3 border-2 border-black shrink-0" />
+            </div>
+
+            {/* meta + CTAs */}
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-10 items-end">
+              <div className="flex flex-wrap items-center gap-4">
+                <button type="button"
+                  className="flex items-center gap-2 bg-black text-white px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border border-black hover:bg-white hover:text-black transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-black focus-visible:outline-offset-[3px] cursor-pointer"
+                  style={MONO}>
+                  Match Programme <span aria-hidden>→</span>
+                </button>
+                <button type="button"
+                  className="px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border-2 border-black hover:bg-black hover:text-white transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-black focus-visible:outline-offset-[3px] cursor-pointer"
+                  style={MONO}>
+                  The Squad
+                </button>
+              </div>
+
+              <motion.dl
+                variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
+                className="justify-self-stretch md:justify-self-end w-full md:max-w-xs text-[11px] uppercase tracking-[0.15em]"
+                style={MONO}
+              >
+                {[
+                  ["Next fixture", "Olympus v Stellar FC — Jun 22"],
+                  ["Kick-off", "21:00 — Olympus Arena"],
+                  ["Position", "1st — Division I"],
+                ].map(([k, v]) => (
+                  <motion.div key={k} variants={fadeUp} className="flex justify-between gap-6 border-t border-[#E5E5E5] py-3 last:border-b">
+                    <dt className="text-[#525252]">{k}</dt>
+                    <dd className="text-right font-medium">{v}</dd>
+                  </motion.div>
+                ))}
+              </motion.dl>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* ------------------------------------------------ footer */}
