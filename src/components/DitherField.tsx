@@ -41,6 +41,7 @@ float bayer4(vec2 cell) {
 
 uniform vec3 u_ink;
 uniform vec3 u_paper;
+uniform float u_dot;
 
 void main() {
   vec2 cell = floor(gl_FragCoord.xy / u_pixel);
@@ -49,6 +50,12 @@ void main() {
   float v = fbm(uv * 3.0 + vec2(u_time * 0.06, u_time * 0.03));
   v = smoothstep(0.35, 0.75, v);
   float ink = step(bayer4(cell), v);
+  if (u_dot > 0.5) {
+    // shrink each dithered cell into a centered circle — PixelBlast's "circle" look
+    vec2 cellUv = fract(gl_FragCoord.xy / u_pixel) - 0.5;
+    float d = length(cellUv);
+    ink *= 1.0 - smoothstep(0.3, 0.38, d);
+  }
   gl_FragColor = vec4(mix(u_paper, u_ink, ink), 1.0);
 }
 `;
@@ -64,10 +71,11 @@ interface DitherFieldProps {
   speed?: number;
   ink?: string;   // hex color of the dither dots
   paper?: string; // hex color of the field behind them
+  dot?: boolean;  // render each cell as a circle instead of a filled square (PixelBlast "circle" variant)
   className?: string;
 }
 
-export default function DitherField({ animate = true, pixelSize = 2.5, speed = 1, ink = "#000000", paper = "#FFFFFF", className = "" }: DitherFieldProps) {
+export default function DitherField({ animate = true, pixelSize = 2.5, speed = 1, ink = "#000000", paper = "#FFFFFF", dot = false, className = "" }: DitherFieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -106,6 +114,7 @@ export default function DitherField({ animate = true, pixelSize = 2.5, speed = 1
     const uPixel = gl.getUniformLocation(program, "u_pixel");
     gl.uniform3fv(gl.getUniformLocation(program, "u_ink"), hexToRgb(ink));
     gl.uniform3fv(gl.getUniformLocation(program, "u_paper"), hexToRgb(paper));
+    gl.uniform1f(gl.getUniformLocation(program, "u_dot"), dot ? 1 : 0);
 
     // ponytail: cap DPR at 1.5 — dither cells are chunky by design, retina density is wasted GPU work
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -158,7 +167,7 @@ export default function DitherField({ animate = true, pixelSize = 2.5, speed = 1
       document.removeEventListener("visibilitychange", onVis);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
-  }, [animate, pixelSize, speed, ink, paper]);
+  }, [animate, pixelSize, speed, ink, paper, dot]);
 
   return <canvas ref={canvasRef} aria-hidden className={`block h-full w-full ${className}`} />;
 }

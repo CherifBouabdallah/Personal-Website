@@ -20,6 +20,7 @@ const MONO = { fontFamily: "'JetBrains Mono', monospace" } as const;
 const INK = "#0D0C0A";
 const PAPER = "#F4EFE4";
 const CHAMP = "#D8BC80";
+const GOLD = "#A07C3E";
 
 const NOISE_BG =
   "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
@@ -318,6 +319,50 @@ function useCurtains(rootRef: React.RefObject<HTMLDivElement | null>, enabled: b
 }
 
 /**
+ * Pin-and-reveal for the featured player section: pins the section for one
+ * viewport of scroll and reveals its content across that pinned range,
+ * instead of a plain scroll-into-view fade — the "sticky intro" pattern.
+ */
+function useFeaturedPin(sectionRef: React.RefObject<HTMLElement | null>, enabled: boolean) {
+  const { reduced } = useMotionPrefs();
+  useEffect(() => {
+    if (!enabled || reduced) return;
+    const section = sectionRef.current;
+    if (!section) return;
+    const kicker = section.querySelector<HTMLElement>("[data-feat-kicker]");
+    const numeral = section.querySelector<HTMLElement>("[data-feat-numeral]");
+    const name = section.querySelector<HTMLElement>("[data-feat-name]");
+    const portrait = section.querySelector<HTMLElement>("[data-feat-portrait]");
+    const stats = section.querySelector<HTMLElement>("[data-feat-stats]");
+    if (!kicker || !numeral || !name || !portrait || !stats) return;
+
+    const ctx = gsap.context(() => {
+      gsap.set(kicker, { opacity: 0, y: 20 });
+      gsap.set(numeral, { opacity: 0, y: 80 });
+      gsap.set(name, { opacity: 0, y: 24 });
+      gsap.set(portrait, { clipPath: "inset(0% 0% 100% 0%)" });
+      gsap.set(stats, { opacity: 0, y: 24 });
+
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: () => `+=${window.innerHeight}`,
+          pin: true,
+          scrub: 0.6,
+        },
+      })
+        .to(kicker, { opacity: 1, y: 0, duration: 0.15 })
+        .to(numeral, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, "<0.05")
+        .to(portrait, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.4, ease: "power2.out" }, "<")
+        .to(name, { opacity: 1, y: 0, duration: 0.2 }, "-=0.15")
+        .to(stats, { opacity: 1, y: 0, duration: 0.2 }, "-=0.1");
+    }, section);
+    return () => ctx.revert();
+  }, [sectionRef, enabled, reduced]);
+}
+
+/**
  * Endless marquee driven by GSAP; when velocityReactive, scroll speed
  * multiplies the marquee's timeScale, which then eases back to 1.
  */
@@ -415,6 +460,8 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
   usePlateStrike(manifestoRef, gsapReveals, { stagger: 0.06 });
   const ctaRef = useRef<HTMLDivElement>(null);
   usePlateStrike(ctaRef, gsapReveals, { stagger: 0.07 });
+  const featuredRef = useRef<HTMLElement>(null);
+  useFeaturedPin(featuredRef, gsapReveals);
 
   const marqueeRef = useRef<HTMLDivElement>(null);
   useMarquee(marqueeRef, !reduced && !isCardPreview, gsapReveals);
@@ -477,9 +524,9 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
       <main className="relative z-10">
         {/* ---------------------------------------------- 00 · hero */}
         <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden pt-16">
-          {/* ink dither band rising through the lower half of the hero */}
+          {/* ink dot-dither band rising through the lower half of the hero (PixelBlast-style circle variant) */}
           <div aria-hidden className="absolute inset-x-0 bottom-0 top-1/3 opacity-[0.55]">
-            <DitherField animate={!isCardPreview && !reduced} speed={0.4} ink={INK} paper={PAPER} />
+            <DitherField animate={!isCardPreview && !reduced} speed={0.4} pixelSize={3.5} dot ink={INK} paper={PAPER} />
             {/* fade the field's top edge into the page */}
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#F4EFE4] to-transparent" />
           </div>
@@ -665,19 +712,21 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
           </div>
         </section>
 
-        {/* ---------------------------------------------- featured №9 (rises over the squad) */}
-        <section className="relative z-20 bg-[#14261E] text-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
+        {/* ---------------------------------------------- featured №9 (rises over the squad, then pins to reveal) */}
+        <section ref={featuredRef} className="relative z-20 bg-[#14261E] text-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
           <Texture style={TEXTURE.vlinesGold} />
           <div className="relative max-w-6xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               <div className="lg:col-span-6 relative">
-                <p className="text-[11px] tracking-[0.3em] uppercase text-[#D8BC80]" style={MONO}>Featured — Striker</p>
-                <div aria-hidden className="leading-[0.75] font-black text-[clamp(10rem,28vw,22rem)] select-none -ml-4 text-[#D8BC80]" style={DISPLAY}>9</div>
-                <h2 className="mt-4 text-4xl md:text-5xl tracking-tight" style={DISPLAY}>Luca Moretti</h2>
-                <p className="mt-3 text-[11px] tracking-[0.3em] uppercase text-[#D8BC80]/80" style={MONO}>№ 9 — Striker — Italy</p>
+                <p data-feat-kicker className="text-[11px] tracking-[0.3em] uppercase text-[#D8BC80]" style={MONO}>Featured — Striker</p>
+                <div data-feat-numeral aria-hidden className="leading-[0.75] font-black text-[clamp(10rem,28vw,22rem)] select-none -ml-4 text-[#D8BC80]" style={DISPLAY}>9</div>
+                <div data-feat-name>
+                  <h2 className="mt-4 text-4xl md:text-5xl tracking-tight" style={DISPLAY}>Luca Moretti</h2>
+                  <p className="mt-3 text-[11px] tracking-[0.3em] uppercase text-[#D8BC80]/80" style={MONO}>№ 9 — Striker — Italy</p>
+                </div>
               </div>
 
-              <div className="lg:col-span-6" data-wipe>
+              <div className="lg:col-span-6" data-feat-portrait>
                 <CursorRevealPanel disabled={reduced || isCardPreview}>
                   <ImagePlaceholder
                     inverted
@@ -690,7 +739,7 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             </div>
 
             {/* stat strip */}
-            <div className="mt-16 grid grid-cols-3 border-t border-b border-[#D8BC80]/40 divide-x divide-[#D8BC80]/40 text-center">
+            <div data-feat-stats className="mt-16 grid grid-cols-3 border-t border-b border-[#D8BC80]/40 divide-x divide-[#D8BC80]/40 text-center">
               {[
                 { target: 24, label: "Goals" },
                 { target: 12, label: "Assists" },
@@ -746,6 +795,9 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
 
         {/* ---------------------------------------------- records (rises over the ledger) */}
         <section className="relative z-20 bg-[#0D0C0A] text-[#F4EFE4] py-24 md:py-32 px-6 md:px-8 lg:px-12 overflow-hidden">
+          <div aria-hidden className="absolute inset-0 opacity-30">
+            <DitherField animate={!isCardPreview && !reduced} speed={0.35} pixelSize={3.5} dot ink={GOLD} paper={INK} />
+          </div>
           <Texture style={TEXTURE.vlinesGold} />
           <div className="relative max-w-6xl mx-auto">
             <div className="grid grid-cols-2 lg:grid-cols-4 lg:divide-x divide-[#D8BC80]/30 text-center">
@@ -833,9 +885,9 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
         {/* ---------------------------------------------- final cta */}
         <section className="relative z-20 bg-[#0D0C0A] text-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
           <Rule weight={8} tone="gold" className="absolute top-0 left-0" />
-          {/* same dither field as the hero, champagne on ink */}
+          {/* same dot-dither field as the hero, champagne on ink */}
           <div aria-hidden className="pointer-events-none absolute inset-0 opacity-40">
-            <DitherField animate={!isCardPreview && !reduced} speed={0.4} ink={CHAMP} paper={INK} />
+            <DitherField animate={!isCardPreview && !reduced} speed={0.4} pixelSize={3.5} dot ink={CHAMP} paper={INK} />
           </div>
           {/* soft ink pool behind the centered content */}
           <div aria-hidden className="pointer-events-none absolute inset-0"
