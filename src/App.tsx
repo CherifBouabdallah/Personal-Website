@@ -74,7 +74,7 @@ function AppInner() {
     });
 
     // Streamlined preloading of heavy images using Promise.all
-    const imagesToPreload = ["/OG2.webp"];
+    const imagesToPreload = ["/images/shared/OG2.webp"];
     const preloadImage = (src: string) =>
       new Promise<void>((resolve) => {
         const img = new Image();
