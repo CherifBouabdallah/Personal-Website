@@ -167,6 +167,29 @@ function useRuleDraw(rootRef: React.RefObject<HTMLDivElement | null>, enabled: b
   }, [rootRef, enabled, reduced]);
 }
 
+// ---------------------------------------------------------------- data
+const SQUAD = [
+  { group: "Goalkeepers", players: [
+    { n: 1, name: "Álvaro Montero", pos: "Goalkeeper", nat: "COL" },
+  ]},
+  { group: "Defenders", players: [
+    { n: 2, name: "James O'Brien", pos: "Right-Back", nat: "IRL" },
+    { n: 3, name: "Yuto Nakamura", pos: "Left-Back", nat: "JPN" },
+    { n: 4, name: "Lucas Delvaux", pos: "Centre-Back", nat: "BEL" },
+    { n: 5, name: "Karim Hadj", pos: "Centre-Back", nat: "ALG" },
+  ]},
+  { group: "Midfielders", players: [
+    { n: 6, name: "André Ferreira", pos: "Defensive Mid", nat: "POR" },
+    { n: 8, name: "Sami El-Masri", pos: "Central Mid", nat: "EGY" },
+    { n: 10, name: "Nils Eriksen", pos: "Attacking Mid", nat: "NOR" },
+  ]},
+  { group: "Forwards", players: [
+    { n: 7, name: "Diego Vargas", pos: "Right Wing", nat: "ARG" },
+    { n: 9, name: "Luca Moretti", pos: "Striker", nat: "ITA" },
+    { n: 11, name: "Moussa Diallo", pos: "Left Wing", nat: "SEN" },
+  ]},
+];
+
 // ---------------------------------------------------------------- page
 interface SoccerTeamProps {
   isPreview?: boolean;
@@ -396,6 +419,46 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                 R. Vallgren — Head Coach
               </figcaption>
             </motion.figure>
+          </div>
+        </section>
+
+        {/* ---------------------------------------------- 02 · first team */}
+        <section className="relative py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
+          <Rule weight={4} className="absolute top-0 left-0" />
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-end justify-between gap-6">
+              <div>
+                <SectionIndex n="02" label="First Team" />
+                <h2 className="mt-6 text-5xl md:text-6xl lg:text-7xl tracking-tight" style={DISPLAY}>The Eleven</h2>
+              </div>
+              <p className="hidden md:block text-[11px] tracking-[0.2em] uppercase text-[#525252] pb-2" style={MONO}>Season 2026–27</p>
+            </div>
+
+            <div className="mt-16">
+              {SQUAD.map(({ group, players }) => (
+                <div key={group} className="mt-12 first:mt-0">
+                  <div className="flex items-baseline justify-between border-b-2 border-black pb-3">
+                    <h3 className="text-[11px] tracking-[0.3em] uppercase font-bold" style={MONO}>{group}</h3>
+                    <span className="text-[11px] tracking-[0.2em] text-[#525252]" style={MONO}>/ {players.length}</span>
+                  </div>
+                  <motion.ul variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
+                    {players.map((p) => (
+                      <motion.li key={p.n} variants={fadeUp}>
+                        <div className="group grid grid-cols-[3rem_1fr_auto] md:grid-cols-[5rem_1fr_10rem_4rem_3rem] items-center gap-4 border-b border-black py-5 px-2 -mx-2 hover:bg-black hover:text-white transition-none cursor-default">
+                          <span className="text-lg md:text-xl tabular-nums text-[#525252] group-hover:text-white" style={MONO}>
+                            {String(p.n).padStart(2, "0")}
+                          </span>
+                          <span className="text-2xl md:text-3xl tracking-tight" style={DISPLAY}>{p.name}</span>
+                          <span className="hidden md:block text-[11px] tracking-[0.2em] uppercase text-[#525252] group-hover:text-white" style={MONO}>{p.pos}</span>
+                          <span className="text-[11px] tracking-[0.2em] justify-self-end md:justify-self-start" style={MONO}>{p.nat}</span>
+                          <span aria-hidden className="hidden md:block justify-self-end text-xl">→</span>
+                        </div>
+                      </motion.li>
+                    ))}
+                  </motion.ul>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </main>
