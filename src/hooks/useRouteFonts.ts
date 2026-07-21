@@ -33,3 +33,6 @@ export const GOOGLE_FONTS_HREF =
 
 export const FONTSHARE_HREF =
   "https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&f[]=clash-display@400,500,600,700&f[]=cabinet-grotesk@800,700,500,400&display=swap";
+
+export const MONOCHROME_FONTS_HREF =
+  "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..600;1,8..60,300..600&family=JetBrains+Mono:wght@300..700&display=swap";
