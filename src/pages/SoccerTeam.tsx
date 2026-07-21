@@ -633,6 +633,67 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             </p>
           </div>
         </section>
+
+        {/* ---------------------------------------------- 04 · the arena */}
+        <section className="relative py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
+          <Texture style={TEXTURE.grid} />
+          <div className="relative max-w-6xl mx-auto">
+            <SectionIndex n="04" label="The Arena" />
+            <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+              {/* image: the ONE sanctioned slow hover (border thickens, content scales, 300ms) */}
+              <div className="lg:col-span-7 group">
+                <div className="border-2 border-black group-hover:border-4 group-hover:-m-[2px] transition-all duration-100 overflow-hidden">
+                  <div className="transition-transform duration-300 group-hover:scale-105">
+                    <ImagePlaceholder
+                      description="Aerial black & white photograph of the stadium's retractable geometric steel roof"
+                      treatment="GRAYSCALE · ARCHITECTURAL · AERIAL"
+                      aspect="16 / 10"
+                      className="border-0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:col-span-5">
+                <h2 className="text-5xl md:text-6xl tracking-tight" style={DISPLAY}>Olympus Arena</h2>
+                <p className="mt-6 text-lg leading-relaxed max-w-[52ch]">
+                  Opened in 2021, the Olympus Arena seats 42,000 beneath a fully retractable geometric steel roof.
+                  Hybrid turf, sight-lines engineered to the millimetre, and not a single decorative surface in the building.
+                </p>
+                <dl className="mt-10" style={MONO}>
+                  {[
+                    ["Capacity", "42,000"],
+                    ["Built", "2021"],
+                    ["Pitch", "Hybrid"],
+                    ["Roof", "Retractable"],
+                  ].map(([k, v]) => (
+                    <div key={k} className="flex justify-between border-t border-[#E5E5E5] last:border-b py-3 text-[11px] tracking-[0.2em] uppercase">
+                      <dt className="text-[#525252]">{k}</dt>
+                      <dd className="font-medium tabular-nums">{v}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            </div>
+
+            {/* milestones */}
+            <div className="mt-24">
+              {[
+                { year: "2021", title: "Retractable Canopy & Hybrid Pitch", text: "State-of-the-art hybrid turf and a fully retractable geometric steel roof over the home ground." },
+                { year: "2023", title: "The Unbeaten Treble", text: "League, continental cup and super cup lifted in a single season without a defeat." },
+                { year: "2025", title: "Digital Arena Integration", text: "Real-time analytics, full-stadium connectivity, and physical-to-virtual matchday sensing." },
+              ].map(({ year, title, text }) => (
+                <div key={year} className="grid grid-cols-1 md:grid-cols-[10rem_1fr] gap-4 md:gap-12 border-t border-black last:border-b py-10 items-baseline">
+                  <p className="text-5xl md:text-6xl font-bold tabular-nums" style={DISPLAY}>{year}</p>
+                  <div>
+                    <h3 className="text-[12px] tracking-[0.3em] uppercase font-bold" style={MONO}>{title}</h3>
+                    <p className="mt-3 text-base leading-relaxed max-w-[62ch] text-[#525252]">{text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
 
       {!isPreview && !isCardPreview && (
