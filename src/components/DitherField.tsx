@@ -107,7 +107,8 @@ export default function DitherField({ animate = true, pixelSize = 2.5, speed = 1
     gl.uniform3fv(gl.getUniformLocation(program, "u_ink"), hexToRgb(ink));
     gl.uniform3fv(gl.getUniformLocation(program, "u_paper"), hexToRgb(paper));
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // ponytail: cap DPR at 1.5 — dither cells are chunky by design, retina density is wasted GPU work
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     const resize = () => {
       const w = canvas.clientWidth; const h = canvas.clientHeight;
       if (!w || !h) return;

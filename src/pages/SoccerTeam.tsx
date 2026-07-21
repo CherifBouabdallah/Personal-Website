@@ -18,6 +18,7 @@ const DISPLAY = { fontFamily: "'Playfair Display', Georgia, serif" } as const;
 const MONO = { fontFamily: "'JetBrains Mono', monospace" } as const;
 
 const INK = "#0D0C0A";
+const PAPER = "#F4EFE4";
 const CHAMP = "#D8BC80";
 
 const NOISE_BG =
@@ -206,15 +207,15 @@ function CursorRevealPanel({ children, disabled = false }: { children: React.Rea
   );
 }
 
-const BLUR_STEPS = [0.5, 1, 2, 4, 8];
-function GradualBlur({ direction }: { direction: "bottom" | "left" | "right" }) {
+// ponytail: default 3 layers (was 5) — backdrop-filter stacks are the main scroll cost
+function GradualBlur({ direction, steps = [1, 3, 8] }: { direction: "bottom" | "left" | "right"; steps?: number[] }) {
   const toEdge = direction === "bottom" ? "to top" : direction === "left" ? "to right" : "to left";
   return (
     <div aria-hidden className="absolute inset-0 pointer-events-none">
-      {BLUR_STEPS.map((px, i) => {
+      {steps.map((px, i) => {
         // each layer blurs a progressively nearer-the-edge band
-        const from = 100 - (i + 1) * (100 / BLUR_STEPS.length);
-        const mask = `linear-gradient(${toEdge}, black ${from}%, transparent ${from + 100 / BLUR_STEPS.length + 10}%)`;
+        const from = 100 - (i + 1) * (100 / steps.length);
+        const mask = `linear-gradient(${toEdge}, black ${from}%, transparent ${Math.min(from + 100 / steps.length + 10, 100)}%)`;
         return (
           <div key={px} className="absolute inset-0"
             style={{ backdropFilter: `blur(${px}px)`, WebkitBackdropFilter: `blur(${px}px)`, maskImage: mask, WebkitMaskImage: mask }} />
@@ -284,6 +285,33 @@ function useScrollFx(rootRef: React.RefObject<HTMLDivElement | null>, enabled: b
           scrollTrigger: { trigger: hero.closest("section"), start: "top top", end: "bottom top", scrub: true },
         });
       }
+    }, el);
+    return () => ctx.revert();
+  }, [rootRef, enabled, reduced]);
+}
+
+/**
+ * "Sticky section layout" curtains: every [data-pin-under] section pins when
+ * its bottom meets the viewport bottom (pinSpacing: false), so the section
+ * that follows it in the DOM rises from the bottom edge and covers it like a
+ * curtain — instead of both scrolling together.
+ */
+function useCurtains(rootRef: React.RefObject<HTMLDivElement | null>, enabled: boolean) {
+  const { reduced } = useMotionPrefs();
+  useEffect(() => {
+    if (!enabled || reduced) return;
+    const el = rootRef.current;
+    if (!el) return;
+    const ctx = gsap.context(() => {
+      gsap.utils.toArray<HTMLElement>("[data-pin-under]").forEach((section) => {
+        ScrollTrigger.create({
+          trigger: section,
+          start: "bottom bottom",
+          end: () => `+=${window.innerHeight}`,
+          pin: true,
+          pinSpacing: false,
+        });
+      });
     }, el);
     return () => ctx.revert();
   }, [rootRef, enabled, reduced]);
@@ -380,6 +408,7 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
 
   useRuleDraw(rootRef, gsapReveals);
   useScrollFx(rootRef, gsapReveals);
+  useCurtains(rootRef, gsapReveals);
   const heroRef = useRef<HTMLDivElement>(null);
   usePlateStrike(heroRef, gsapReveals, { stagger: 0.08, distance: -40 });
   const manifestoRef = useRef<HTMLDivElement>(null);
@@ -447,23 +476,23 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
 
       <main className="relative z-10">
         {/* ---------------------------------------------- 00 · hero */}
-        <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden pt-16 bg-[#0D0C0A] text-[#F4EFE4]">
-          {/* full-bleed champagne dither field */}
-          <div aria-hidden className="absolute inset-0 opacity-90">
-            <DitherField animate={!isCardPreview && !reduced} speed={0.5} pixelSize={3} ink={CHAMP} paper={INK} />
+        <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden pt-16">
+          {/* ink dither band rising through the lower half of the hero */}
+          <div aria-hidden className="absolute inset-x-0 bottom-0 top-1/3 opacity-[0.55]">
+            <DitherField animate={!isCardPreview && !reduced} speed={0.4} ink={INK} paper={PAPER} />
+            {/* fade the field's top edge into the page */}
+            <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#F4EFE4] to-transparent" />
           </div>
-          {/* legibility gradients over the field */}
-          <div aria-hidden className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[#0D0C0A] to-transparent" />
-          <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[#0D0C0A]/80 via-[#0D0C0A]/30 to-transparent" />
+          <Texture style={TEXTURE.lines} />
 
           <div ref={heroRef} data-hero-drift className="relative max-w-6xl mx-auto w-full px-6 md:px-8 lg:px-12 py-24">
             {/* kicker */}
             <div className="flex items-center gap-4">
-              <span aria-hidden className="h-px w-12 bg-[#D8BC80]" />
-              <p className="text-[11px] tracking-[0.3em] uppercase text-[#D8BC80]" style={MONO}>
+              <span aria-hidden className="h-px w-12 bg-[#A07C3E]" />
+              <p className="text-[11px] tracking-[0.3em] uppercase" style={MONO}>
                 Est. 2018 — Athletic Club — Division I
               </p>
-              <span aria-hidden className="h-px flex-1 bg-[#D8BC80]/40" />
+              <span aria-hidden className="h-px flex-1 bg-[#A07C3E]/50" />
             </div>
 
             {/* headline */}
@@ -473,26 +502,26 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             >
               <SplitLine text="OLYMPUS" />
             </h1>
-            <p className="mt-2 md:text-right italic text-[clamp(1.75rem,5vw,4rem)] leading-none text-[#D8BC80]" style={DISPLAY}>
+            <p className="mt-2 md:text-right italic text-[clamp(1.75rem,5vw,4rem)] leading-none text-[#A07C3E]" style={DISPLAY}>
               <SplitLine text="Football Club" />
             </p>
 
             {/* thick rule terminated by a bordered square */}
             <div className="mt-10 flex items-center gap-3">
-              <Rule weight={4} tone="champagne" animated className="flex-1" />
-              <span aria-hidden className="block w-3 h-3 border-2 border-[#D8BC80] shrink-0" />
+              <Rule weight={4} tone="gold" animated className="flex-1" />
+              <span aria-hidden className="block w-3 h-3 border-2 border-[#A07C3E] shrink-0" />
             </div>
 
             {/* meta + CTAs */}
             <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-10 items-end">
               <div className="flex flex-wrap items-center gap-4">
                 <button type="button"
-                  className="flex items-center gap-2 bg-[#D8BC80] text-[#0D0C0A] px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border border-[#D8BC80] hover:bg-[#F4EFE4] hover:border-[#F4EFE4] transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#D8BC80] focus-visible:outline-offset-[3px] cursor-pointer"
+                  className="flex items-center gap-2 bg-[#0D0C0A] text-[#F4EFE4] px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border border-[#0D0C0A] hover:bg-[#A07C3E] hover:text-[#0D0C0A] hover:border-[#A07C3E] transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#0D0C0A] focus-visible:outline-offset-[3px] cursor-pointer"
                   style={MONO}>
                   Match Programme <span aria-hidden>→</span>
                 </button>
                 <button type="button"
-                  className="px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border-2 border-[#F4EFE4]/70 text-[#F4EFE4] hover:bg-[#F4EFE4] hover:text-[#0D0C0A] transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#F4EFE4] focus-visible:outline-offset-[3px] cursor-pointer"
+                  className="px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border-2 border-[#0D0C0A] hover:bg-[#0D0C0A] hover:text-[#F4EFE4] transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#0D0C0A] focus-visible:outline-offset-[3px] cursor-pointer"
                   style={MONO}>
                   The Squad
                 </button>
@@ -508,8 +537,8 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                   ["Kick-off", "21:00 — Olympus Arena"],
                   ["Position", "1st — Division I"],
                 ].map(([k, v]) => (
-                  <motion.div key={k} variants={fadeUp} className="flex justify-between gap-6 border-t border-[#F4EFE4]/20 py-3 last:border-b">
-                    <dt className="text-[#F4EFE4]/50">{k}</dt>
+                  <motion.div key={k} variants={fadeUp} className="flex justify-between gap-6 border-t border-[#DAD1BD] py-3 last:border-b">
+                    <dt className="text-[#6E6555]">{k}</dt>
                     <dd className="text-right font-medium">{v}</dd>
                   </motion.div>
                 ))}
@@ -597,7 +626,7 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
         </section>
 
         {/* ---------------------------------------------- 02 · first team */}
-        <section className="relative py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
+        <section data-pin-under className="relative z-10 bg-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
           <Rule weight={4} className="absolute top-0 left-0" />
           <div className="max-w-6xl mx-auto">
             <div className="flex items-end justify-between gap-6">
@@ -636,14 +665,14 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
           </div>
         </section>
 
-        {/* ---------------------------------------------- featured №9 */}
-        <section className="relative bg-[#14261E] text-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
+        {/* ---------------------------------------------- featured №9 (rises over the squad) */}
+        <section className="relative z-20 bg-[#14261E] text-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
           <Texture style={TEXTURE.vlinesGold} />
           <div className="relative max-w-6xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               <div className="lg:col-span-6 relative">
                 <p className="text-[11px] tracking-[0.3em] uppercase text-[#D8BC80]" style={MONO}>Featured — Striker</p>
-                <div aria-hidden data-drift="50" className="leading-[0.75] font-black text-[clamp(10rem,28vw,22rem)] select-none -ml-4 text-[#D8BC80]" style={DISPLAY}>9</div>
+                <div aria-hidden className="leading-[0.75] font-black text-[clamp(10rem,28vw,22rem)] select-none -ml-4 text-[#D8BC80]" style={DISPLAY}>9</div>
                 <h2 className="mt-4 text-4xl md:text-5xl tracking-tight" style={DISPLAY}>Luca Moretti</h2>
                 <p className="mt-3 text-[11px] tracking-[0.3em] uppercase text-[#D8BC80]/80" style={MONO}>№ 9 — Striker — Italy</p>
               </div>
@@ -677,7 +706,7 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
         </section>
 
         {/* ---------------------------------------------- 03 · fixtures */}
-        <section className="relative py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
+        <section data-pin-under className="relative z-10 bg-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
           <Texture style={TEXTURE.diag} />
           <div className="relative max-w-6xl mx-auto">
             <SectionIndex n="03" label="Fixtures" />
@@ -715,8 +744,8 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
           </div>
         </section>
 
-        {/* ---------------------------------------------- records */}
-        <section className="relative bg-[#0D0C0A] text-[#F4EFE4] py-24 md:py-32 px-6 md:px-8 lg:px-12 overflow-hidden">
+        {/* ---------------------------------------------- records (rises over the ledger) */}
+        <section className="relative z-20 bg-[#0D0C0A] text-[#F4EFE4] py-24 md:py-32 px-6 md:px-8 lg:px-12 overflow-hidden">
           <Texture style={TEXTURE.vlinesGold} />
           <div className="relative max-w-6xl mx-auto">
             <div className="grid grid-cols-2 lg:grid-cols-4 lg:divide-x divide-[#D8BC80]/30 text-center">
@@ -741,7 +770,7 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
         </section>
 
         {/* ---------------------------------------------- 04 · the arena */}
-        <section className="relative py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
+        <section data-pin-under className="relative z-10 bg-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
           <Texture style={TEXTURE.grid} />
           <div className="relative max-w-6xl mx-auto">
             <SectionIndex n="04" label="The Arena" />
@@ -802,10 +831,15 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
         </section>
 
         {/* ---------------------------------------------- final cta */}
-        <Rule weight={8} tone="gold" />
-        <section className="relative bg-[#0D0C0A] text-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
+        <section className="relative z-20 bg-[#0D0C0A] text-[#F4EFE4] py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
+          <Rule weight={8} tone="gold" className="absolute top-0 left-0" />
+          {/* same dither field as the hero, champagne on ink */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 opacity-40">
+            <DitherField animate={!isCardPreview && !reduced} speed={0.4} ink={CHAMP} paper={INK} />
+          </div>
+          {/* soft ink pool behind the centered content */}
           <div aria-hidden className="pointer-events-none absolute inset-0"
-            style={{ backgroundImage: "radial-gradient(circle at top center, #D8BC80, transparent 70%)", opacity: 0.08 }} />
+            style={{ backgroundImage: "radial-gradient(ellipse at center, #0D0C0A 25%, transparent 75%)" }} />
           <div ref={ctaRef} className="relative max-w-4xl mx-auto text-center">
             <h2 className="text-6xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight uppercase font-bold" style={DISPLAY}>
               <SplitLine text="Join the First Eleven" />
@@ -839,8 +873,9 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
       </main>
 
       {!isPreview && !isCardPreview && (
-        <div aria-hidden className="fixed bottom-0 left-0 right-0 h-28 z-30 pointer-events-none">
-          <GradualBlur direction="bottom" />
+        <div aria-hidden className="fixed bottom-0 left-0 right-0 h-24 z-30 pointer-events-none">
+          {/* ponytail: single blur layer here — a 5-layer stack over full-width scrolling content is the priciest thing on the page */}
+          <GradualBlur direction="bottom" steps={[6]} />
         </div>
       )}
 
