@@ -130,6 +130,66 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
   return <span ref={ref} className="tabular-nums">{count}{suffix}</span>;
 }
 
+/**
+ * "Shape blur" adaptation: two stacked copies of the child — a dimmed base
+ * and a full layer masked by a soft-edged circle that lerps toward the
+ * mouse pointer. Touch and disabled cases render the child plainly.
+ */
+function CursorRevealPanel({ children, disabled = false }: { children: React.ReactNode; disabled?: boolean }) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const state = useRef({ x: 50, y: 50, tx: 50, ty: 50, raf: 0, active: false });
+
+  const stop = () => { cancelAnimationFrame(state.current.raf); state.current.active = false; };
+  useEffect(() => stop, []);
+
+  if (disabled) return <div>{children}</div>;
+
+  const tick = () => {
+    const s = state.current;
+    s.x += (s.tx - s.x) * 0.12;
+    s.y += (s.ty - s.y) * 0.12;
+    const el = overlayRef.current;
+    if (el) {
+      el.style.setProperty("--mx", `${s.x}%`);
+      el.style.setProperty("--my", `${s.y}%`);
+    }
+    if (Math.abs(s.tx - s.x) + Math.abs(s.ty - s.y) > 0.1 || s.active) {
+      s.raf = requestAnimationFrame(tick);
+    }
+  };
+
+  return (
+    <div
+      className="relative"
+      onPointerMove={(e) => {
+        if (e.pointerType !== "mouse") return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const s = state.current;
+        s.tx = ((e.clientX - rect.left) / rect.width) * 100;
+        s.ty = ((e.clientY - rect.top) / rect.height) * 100;
+        if (!s.active) { s.active = true; s.raf = requestAnimationFrame(tick); }
+      }}
+      onPointerLeave={(e) => { if (e.pointerType === "mouse") stop(); }}
+    >
+      {/* dimmed base — always visible so touch/no-hover still sees content */}
+      <div className="opacity-40" aria-hidden>{children}</div>
+      {/* full layer revealed through a soft cursor-following mask */}
+      <div
+        ref={overlayRef}
+        className="absolute inset-0"
+        style={{
+          ["--mx" as string]: "50%",
+          ["--my" as string]: "50%",
+          maskImage: "radial-gradient(circle 200px at var(--mx) var(--my), black 35%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(circle 200px at var(--mx) var(--my), black 35%, transparent 75%)",
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 const BLUR_STEPS = [0.5, 1, 2, 4, 8];
 function GradualBlur({ direction }: { direction: "bottom" | "left" | "right" }) {
   const toEdge = direction === "bottom" ? "to top" : direction === "left" ? "to right" : "to left";
@@ -456,6 +516,46 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                       </motion.li>
                     ))}
                   </motion.ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ---------------------------------------------- featured №9 */}
+        <section className="relative bg-black text-white py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12 overflow-hidden">
+          <Texture style={TEXTURE.vlinesWhite} />
+          <div className="relative max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              <div className="lg:col-span-6 relative">
+                <p className="text-[11px] tracking-[0.3em] uppercase text-white/60" style={MONO}>Featured — Striker</p>
+                <div aria-hidden className="leading-[0.75] font-black text-[clamp(10rem,28vw,22rem)] select-none -ml-4" style={DISPLAY}>9</div>
+                <h2 className="mt-4 text-4xl md:text-5xl tracking-tight" style={DISPLAY}>Luca Moretti</h2>
+                <p className="mt-3 text-[11px] tracking-[0.3em] uppercase text-white/60" style={MONO}>№ 9 — Striker — Italy</p>
+              </div>
+
+              <div className="lg:col-span-6">
+                <CursorRevealPanel disabled={reduced || isCardPreview}>
+                  <ImagePlaceholder
+                    inverted
+                    description="Full-body studio portrait of striker Luca Moretti, black & white, dark background"
+                    treatment="GRAYSCALE · HIGH CONTRAST · DARK SET"
+                    aspect="4 / 5"
+                  />
+                </CursorRevealPanel>
+              </div>
+            </div>
+
+            {/* stat strip */}
+            <div className="mt-16 grid grid-cols-3 border-t border-b border-white/40 divide-x divide-white/40 text-center">
+              {[
+                { target: 24, label: "Goals" },
+                { target: 12, label: "Assists" },
+                { target: 32, label: "Matches" },
+              ].map(({ target, label }) => (
+                <div key={label} className="py-8">
+                  <p className="text-4xl md:text-5xl font-bold" style={DISPLAY}><Counter target={target} /></p>
+                  <p className="mt-2 text-[11px] tracking-[0.3em] uppercase text-white/60" style={MONO}>{label}</p>
                 </div>
               ))}
             </div>
