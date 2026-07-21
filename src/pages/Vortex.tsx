@@ -1,8 +1,11 @@
 import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from "framer-motion";
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
 import { useRouteFonts, GOOGLE_FONTS_HREF } from "../hooks/useRouteFonts";
 import BackToPortfolioButton from "../components/BackToPortfolioButton";
+
+// Vortex is a fake product demo: its own nav/CTA buttons stay animated but
+// never leave the preview — only BackToPortfolioButton performs real navigation.
+const dead = (e: React.SyntheticEvent) => e.preventDefault();
 
 interface VortexProps {
   isPreview?: boolean;
@@ -37,8 +40,6 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
   // Simulated metrics
   const [cpuLoad, setCpuLoad] = useState(12);
   const [memLoad, setMemLoad] = useState(7.4);
-
-  const navigate = useNavigate();
 
   // Dynamic font and style inject
   useEffect(() => {
@@ -161,7 +162,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
       {/* 1. MOCKUP VORTEX HEADER (Fixed top edge-to-edge nav) */}
       <header className={`${isPreview ? 'absolute' : 'fixed'} top-0 left-0 right-0 w-full flex items-center justify-between border-b border-[#FDFBF7]/5 bg-[#1C1917]/85 backdrop-blur-md px-4 py-4.5 shadow-md z-30`}>
         {/* Logo element */}
-        <Link to="/" className="flex items-center cursor-pointer group decoration-none text-inherit">
+        <div className="flex items-center cursor-pointer group decoration-none text-inherit">
           <div className="relative mr-3 w-8 h-8 rounded-lg border-2 border-[#FDFBF7] overflow-hidden flex items-center justify-center bg-stone-950">
             {/* Sliding cover gradient */}
             <div className="absolute inset-[1.5px] rounded-[5px] bg-gradient-to-t from-orange-500/20 to-orange-500/90 transition-transform duration-500 ease-out group-hover:-translate-x-full group-hover:scale-x-50 group-hover:opacity-25" />
@@ -171,12 +172,12 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
             </svg>
           </div>
           <span className="vortex-font-bricolage text-xl font-bold tracking-tight">Vortex</span>
-        </Link>
+        </div>
 
         {/* Nav links right */}
         <div className="flex items-center gap-4 sm:gap-6">
           {/* Portfolio link */}
-          <a href="/portfolio" onClick={(e) => { e.preventDefault(); navigate("/portfolio"); }} className="group flex items-center text-sm font-bold text-[#FDFBF7]/70 hover:text-[#FDFBF7] transition duration-300">
+          <a href="#" onClick={dead} className="group flex items-center text-sm font-bold text-[#FDFBF7]/70 hover:text-[#FDFBF7] transition duration-300">
             <svg className="w-4.5 h-4.5 mr-1.5 fill-current transition-transform duration-300 group-hover:-rotate-12" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z" />
             </svg>
@@ -185,9 +186,8 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
 
           {/* GitHub Link Button with Arrow Slide */}
           <a
-            href="https://github.com/CherifBouabdallah"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#"
+            onClick={dead}
             className="hidden sm:inline-flex group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 overflow-hidden pl-10 pr-4 select-none h-11 border border-[#FDFBF7]/5 text-[#FDFBF7] decoration-none"
           >
             {/* GitHub icon left */}
@@ -210,7 +210,6 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
 
           {/* Hire Cherif Button */}
           <button
-            onClick={() => navigate("/contact")}
             className="group relative inline-flex items-center justify-center rounded-xl bg-[#FDFBF7] text-stone-900 hover:bg-[#FDFBF7]/90 px-4 py-2.5 text-xs sm:text-sm font-bold transition duration-300 h-11 border border-[#FDFBF7]/10 cursor-pointer"
           >
             {/* Gear/Star SVG badge */}
@@ -271,7 +270,7 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
               </div>
             </button>
 
-            <button onClick={() => navigate("/contact")} className="group relative inline-flex items-center justify-center rounded-2xl bg-[#FDFBF7]/10 text-[#FDFBF7] font-bold px-6 py-4 text-base transition duration-300 border border-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 cursor-pointer">
+            <button className="group relative inline-flex items-center justify-center rounded-2xl bg-[#FDFBF7]/10 text-[#FDFBF7] font-bold px-6 py-4 text-base transition duration-300 border border-[#FDFBF7]/10 hover:bg-[#FDFBF7]/15 cursor-pointer">
               <svg className="mr-2.5 w-5 h-5 fill-current text-orange-500 group-hover:rotate-180 transition-transform duration-500" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
               </svg>
@@ -797,7 +796,6 @@ export default function Vortex({ isPreview = false, onClose, startUnlocked = fal
         {/* ========================================================= */}
         <section className="w-full max-w-2xl flex justify-center mt-6">
           <div
-            onClick={() => navigate("/contact")}
             className="w-full border-2 border-stone-800 hover:border-orange-500/40 rounded-[32px] p-8 flex flex-col items-center justify-center gap-5 cursor-pointer group transition-all duration-500 bg-stone-900/30 relative overflow-hidden text-center shadow-2xl"
           >
             {/* Decal background layout */}

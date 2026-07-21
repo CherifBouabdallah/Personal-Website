@@ -1,6 +1,5 @@
 import { motion, type Variants } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useRouteFonts, MONOCHROME_FONTS_HREF } from "../hooks/useRouteFonts";
 import { useMotionPrefs, EASE_ENTER } from "../lib/motion";
 import SplitLine from "../components/SplitLine";
@@ -420,7 +419,6 @@ interface SoccerTeamProps {
 
 export default function SoccerTeam({ isPreview = false, onClose, isCardPreview = false }: SoccerTeamProps) {
   useRouteFonts([MONOCHROME_FONTS_HREF]);
-  const navigate = useNavigate();
   const rootRef = useRef<HTMLDivElement>(null);
   const { reduced } = useMotionPrefs();
 
@@ -498,7 +496,7 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
           <div className="flex items-center gap-4">
             <button
               type="button"
-              onClick={() => { if (onClose) onClose(); else navigate("/portfolio"); }}
+              onClick={() => onClose?.()}
               className="text-[10px] tracking-[0.25em] uppercase underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#0D0C0A] focus-visible:outline-offset-2 min-h-[44px] px-2 cursor-pointer"
               style={MONO}
             >

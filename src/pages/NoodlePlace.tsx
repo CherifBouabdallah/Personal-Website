@@ -14,6 +14,10 @@ import {
 import { useRouteFonts, FONTSHARE_HREF } from "../hooks/useRouteFonts";
 import BackToPortfolioButton from "../components/BackToPortfolioButton";
 
+// Kiri Ramen is a fake product demo: its nav/CTA anchors stay animated but
+// never jump anywhere — only BackToPortfolioButton performs real navigation.
+const dead = (e: React.SyntheticEvent) => e.preventDefault();
+
 interface NoodlePlaceProps {
   isPreview?: boolean;
   isCardPreview?: boolean;
@@ -222,9 +226,9 @@ export default function NoodlePlace({ isPreview = false, isCardPreview = false }
           霧 <span className="text-[#C85A32]">KIRI</span>
         </span>
         <div className="flex gap-6 font-mono text-[8px] tracking-[0.18em] uppercase">
-          <a href="#menu" className="text-[#F4F1EA]/70 hover:text-[#F4F1EA] transition-colors">THE MENU</a>
-          <a href="#ritual" className="text-[#F4F1EA]/70 hover:text-[#F4F1EA] transition-colors">THE RITUAL</a>
-          <a href="#reserve" className="text-[#F4F1EA]/70 hover:text-[#F4F1EA] transition-colors font-bold text-[#C85A32]">REQUEST SEAT</a>
+          <a href="#menu" onClick={dead} className="text-[#F4F1EA]/70 hover:text-[#F4F1EA] transition-colors">THE MENU</a>
+          <a href="#ritual" onClick={dead} className="text-[#F4F1EA]/70 hover:text-[#F4F1EA] transition-colors">THE RITUAL</a>
+          <a href="#reserve" onClick={dead} className="text-[#F4F1EA]/70 hover:text-[#F4F1EA] transition-colors font-bold text-[#C85A32]">REQUEST SEAT</a>
         </div>
       </nav>
 
@@ -265,6 +269,7 @@ export default function NoodlePlace({ isPreview = false, isCardPreview = false }
             <div className="flex flex-col sm:flex-row gap-4">
               <a
                 href="#reserve"
+                onClick={dead}
                 className="inline-flex items-center justify-between gap-4 py-3.5 px-6 rounded-full bg-[#C85A32] text-[#F4F1EA] font-mono text-[10px] font-bold tracking-widest hover:bg-[#C85A32]/90 active:scale-[0.98] transition-all duration-300 shadow-md group"
               >
                 <span>REQUEST A SEAT</span>
@@ -274,6 +279,7 @@ export default function NoodlePlace({ isPreview = false, isCardPreview = false }
               </a>
               <a
                 href="#menu"
+                onClick={dead}
                 className="inline-flex items-center justify-center py-3.5 px-6 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 text-[#F4F1EA] font-mono text-[10px] font-bold tracking-widest transition-all duration-300"
               >
                 EXPLORE MENU
@@ -800,9 +806,9 @@ export default function NoodlePlace({ isPreview = false, isCardPreview = false }
             © {new Date().getFullYear()} KIRI RAMEN. Kyoto & Overseas.
           </span>
           <div className="flex gap-6 uppercase">
-            <a href="#menu" className="hover:text-[#F4F1EA]">MENU</a>
-            <a href="#ritual" className="hover:text-[#F4F1EA]">RITUAL</a>
-            <a href="#reserve" className="hover:text-[#F4F1EA]">RESERVATIONS</a>
+            <a href="#menu" onClick={dead} className="hover:text-[#F4F1EA]">MENU</a>
+            <a href="#ritual" onClick={dead} className="hover:text-[#F4F1EA]">RITUAL</a>
+            <a href="#reserve" onClick={dead} className="hover:text-[#F4F1EA]">RESERVATIONS</a>
           </div>
         </div>
       </footer>
