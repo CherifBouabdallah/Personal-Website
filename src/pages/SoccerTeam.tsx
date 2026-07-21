@@ -18,7 +18,6 @@ const DISPLAY = { fontFamily: "'Playfair Display', Georgia, serif" } as const;
 const MONO = { fontFamily: "'JetBrains Mono', monospace" } as const;
 
 const INK = "#0D0C0A";
-const PAPER = "#F4EFE4";
 const CHAMP = "#D8BC80";
 const GOLD = "#A07C3E";
 
@@ -522,24 +521,22 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
       </header>
 
       <main className="relative z-10">
-        {/* ---------------------------------------------- 00 · hero */}
-        <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden pt-16">
-          {/* ink dot-dither band rising through the lower half of the hero (PixelBlast-style circle variant) */}
-          <div aria-hidden className="absolute inset-x-0 bottom-0 top-1/3 opacity-[0.55]">
-            <DitherField animate={!isCardPreview && !reduced} speed={0.4} pixelSize={3.5} dot ink={INK} paper={PAPER} />
-            {/* fade the field's top edge into the page */}
-            <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#F4EFE4] to-transparent" />
+        {/* ---------------------------------------------- 00 · hero (dark, matching the sections below) */}
+        <section className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden pt-16 bg-[#0D0C0A] text-[#F4EFE4]">
+          {/* champagne dot-dither field, full-bleed (PixelBlast-style circle variant) */}
+          <div aria-hidden className="absolute inset-0 opacity-50">
+            <DitherField animate={!isCardPreview && !reduced} speed={0.4} pixelSize={3.5} dot ink={CHAMP} paper={INK} />
           </div>
-          <Texture style={TEXTURE.lines} />
+          <Texture style={TEXTURE.vlinesGold} />
 
           <div ref={heroRef} data-hero-drift className="relative max-w-6xl mx-auto w-full px-6 md:px-8 lg:px-12 py-24">
             {/* kicker */}
             <div className="flex items-center gap-4">
-              <span aria-hidden className="h-px w-12 bg-[#A07C3E]" />
+              <span aria-hidden className="h-px w-12 bg-[#D8BC80]" />
               <p className="text-[11px] tracking-[0.3em] uppercase" style={MONO}>
                 Est. 2018 — Athletic Club — Division I
               </p>
-              <span aria-hidden className="h-px flex-1 bg-[#A07C3E]/50" />
+              <span aria-hidden className="h-px flex-1 bg-[#D8BC80]/40" />
             </div>
 
             {/* headline */}
@@ -549,26 +546,26 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             >
               <SplitLine text="OLYMPUS" />
             </h1>
-            <p className="mt-2 md:text-right italic text-[clamp(1.75rem,5vw,4rem)] leading-none text-[#A07C3E]" style={DISPLAY}>
+            <p className="mt-2 md:text-right italic text-[clamp(1.75rem,5vw,4rem)] leading-none text-[#D8BC80]" style={DISPLAY}>
               <SplitLine text="Football Club" />
             </p>
 
             {/* thick rule terminated by a bordered square */}
             <div className="mt-10 flex items-center gap-3">
-              <Rule weight={4} tone="gold" animated className="flex-1" />
-              <span aria-hidden className="block w-3 h-3 border-2 border-[#A07C3E] shrink-0" />
+              <Rule weight={4} tone="champagne" animated className="flex-1" />
+              <span aria-hidden className="block w-3 h-3 border-2 border-[#D8BC80] shrink-0" />
             </div>
 
             {/* meta + CTAs */}
             <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-10 items-end">
               <div className="flex flex-wrap items-center gap-4">
                 <button type="button"
-                  className="flex items-center gap-2 bg-[#0D0C0A] text-[#F4EFE4] px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border border-[#0D0C0A] hover:bg-[#A07C3E] hover:text-[#0D0C0A] hover:border-[#A07C3E] transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#0D0C0A] focus-visible:outline-offset-[3px] cursor-pointer"
+                  className="flex items-center gap-2 bg-[#D8BC80] text-[#0D0C0A] px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border border-[#D8BC80] hover:bg-[#F4EFE4] hover:border-[#F4EFE4] transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#D8BC80] focus-visible:outline-offset-[3px] cursor-pointer"
                   style={MONO}>
                   Match Programme <span aria-hidden>→</span>
                 </button>
                 <button type="button"
-                  className="px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border-2 border-[#0D0C0A] hover:bg-[#0D0C0A] hover:text-[#F4EFE4] transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#0D0C0A] focus-visible:outline-offset-[3px] cursor-pointer"
+                  className="px-8 py-4 min-h-[44px] text-[11px] tracking-[0.25em] uppercase font-medium border-2 border-[#F4EFE4]/70 text-[#F4EFE4] hover:bg-[#F4EFE4] hover:text-[#0D0C0A] transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#F4EFE4] focus-visible:outline-offset-[3px] cursor-pointer"
                   style={MONO}>
                   The Squad
                 </button>
@@ -584,8 +581,8 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                   ["Kick-off", "21:00 — Olympus Arena"],
                   ["Position", "1st — Division I"],
                 ].map(([k, v]) => (
-                  <motion.div key={k} variants={fadeUp} className="flex justify-between gap-6 border-t border-[#DAD1BD] py-3 last:border-b">
-                    <dt className="text-[#6E6555]">{k}</dt>
+                  <motion.div key={k} variants={fadeUp} className="flex justify-between gap-6 border-t border-[#F4EFE4]/20 py-3 last:border-b">
+                    <dt className="text-[#F4EFE4]/50">{k}</dt>
                     <dd className="text-right font-medium">{v}</dd>
                   </motion.div>
                 ))}
