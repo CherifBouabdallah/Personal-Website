@@ -130,6 +130,24 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
   return <span ref={ref} className="tabular-nums">{count}{suffix}</span>;
 }
 
+const BLUR_STEPS = [0.5, 1, 2, 4, 8];
+function GradualBlur({ direction }: { direction: "bottom" | "left" | "right" }) {
+  const toEdge = direction === "bottom" ? "to top" : direction === "left" ? "to right" : "to left";
+  return (
+    <div aria-hidden className="absolute inset-0 pointer-events-none">
+      {BLUR_STEPS.map((px, i) => {
+        // each layer blurs a progressively nearer-the-edge band
+        const from = 100 - (i + 1) * (100 / BLUR_STEPS.length);
+        const mask = `linear-gradient(${toEdge}, black ${from}%, transparent ${from + 100 / BLUR_STEPS.length + 10}%)`;
+        return (
+          <div key={px} className="absolute inset-0"
+            style={{ backdropFilter: `blur(${px}px)`, WebkitBackdropFilter: `blur(${px}px)`, maskImage: mask, WebkitMaskImage: mask }} />
+        );
+      })}
+    </div>
+  );
+}
+
 /** Draws every [data-rule] in from the left on scroll, once. Window scroller only. */
 function useRuleDraw(rootRef: React.RefObject<HTMLDivElement | null>, enabled: boolean) {
   const { reduced } = useMotionPrefs();
@@ -183,6 +201,10 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
       className="relative w-full min-h-screen overflow-x-hidden bg-white text-black selection:bg-black selection:text-white"
       style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
     >
+      <style>{`
+        @keyframes olympus-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+      `}</style>
+
       {/* global paper noise */}
       <div
         aria-hidden
@@ -304,7 +326,39 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
             </div>
           </div>
         </section>
+
+        {/* ---------------------------------------------- marquee */}
+        <section aria-hidden className="relative bg-black text-white overflow-hidden select-none">
+          <Rule weight={4} className="absolute top-0" />
+          <div className="py-6 overflow-hidden relative">
+            <div
+              className="flex w-max whitespace-nowrap will-change-transform"
+              style={(reduced || isCardPreview) ? undefined : { animation: "olympus-marquee 28s linear infinite" }}
+            >
+              {[0, 1].map((copy) => (
+                <div key={copy} className="flex items-center">
+                  {["Olympus FC", "Est. MMXVIII", "Fortuna Audaces Iuvat", "The Unbeaten Treble"].map((text) => (
+                    <span key={text} className="flex items-center">
+                      <span className="px-8 text-2xl md:text-3xl uppercase font-bold tracking-tight" style={DISPLAY}>{text}</span>
+                      <span className="block w-2 h-2 bg-white" />
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+            {/* gradual blur at both ends of the band */}
+            <div className="absolute inset-y-0 left-0 w-24"><GradualBlur direction="left" /></div>
+            <div className="absolute inset-y-0 right-0 w-24"><GradualBlur direction="right" /></div>
+          </div>
+          <Rule weight={4} className="absolute bottom-0" />
+        </section>
       </main>
+
+      {!isPreview && !isCardPreview && (
+        <div aria-hidden className="fixed bottom-0 left-0 right-0 h-28 z-30 pointer-events-none">
+          <GradualBlur direction="bottom" />
+        </div>
+      )}
 
       {/* ------------------------------------------------ footer */}
       <footer className="relative border-t border-black py-12 px-6 md:px-8 lg:px-12">
