@@ -250,6 +250,14 @@ const SQUAD = [
   ]},
 ];
 
+const FIXTURES = [
+  { home: "Olympus FC", away: "Titan Athletic", date: "Jun 08", venue: "Olympus Arena", score: "3–1" },
+  { home: "Nova United", away: "Olympus FC", date: "Jun 15", venue: "Nova Park", score: "1–2" },
+  { home: "Olympus FC", away: "Stellar FC", date: "Jun 22", venue: "Olympus Arena", score: null },
+  { home: "Phoenix Rising", away: "Olympus FC", date: "Jun 29", venue: "Phoenix Stadium", score: null },
+  { home: "Olympus FC", away: "Apex City", date: "Jul 06", venue: "Olympus Arena", score: null },
+] as const;
+
 // ---------------------------------------------------------------- page
 interface SoccerTeamProps {
   isPreview?: boolean;
@@ -559,6 +567,45 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ---------------------------------------------- 03 · fixtures */}
+        <section className="relative py-24 md:py-32 lg:py-40 px-6 md:px-8 lg:px-12">
+          <Texture style={TEXTURE.diag} />
+          <div className="relative max-w-6xl mx-auto">
+            <SectionIndex n="03" label="Fixtures" />
+            <h2 className="mt-6 text-5xl md:text-6xl lg:text-7xl tracking-tight" style={DISPLAY}>The Ledger</h2>
+
+            <motion.ul variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="mt-16 border-t border-black">
+              {FIXTURES.map((f) => {
+                const olympusHome = f.home === "Olympus FC";
+                return (
+                  <motion.li key={`${f.home}-${f.away}`} variants={fadeUp}>
+                    <div className="group grid grid-cols-1 md:grid-cols-[6rem_1fr_auto] items-center gap-4 md:gap-8 border-b border-black hover:border-b-[3px] hover:-mb-[2px] py-8 transition-none">
+                      <div style={MONO} className="text-[11px] tracking-[0.25em] uppercase text-[#525252]">
+                        {f.date}
+                        <span className="block mt-1 text-[10px] normal-case tracking-[0.15em]">{f.venue}</span>
+                      </div>
+                      <p className="text-2xl md:text-4xl tracking-tight" style={DISPLAY}>
+                        <span className={olympusHome ? "font-bold" : ""}>{f.home}</span>
+                        <span className="italic text-[#525252] mx-3 text-xl md:text-2xl">vs</span>
+                        <span className={!olympusHome ? "font-bold" : ""}>{f.away}</span>
+                      </p>
+                      {f.score ? (
+                        <p className="text-4xl md:text-5xl font-bold tabular-nums justify-self-start md:justify-self-end" style={DISPLAY}>{f.score}</p>
+                      ) : (
+                        <button type="button"
+                          className="justify-self-start md:justify-self-end text-[11px] tracking-[0.25em] uppercase border-2 border-black px-6 py-3 min-h-[44px] hover:bg-black hover:text-white transition-none focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-black focus-visible:outline-offset-[3px] cursor-pointer"
+                          style={MONO}>
+                          Reserve <span aria-hidden>→</span>
+                        </button>
+                      )}
+                    </div>
+                  </motion.li>
+                );
+              })}
+            </motion.ul>
           </div>
         </section>
       </main>
