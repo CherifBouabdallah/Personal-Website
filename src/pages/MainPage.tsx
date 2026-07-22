@@ -3,7 +3,6 @@ import { useLocation } from "react-router-dom";
 import Home from "./Home";
 import Portfolio from "./Portfolio";
 import Contact from "./Contact";
-import Grain from "../components/Grain";
 
 type Language = "en" | "fr";
 
@@ -43,29 +42,38 @@ export default function MainPage({ lang, setLang, activeSection, setActiveSectio
     }
   }, [location.pathname, location.hash]);
 
-  // Scroll spy to update the active navbar state based on scroll position
+  // Scroll spy to update the active navbar state based on scroll position.
+  // rAF-throttled (native scroll fires faster than one-per-frame) and bails
+  // out unless the section actually changed — setActiveSection lives in App
+  // and re-renders the whole tree, so calling it every scroll tick regardless
+  // of whether anything changed was the main React-scheduler cost on scroll.
   useEffect(() => {
     const sections = ["home", "portfolio", "contact"];
+    let ticking = false;
+    let lastSection = activeSection;
 
-    const handleScroll = () => {
+    const computeSection = () => {
+      ticking = false;
+
       // If near the bottom of the page, always show contact
       const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
-      if (isAtBottom) {
-        setActiveSection("contact");
-        return;
-      }
-
-      // Find the section whose top is closest to (but above) the viewport center
-      const viewportCenter = window.scrollY + window.innerHeight * 0.35;
       let current = "home";
 
-      for (const id of sections) {
-        const el = document.getElementById(id);
-        if (el && el.offsetTop <= viewportCenter) {
-          current = id;
+      if (isAtBottom) {
+        current = "contact";
+      } else {
+        // Find the section whose top is closest to (but above) the viewport center
+        const viewportCenter = window.scrollY + window.innerHeight * 0.35;
+        for (const id of sections) {
+          const el = document.getElementById(id);
+          if (el && el.offsetTop <= viewportCenter) {
+            current = id;
+          }
         }
       }
 
+      if (current === lastSection) return;
+      lastSection = current;
       setActiveSection(current);
 
       // Update URL to reflect the current section with clean paths
@@ -75,9 +83,15 @@ export default function MainPage({ lang, setLang, activeSection, setActiveSectio
       }
     };
 
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(computeSection);
+    };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     // Run once on mount to set the correct initial state
-    handleScroll();
+    computeSection();
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -86,7 +100,6 @@ export default function MainPage({ lang, setLang, activeSection, setActiveSectio
 
   return (
     <div className="w-full flex flex-col items-stretch justify-start bg-theme-bg">
-      <Grain />
       <Home lang={lang} setLang={setLang} />
       <Portfolio lang={lang} setLang={setLang} />
       <Contact lang={lang} />

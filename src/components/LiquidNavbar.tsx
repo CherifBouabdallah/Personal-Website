@@ -24,6 +24,45 @@ export default function LiquidNavbar({ className = "", activeSection = "home", s
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const [coords, setCoords] = useState<{ left: number; width: number } | null>(null);
 
+  // Whether the navbar is currently sitting over the Portfolio section's
+  // cream background (it's the one inverted "negative" section — cream bg,
+  // dark text). Tracked from real on-screen geometry, not the coarser
+  // activeSection scroll-spy (which fires at 35% viewport and lags well
+  // behind the moment the cream background actually reaches the fixed
+  // navbar near the top of the screen).
+  const [onLight, setOnLight] = useState(false);
+
+  useEffect(() => {
+    let ticking = false;
+
+    const checkBackground = () => {
+      ticking = false;
+      const nav = containerRef.current;
+      const portfolioEl = document.getElementById("portfolio");
+      if (!nav || !portfolioEl) {
+        setOnLight(false);
+        return;
+      }
+      const navMid = nav.getBoundingClientRect().top + nav.getBoundingClientRect().height / 2;
+      const pRect = portfolioEl.getBoundingClientRect();
+      setOnLight(navMid >= pRect.top && navMid <= pRect.bottom);
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(checkBackground);
+    };
+
+    checkBackground();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [location.pathname]);
+
   // Transition settings based on reduced motion preferences
   const transition = reduced ? TWEEN_INSTANT : SPRING_NAV;
 
@@ -88,7 +127,7 @@ export default function LiquidNavbar({ className = "", activeSection = "home", s
       {/* Editorial Underline Navbar */}
       <div
         ref={containerRef}
-        className="flex items-center gap-10 md:gap-16 relative py-3 px-6 border-b border-theme-text/10"
+        className={`flex items-center gap-10 md:gap-16 relative py-3 px-6 border-b ${onLight ? "border-theme-bg/15" : "border-theme-text/10"}`}
       >
         {SECTIONS.map((section, index) => {
           let label = "Home";
@@ -104,8 +143,14 @@ export default function LiquidNavbar({ className = "", activeSection = "home", s
                 linkRefs.current[index] = el;
               }}
               onClick={(e) => handleNavClick(section, e)}
-              className={`relative font-mono text-[9px] sm:text-[10px] tracking-[0.25em] uppercase transition-colors duration-200 py-1.5 cursor-pointer decoration-none inline-flex flex-col items-center justify-center ${
-                active ? "text-theme-text font-bold" : "text-theme-text/55 hover:text-theme-text/90"
+              className={`relative font-mono text-[9px] sm:text-[10px] tracking-[0.25em] uppercase py-1.5 cursor-pointer decoration-none inline-flex flex-col items-center justify-center ${
+                onLight
+                  ? active
+                    ? "text-theme-bg font-bold"
+                    : "text-theme-bg/55 hover:text-theme-bg/90"
+                  : active
+                    ? "text-theme-text font-bold"
+                    : "text-theme-text/55 hover:text-theme-text/90"
               }`}
               data-text={label}
             >
@@ -116,7 +161,7 @@ export default function LiquidNavbar({ className = "", activeSection = "home", s
 
         {coords && (
           <motion.div
-            className="absolute bottom-3 h-[1.5px] bg-theme-text"
+            className={`absolute bottom-3 h-[1.5px] ${onLight ? "bg-theme-bg" : "bg-theme-text"}`}
             animate={{
               left: coords.left,
               width: coords.width,

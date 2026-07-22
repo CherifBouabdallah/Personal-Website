@@ -8,6 +8,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import MainPage from "./pages/MainPage";
+import { PROJECT_PREVIEW_POSTER } from "./pages/Portfolio";
 import LiquidNavbar from "./components/LiquidNavbar";
 import Lenis from "lenis";
 import { EASE_ENTER, ARRIVAL_SETTLE_MS, ARRIVAL_CONTRACT_MS, useMotionPrefs } from "./lib/motion";
@@ -73,8 +74,11 @@ function AppInner() {
       fontsLoadedRef.current = true;
     });
 
-    // Streamlined preloading of heavy images using Promise.all
-    const imagesToPreload = ["/images/shared/OG2.webp"];
+    // Streamlined preloading of heavy images using Promise.all.
+    // Portfolio's hover-preview posters are included so they're already
+    // decoded/cached by the time the user reaches the portfolio section —
+    // zero-latency hover, paid for during the loading screen instead.
+    const imagesToPreload = ["/images/shared/OG2.webp", ...Object.values(PROJECT_PREVIEW_POSTER)];
     const preloadImage = (src: string) =>
       new Promise<void>((resolve) => {
         const img = new Image();

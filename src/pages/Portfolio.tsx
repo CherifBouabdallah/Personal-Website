@@ -61,7 +61,19 @@ export const FEATURED_PROJECTS: FeaturedProject[] = [
   }
 ];
 
-// Shared Preview: Scaled page thumbnail with unified hover (Memoized)
+// Static poster for each project's hover preview — a real screenshot of the
+// live page, not the page itself. ponytail: the previous version mounted the
+// entire live NoodlePlace/SoccerTeam/Vortex component tree (full images, full
+// GSAP/Framer setup) inside this thumbnail and just CSS-scaled it down, which
+// meant paying full-page render cost for a shrunk-down decorative preview on
+// every hover. A static image costs nothing to animate.
+export const PROJECT_PREVIEW_POSTER: Record<ModalKey, string> = {
+  vortex: "/images/vortex/preview.webp",
+  soccer: "/images/soccer-team/preview.webp",
+  noodle: "/images/noodle-place/preview.webp",
+};
+
+// Shared Preview: static poster thumbnail with unified hover (Memoized)
 export const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children, hoverLabel = "Open Project" }: {
   onClick: () => void;
   layoutId: string;
@@ -69,30 +81,10 @@ export const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children
   children: React.ReactNode;
   hoverLabel?: string;
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.35);
   const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    const updateScale = () => {
-      if (containerRef.current) {
-        const width = containerRef.current.clientWidth;
-        setScale(width / 1280);
-      }
-    };
-    updateScale();
-    window.addEventListener("resize", updateScale);
-    const observer = new ResizeObserver(updateScale);
-    if (containerRef.current) observer.observe(containerRef.current);
-    return () => {
-      window.removeEventListener("resize", updateScale);
-      observer.disconnect();
-    };
-  }, []);
 
   return (
     <motion.div
-      ref={containerRef}
       onClick={onClick}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -110,10 +102,7 @@ export const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children
       className="w-full aspect-[16/10] border border-theme-text/10 cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme-text/40 focus-visible:ring-offset-2 focus-visible:ring-offset-theme-bg"
       style={{ background: bgColor, borderRadius: 20, overflow: "hidden", position: "relative", clipPath: "inset(0 round 20px)" }}
     >
-      <div
-        className="absolute top-0 left-0 origin-top-left pointer-events-none"
-        style={{ width: 1280, height: 800, transform: `scale(${scale})` }}
-      >
+      <div className="absolute inset-0 pointer-events-none">
         {children}
       </div>
       {/* Unified hover overlay */}
@@ -130,94 +119,17 @@ export const ProjectPreview = React.memo(({ onClick, layoutId, bgColor, children
   );
 });
 
-// Per-project skeleton palette. Must match BG_COLOR[variant] exactly — the
-// skeleton fades out over that same container background (its opacity
-// animates to 0), so any mismatch shows up as a muddy cross-fade blend.
-const SKELETON_PALETTE: Record<ModalKey, { bg: string; base: string; highlight: string }> = {
-  vortex: { bg: "#141212", base: "rgba(255,255,255,0.06)", highlight: "rgba(255,255,255,0.14)" },
-  soccer: { bg: "#F4EFE4", base: "rgba(13,12,10,0.06)", highlight: "rgba(160,124,62,0.22)" },
-  noodle: { bg: "#121212", base: "rgba(255,255,255,0.06)", highlight: "rgba(200,90,50,0.18)" },
-};
-
-const skeletonVars = (variant: ModalKey) => ({
-  ["--skeleton-base" as string]: SKELETON_PALETTE[variant].base,
-  ["--skeleton-highlight" as string]: SKELETON_PALETTE[variant].highlight,
-});
-
-// Skeleton screen shown while the lazy project chunk loads, shaped after
-// each project's actual layout instead of one generic placeholder.
-function PreviewSkeleton({ variant }: { variant: ModalKey }) {
-  const wrapperClass = "absolute inset-0 w-full h-full overflow-hidden select-none";
-  const style = { background: SKELETON_PALETTE[variant].bg, ...skeletonVars(variant) };
-  const shared = { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.25, ease: "easeOut" as const } };
-
-  if (variant === "vortex") {
-    // Mirrors Vortex's own shape: top nav bar, centered headline, the big
-    // rounded "mac window" mockup, then a row of feature cards.
-    return (
-      <motion.div {...shared} className={wrapperClass} style={style}>
-        <div className="skeleton-shimmer absolute top-0 left-0 right-0 h-16" />
-        <div className="flex flex-col items-center gap-6 p-6 md:p-10 pt-24 h-full">
-          <div className="skeleton-shimmer h-7 w-56 rounded-full" />
-          <div className="skeleton-shimmer h-7 w-36 rounded-full" />
-          <div className="flex-1 w-full max-w-3xl skeleton-shimmer rounded-[32px]" />
-          <div className="grid grid-cols-4 gap-4 w-full max-w-3xl h-16">
-            {[0, 1, 2, 3].map((i) => <div key={i} className="skeleton-shimmer rounded-2xl" />)}
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
-
-  if (variant === "soccer") {
-    // Mirrors Olympus FC's editorial hero: kicker rule, big headline block,
-    // a thick rule, then a three-column stat strip.
-    return (
-      <motion.div {...shared} className={wrapperClass} style={style}>
-        <div className="flex flex-col gap-6 p-6 md:p-12 pt-20 h-full">
-          <div className="skeleton-shimmer h-3 w-48 rounded-full" />
-          <div className="skeleton-shimmer h-16 md:h-24 w-full max-w-2xl rounded-lg" />
-          <div className="skeleton-shimmer h-16 md:h-20 w-3/4 max-w-xl rounded-lg" />
-          <div className="skeleton-shimmer h-1.5 w-full max-w-md mt-2" />
-          <div className="grid grid-cols-3 gap-6 flex-1 items-end pb-6">
-            {[0, 1, 2].map((i) => <div key={i} className="skeleton-shimmer h-2/3 rounded-lg" />)}
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
-
-  // noodle: two-column hero (copy left, square hero image right), plus the
-  // floating island nav pill.
-  return (
-    <motion.div {...shared} className={wrapperClass} style={style}>
-      <div className="skeleton-shimmer absolute top-6 left-1/2 -translate-x-1/2 w-1/2 max-w-xs h-9 rounded-full" />
-      <div className="grid grid-cols-2 gap-8 items-center p-6 md:p-12 h-full">
-        <div className="flex flex-col gap-4">
-          <div className="skeleton-shimmer h-3 w-40 rounded-full" />
-          <div className="skeleton-shimmer h-10 w-full rounded-lg" />
-          <div className="skeleton-shimmer h-10 w-3/4 rounded-lg" />
-          <div className="skeleton-shimmer h-10 w-32 rounded-full mt-4" />
-        </div>
-        <div className="skeleton-shimmer aspect-square rounded-[2.5rem]" />
-      </div>
-    </motion.div>
-  );
-}
-
 // Preview Modal Overlay (Memoized)
 interface PreviewModalProps {
   onClose: () => void;
   onExpand: () => void;
   layoutId: string;
   bgColor: string;
-  variant: ModalKey;
   children: React.ReactNode;
 }
 
-export const PreviewModal = React.memo(({ onClose, onExpand, layoutId, bgColor, variant, children }: PreviewModalProps) => {
+export const PreviewModal = React.memo(({ onClose, onExpand, layoutId, bgColor, children }: PreviewModalProps) => {
   const [isLayoutComplete, setIsLayoutComplete] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Fallback timer: in case onLayoutAnimationComplete doesn't fire for some reason
@@ -227,15 +139,6 @@ export const PreviewModal = React.memo(({ onClose, onExpand, layoutId, bgColor, 
 
     return () => clearTimeout(fallbackTimer);
   }, []);
-
-  useEffect(() => {
-    if (isLayoutComplete) {
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 400);
-      return () => clearTimeout(timer);
-    }
-  }, [isLayoutComplete]);
 
   return (
     <motion.div
@@ -262,14 +165,12 @@ export const PreviewModal = React.memo(({ onClose, onExpand, layoutId, bgColor, 
           <AnimatePresence mode="wait">
             {!isLayoutComplete ? (
               <div key="blank" className="w-full h-full" />
-            ) : isLoading ? (
-              <PreviewSkeleton key="skeleton" variant={variant} />
             ) : (
               <motion.div
                 key="content"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.45, ease: "easeOut" }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
                 className="w-full h-full"
               >
                 {children}
@@ -482,9 +383,14 @@ export default function Portfolio({ lang }: PortfolioProps) {
                         bgColor={hoveredProject.bgColor}
                         hoverLabel={t.openProjectHover}
                       >
-                        <Suspense fallback={null}>
-                          <ProjectBody id={hoveredProject.id} isCardPreview />
-                        </Suspense>
+                        <img
+                          src={PROJECT_PREVIEW_POSTER[hoveredProject.id]}
+                          alt=""
+                          width={1280}
+                          height={800}
+                          decoding="async"
+                          className="w-full h-full object-cover object-top"
+                        />
                       </ProjectPreview>
                     </motion.div>
                   ) : (
@@ -514,7 +420,6 @@ export default function Portfolio({ lang }: PortfolioProps) {
             onExpand={handleExpand}
             layoutId={activeProject.layoutId}
             bgColor={BG_COLOR[activeModal]}
-            variant={activeModal}
           >
             <Suspense fallback={null}>
               <ProjectBody id={activeModal} startUnlocked />

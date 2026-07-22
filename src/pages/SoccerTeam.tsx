@@ -602,9 +602,11 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
                 </div>
               ))}
             </div>
-            {/* gradual blur at both ends of the band */}
-            <div className="absolute inset-y-0 left-0 w-24"><GradualBlur direction="left" /></div>
-            <div className="absolute inset-y-0 right-0 w-24"><GradualBlur direction="right" /></div>
+            {/* ponytail: flat gradient instead of GradualBlur — the band behind is
+                a solid color, so fading to it looks identical to blurring it, without
+                the backdrop-filter cost of doing so on every marquee animation frame */}
+            <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#14261E] to-transparent" />
+            <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#14261E] to-transparent" />
           </div>
           <Rule weight={4} tone="gold" className="absolute bottom-0" />
         </section>

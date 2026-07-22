@@ -87,7 +87,7 @@ export default function Contact({ lang }: ContactProps) {
     <div
       id="contact"
       ref={sectionRef}
-      className="w-full min-h-screen relative flex flex-col items-center justify-center selection:bg-theme-text selection:text-theme-bg py-24 md:py-32 bg-theme-bg text-theme-text overflow-hidden"
+      className="w-full min-h-screen relative flex flex-col items-center justify-center selection:bg-theme-text selection:text-theme-bg pt-40 pb-24 md:pt-56 md:pb-32 bg-theme-bg text-theme-text overflow-hidden"
     >
 
       <div className="relative z-10 flex flex-col items-center w-full max-w-3xl px-6">
