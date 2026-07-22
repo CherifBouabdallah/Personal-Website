@@ -468,7 +468,9 @@ export default function SoccerTeam({ isPreview = false, onClose, isCardPreview =
       <div
         aria-hidden
         className={`${isPreview ? "absolute" : "fixed"} inset-0 pointer-events-none z-40`}
-        style={{ backgroundImage: NOISE_BG, opacity: 0.02 }}
+        // ponytail: layer-promote to avoid re-rasterizing the feTurbulence
+        // filter every paint — same fix as Grain.tsx, see its comment.
+        style={{ backgroundImage: NOISE_BG, opacity: 0.02, transform: "translateZ(0)" }}
       />
 
       {/* ------------------------------------------------ header */}
