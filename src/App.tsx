@@ -15,8 +15,8 @@ import { EASE_ENTER, ARRIVAL_SETTLE_MS, ARRIVAL_CONTRACT_MS, useMotionPrefs } fr
 import { bridgeLenisToScrollTrigger } from "./lib/gsapSetup";
 
 // Static routes config to prevent recreation on every render
-const SCROLLABLE_ROUTES = new Set(["/", "/vortex", "/portfolio", "/contact", "/soccer-team", "/noodle-place"]);
-const NAVBAR_HIDDEN_ROUTES = new Set(["/vortex", "/soccer-team", "/noodle-place", "/secret101"]);
+const SCROLLABLE_ROUTES = new Set(["/", "/vortex", "/portfolio", "/contact", "/soccer-team", "/noodle-place", "/campusdrop"]);
+const NAVBAR_HIDDEN_ROUTES = new Set(["/vortex", "/soccer-team", "/noodle-place", "/campusdrop", "/secret101"]);
 
 // Helper to support preloading on lazy components
 function lazyWithPreload<T extends ComponentType<any>>(
@@ -31,6 +31,7 @@ function lazyWithPreload<T extends ComponentType<any>>(
 const Vortex = lazyWithPreload(() => import("./pages/Vortex"));
 const SoccerTeam = lazyWithPreload(() => import("./pages/SoccerTeam"));
 const NoodlePlace = lazyWithPreload(() => import("./pages/NoodlePlace"));
+const CampusDrop = lazyWithPreload(() => import("./pages/CampusDrop"));
 const NotFound = lazyWithPreload(() => import("./pages/NotFound"));
 const Secret101 = lazyWithPreload(() => import("./pages/Secret101"));
 
@@ -289,6 +290,7 @@ function AppInner() {
                 <Route path="/vortex" element={<Vortex />} />
                 <Route path="/soccer-team" element={<SoccerTeam />} />
                 <Route path="/noodle-place" element={<NoodlePlace />} />
+                <Route path="/campusdrop" element={<CampusDrop />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

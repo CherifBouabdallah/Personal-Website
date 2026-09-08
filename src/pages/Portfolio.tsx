@@ -10,9 +10,10 @@ import { usePlateStrike } from "../hooks/useBroadsheetMotion";
 const Vortex = React.lazy(() => import("./Vortex"));
 const SoccerTeam = React.lazy(() => import("./SoccerTeam"));
 const NoodlePlace = React.lazy(() => import("./NoodlePlace"));
+const CampusDrop = React.lazy(() => import("./CampusDrop"));
 
 // Type declarations
-export type ModalKey = "vortex" | "soccer" | "noodle";
+export type ModalKey = "vortex" | "soccer" | "noodle" | "campus";
 
 export interface FeaturedProject {
   id: ModalKey;
@@ -58,6 +59,17 @@ export const FEATURED_PROJECTS: FeaturedProject[] = [
     showGithub: false,
     layoutId: "noodle-place-card",
     bgColor: "#121212",
+  },
+  {
+    id: "campus",
+    number: "04",
+    title: "CampusDrop",
+    descriptionKey: "campusDesc",
+    githubUrl: "https://github.com/CherifBouabdallah",
+    showGithub: false,
+    layoutId: "campusdrop-card",
+    bgColor: "#1B1517",
+    reverse: true,
   }
 ];
 
@@ -71,6 +83,7 @@ export const PROJECT_PREVIEW_POSTER: Record<ModalKey, string> = {
   vortex: "/images/vortex/preview.webp",
   soccer: "/images/soccer-team/preview.webp",
   noodle: "/images/noodle-place/preview.webp",
+  campus: "/images/campusdrop/preview.webp",
 };
 
 // Shared Preview: static poster thumbnail with unified hover (Memoized)
@@ -205,20 +218,23 @@ const BG_COLOR: Record<ModalKey, string> = {
   vortex: "#141212",
   soccer: "#F4EFE4",
   noodle: "#121212",
+  campus: "#1B1517",
 };
 
 // Contents-index metadata not carried by FeaturedProject — reuses existing
 // translated category labels rather than adding new ones.
-type CategoryKey = "sandboxLabel" | "webDesignLabel" | "ramenLabel";
+type CategoryKey = "sandboxLabel" | "webDesignLabel" | "ramenLabel" | "campusLabel";
 const PLATE_META: Record<ModalKey, { year: string; categoryKey: CategoryKey }> = {
   vortex: { year: "2024", categoryKey: "sandboxLabel" },
   soccer: { year: "2023", categoryKey: "webDesignLabel" },
   noodle: { year: "2024", categoryKey: "ramenLabel" },
+  campus: { year: "2025", categoryKey: "campusLabel" },
 };
 
 function ProjectBody({ id, isCardPreview = false, startUnlocked = false }: { id: ModalKey; isCardPreview?: boolean; startUnlocked?: boolean }) {
   if (id === "vortex") return <Vortex isPreview startUnlocked={startUnlocked} isCardPreview={isCardPreview} />;
   if (id === "soccer") return <SoccerTeam isPreview isCardPreview={isCardPreview} />;
+  if (id === "campus") return <CampusDrop isPreview />;
   return <NoodlePlace isPreview isCardPreview={isCardPreview} />;
 }
 
@@ -228,6 +244,7 @@ const ROUTE_PATH: Record<ModalKey, string> = {
   vortex: "/vortex",
   soccer: "/soccer-team",
   noodle: "/noodle-place",
+  campus: "/campusdrop",
 };
 
 interface IndexRowProps {

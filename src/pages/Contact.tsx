@@ -98,7 +98,7 @@ export default function Contact({ lang }: ContactProps) {
           <SplitLine text="Contact" />
         </h1>
 
-        <div className="flex items-center justify-center gap-8 sm:gap-10 md:gap-16 w-full border-t border-theme-text/10 pt-14">
+        <div className="flex items-center justify-center gap-8 sm:gap-10 md:gap-16 border-t border-theme-text/10 pt-14">
           {socials.map((social) => {
             const isExpanded = activePopup === social.name;
             return (
