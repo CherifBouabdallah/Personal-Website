@@ -34,6 +34,7 @@ export interface LanguageTranslations {
 
   // Broadsheet chrome keys — Portfolio contents-index kicker.
   broadsheetContentsLabel: string;
+  scrollLabel: string;
 }
 
 export const TRANSLATIONS: Record<"en" | "fr", LanguageTranslations> = {
@@ -126,7 +127,8 @@ export const TRANSLATIONS: Record<"en" | "fr", LanguageTranslations> = {
     campusDesc: "The marketing site for CampusDrop, a campus delivery product where students run each other's errands. A scroll-driven landing page in seven acts with animated phone mockups, a grain-lit gradient backdrop and copy that stays deliberately honest about how the money moves.",
     ramenDesc: "A sensory digital showcase for a premium ramen sanctuary. Fuses wabi-sabi aesthetics with smooth scroll-driven typography reveals, asymmetric bento menu layouts, micro-interactive ingredient drawers, and a warm terracotta and charcoal canvas.",
 
-    broadsheetContentsLabel: "Contents"
+    broadsheetContentsLabel: "Contents",
+    scrollLabel: "SCROLL"
   },
   fr: {
     monologue: [
@@ -224,6 +226,7 @@ export const TRANSLATIONS: Record<"en" | "fr", LanguageTranslations> = {
     campusDesc: "Le site vitrine de CampusDrop, un service de livraison sur le campus où les étudiants se rendent service. Une page d'accueil scénarisée au défilement en sept actes, avec maquettes de téléphone animées, fond dégradé texturé et un discours volontairement transparent sur la circulation de l'argent.",
     ramenDesc: "Une vitrine numérique sensorielle pour un temple du ramen haut de gamme. Allie l'esthétique wabi-sabi à des révélations typographiques fluides au défilement, des grilles de menu bento asymétriques, des tiroirs d'ingrédients micro-interactifs et un canevas terre cuite et charbon.",
 
-    broadsheetContentsLabel: "Sommaire"
+    broadsheetContentsLabel: "Sommaire",
+    scrollLabel: "DÉFILER"
   }
 };

@@ -78,9 +78,9 @@ export default function Contact({ lang }: ContactProps) {
   const footerY = useTransform(smoothProgress, [0.65, 0.98], ["15px", "0px"]);
 
   const socials = [
-    { name: "GITHUB" as const, number: "01", url: "https://github.com/CherifBouabdallah", icon: <GithubIcon /> },
-    { name: "EMAIL" as const, number: "02", url: "", icon: <EmailIcon /> },
-    { name: "LINKEDIN" as const, number: "03", url: "https://www.linkedin.com/in/cherif-bouabdallah/", icon: <LinkedinIcon /> },
+    { name: "GITHUB" as const, url: "https://github.com/CherifBouabdallah", icon: <GithubIcon /> },
+    { name: "EMAIL" as const, url: "", icon: <EmailIcon /> },
+    { name: "LINKEDIN" as const, url: "https://www.linkedin.com/in/cherif-bouabdallah/", icon: <LinkedinIcon /> },
   ];
 
   return (
@@ -118,7 +118,6 @@ export default function Contact({ lang }: ContactProps) {
                   }
                 }}
               >
-                <span className="font-mono text-[9px] tracking-[0.25em] opacity-30 mb-2">{social.number}</span>
                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-theme-text/20 flex items-center justify-center text-theme-text/90 bg-theme-text/5 transition-all duration-500 group-hover:bg-theme-text group-hover:text-theme-bg group-hover:scale-105 group-hover:border-theme-text">
                   {social.icon}
                 </div>

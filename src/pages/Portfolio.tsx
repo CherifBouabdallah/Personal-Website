@@ -30,14 +30,14 @@ export interface FeaturedProject {
 // Static project database
 export const FEATURED_PROJECTS: FeaturedProject[] = [
   {
-    id: "vortex",
+    id: "campus",
     number: "01",
-    title: "Vortex",
-    descriptionKey: "vortexDesc",
+    title: "CampusDrop",
+    descriptionKey: "campusDesc",
     githubUrl: "https://github.com/CherifBouabdallah",
-    showGithub: true,
-    layoutId: "vortex-sandbox-card",
-    bgColor: "#141212",
+    showGithub: false,
+    layoutId: "campusdrop-card",
+    bgColor: "#1B1517",
   },
   {
     id: "soccer",
@@ -51,24 +51,24 @@ export const FEATURED_PROJECTS: FeaturedProject[] = [
     reverse: true,
   },
   {
-    id: "noodle",
+    id: "vortex",
     number: "03",
+    title: "Vortex",
+    descriptionKey: "vortexDesc",
+    githubUrl: "https://github.com/CherifBouabdallah",
+    showGithub: true,
+    layoutId: "vortex-sandbox-card",
+    bgColor: "#141212",
+  },
+  {
+    id: "noodle",
+    number: "04",
     title: "Kiri Ramen",
     descriptionKey: "ramenDesc",
     githubUrl: "https://github.com/CherifBouabdallah",
     showGithub: false,
     layoutId: "noodle-place-card",
     bgColor: "#121212",
-  },
-  {
-    id: "campus",
-    number: "04",
-    title: "CampusDrop",
-    descriptionKey: "campusDesc",
-    githubUrl: "https://github.com/CherifBouabdallah",
-    showGithub: false,
-    layoutId: "campusdrop-card",
-    bgColor: "#1B1517",
     reverse: true,
   }
 ];
@@ -224,11 +224,11 @@ const BG_COLOR: Record<ModalKey, string> = {
 // Contents-index metadata not carried by FeaturedProject — reuses existing
 // translated category labels rather than adding new ones.
 type CategoryKey = "sandboxLabel" | "webDesignLabel" | "ramenLabel" | "campusLabel";
-const PLATE_META: Record<ModalKey, { year: string; categoryKey: CategoryKey }> = {
-  vortex: { year: "2024", categoryKey: "sandboxLabel" },
-  soccer: { year: "2023", categoryKey: "webDesignLabel" },
-  noodle: { year: "2024", categoryKey: "ramenLabel" },
-  campus: { year: "2025", categoryKey: "campusLabel" },
+const PLATE_META: Record<ModalKey, { categoryKey: CategoryKey }> = {
+  vortex: { categoryKey: "sandboxLabel" },
+  soccer: { categoryKey: "webDesignLabel" },
+  noodle: { categoryKey: "ramenLabel" },
+  campus: { categoryKey: "campusLabel" },
 };
 
 function ProjectBody({ id, isCardPreview = false, startUnlocked = false }: { id: ModalKey; isCardPreview?: boolean; startUnlocked?: boolean }) {
@@ -282,7 +282,7 @@ const IndexRow = React.memo(({ project, t, isHovered, onHover, onOpen }: IndexRo
         {project.title}
       </h3>
       <span className="col-span-2 md:col-span-1 font-mono text-[9px] tracking-[0.25em] uppercase opacity-45 md:text-right whitespace-nowrap">
-        {meta.year} · {t[meta.categoryKey]}
+        {t[meta.categoryKey]}
       </span>
     </div>
   );
@@ -362,9 +362,6 @@ export default function Portfolio({ lang }: PortfolioProps) {
           <p className="font-mono text-[9px] md:text-[11px] tracking-[0.25em] uppercase opacity-60 max-w-sm leading-relaxed mt-6 text-center px-6">
             {t.portfolioIntro}
           </p>
-          <span className="font-mono text-[9px] tracking-[0.35em] uppercase opacity-40 mt-10 border-t border-theme-bg/15 pt-4">
-            {t.broadsheetContentsLabel}
-          </span>
         </div>
 
         {/* Right: numbered contents index + margin preview */}

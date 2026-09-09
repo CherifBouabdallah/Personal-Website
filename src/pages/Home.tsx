@@ -1,5 +1,5 @@
 import { useState, useEffect, memo, Fragment } from "react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { TRANSLATIONS } from "../data/translations";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
@@ -81,6 +81,11 @@ export default function Home({ lang, setLang }: HomeProps) {
   const [photoshopClicks, setPhotoshopClicks] = useState(0);
   const [isReady, setIsReady] = useState(false);
   const { reduced, transition } = useMotionPrefs();
+
+  // Scroll invite — fades out as soon as the user starts scrolling.
+  const { scrollY } = useScroll();
+  const inviteOpacity = useTransform(scrollY, [0, 200], [1, 0]);
+  const inviteY = useTransform(scrollY, [0, 200], ["0px", "15px"]);
 
   const wordContainer = (delayChildren: number) => ({
     hidden: {},
@@ -319,6 +324,24 @@ export default function Home({ lang, setLang }: HomeProps) {
           </div>
         </div>
       </div>
+
+      {/* Scroll invite — minimalist sliding line, fades out once the user scrolls */}
+      <motion.div
+        style={{ opacity: inviteOpacity, y: inviteY }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10 pointer-events-none"
+      >
+        <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-theme-text/60">
+          {t.scrollLabel}
+        </span>
+        <div className="w-[1.5px] h-[22px] bg-theme-text/20 relative overflow-hidden">
+          <motion.div
+            animate={reduced ? undefined : { y: ["-100%", "100%"] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-0 bg-theme-text/80 h-full w-full"
+            style={{ originY: 0 }}
+          />
+        </div>
+      </motion.div>
     </div>
   );
 }
