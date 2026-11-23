@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>L&#x27;instant gâteau · Pully</title>
+<style>
+[hidden]{display:none !important}
+*{box-sizing:border-box;margin:0}
+:root{--bg:#3a2a12;--paper:#fdf8ee;--ink:#3a2a12;--acc:#c27c0e;--soft:#f5e6c8}
+body{font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--paper)}
+a{color:inherit}
+.rib{background:var(--acc);color:#fff;font-size:13.5px;padding:8px 16px;text-align:center}
+.rib a{font-weight:600}
+nav{display:flex;align-items:center;gap:14px;padding:18px clamp(16px,5vw,64px);border-bottom:1px solid var(--soft)}
+.logo{width:42px;height:42px;border-radius:50%;background:var(--bg);color:var(--paper);display:grid;place-items:center;font:600 16px Georgia,serif;letter-spacing:.5px}
+nav b{font:600 18px Georgia,serif}
+nav .links{margin-left:auto;display:flex;gap:22px;font-size:14.5px}
+nav .links a{text-decoration:none;opacity:.8}
+.hero{background:var(--bg);color:var(--paper);padding:clamp(56px,10vw,120px) clamp(16px,5vw,64px);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-12vw;top:-12vw;width:48vw;height:48vw;border-radius:50%;background:var(--acc);opacity:.22}
+.kick{text-transform:uppercase;letter-spacing:2px;font-size:13px;opacity:.75}
+h1{font:600 clamp(38px,7vw,84px)/1.05 Georgia,"Times New Roman",serif;margin:14px 0 18px;max-width:16ch;position:relative;z-index:1}
+.tag{font-size:clamp(18px,2.2vw,24px);opacity:.9;max-width:34ch}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;position:relative;z-index:1}
+.btn{background:var(--acc);color:#fff;text-decoration:none;padding:13px 22px;border-radius:999px;font-weight:600}
+.btn.ghost{background:transparent;border:1.5px solid var(--paper);color:var(--paper)}
+section{padding:clamp(48px,7vw,88px) clamp(16px,5vw,64px)}
+h2{font:600 clamp(26px,3.4vw,38px) Georgia,serif;margin-bottom:26px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.card{background:#fff;border:1px solid var(--soft);border-radius:14px;padding:26px}
+.card .n{color:var(--acc);font:600 14px ui-monospace,monospace}
+.card h3{font:600 21px Georgia,serif;margin:8px 0 6px}
+.visit{background:var(--soft);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:36px;align-items:start}
+.hrs{border-collapse:collapse;width:100%;max-width:420px}
+.hrs th,.hrs td{text-align:left;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.08);font-weight:400}
+.hrs th{width:42%;font-weight:600}
+.map{width:100%;height:360px;border:0;border-radius:14px;background:#ddd}
+.muted{opacity:.7}
+.addr{font-size:18px;margin:18px 0 6px}
+footer{background:var(--bg);color:var(--paper);padding:34px clamp(16px,5vw,64px);font-size:14px;display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+footer .me{opacity:.75}
+@media (max-width:760px){nav .links{display:none} .visit{grid-template-columns:1fr} .map{height:260px}}
+</style></head><body>
+<div class="rib">Maquette gratuite pour L&#x27;instant gâteau, préparée par Chérif · les textes sont des exemples, tout se change ·
+site complet 290 CHF · <a href="mailto:contact@cherifbouabdallah.dev?subject=Maquette%20L%27instant%20g%C3%A2teau">me répondre</a></div>
+<nav><div class="logo">LI</div><b>L&#x27;instant gâteau</b>
+<div class="links"><a href="#offre">La boutique</a><a href="#visite">Horaires</a><a href="#contact">Contact</a></div></nav>
+<header class="hero"><div class="kick">Boulangerie · Pully</div><h1>L&#x27;instant gâteau</h1><p class="tag">Fait ici, chaque jour.</p>
+<div class="cta"><a class="btn" href="tel:+41217112390">Appeler 021 711 23 90</a><a class="btn ghost" href="https://www.openstreetmap.org/directions?to=46.5096803%2C6.6606309" target="_blank" rel="noopener">Itinéraire</a></div></header>
+<section id="offre"><h2>La boutique</h2><div class="cards"><div class="card"><span class="n">01</span><h3>Nos produits</h3><p>Ce qui sort du four ou de la cave cette semaine, avec photos.</p></div><div class="card"><span class="n">02</span><h3>Commandes</h3><p>Gâteaux, plateaux, paniers pour les fêtes : commandés à l&#x27;avance, prêts à l&#x27;heure.</p></div><div class="card"><span class="n">03</span><h3>La maison</h3><p>Votre histoire, votre savoir-faire et vos producteurs, en quelques lignes.</p></div></div></section>
+<section id="visite" class="visit"><div><h2>Horaires</h2><table class="hrs"><tr><th>Lundi</th><td>Fermé</td></tr><tr><th>Mardi</th><td>08:30 – 18:00</td></tr><tr><th>Mercredi</th><td>08:30 – 18:00</td></tr><tr><th>Jeudi</th><td>08:30 – 18:00</td></tr><tr><th>Vendredi</th><td>08:30 – 18:00</td></tr><tr><th>Samedi</th><td>08:30 – 18:00</td></tr><tr><th>Dimanche</th><td>Fermé</td></tr></table>
+<p class="addr">Rue du Centre 14, 1009 Pully</p><p><a href="https://www.openstreetmap.org/directions?to=46.5096803%2C6.6606309" target="_blank" rel="noopener">Itinéraire →</a></p></div>
+<div><iframe class="map" loading="lazy" title="Carte" src="https://www.openstreetmap.org/export/embed.html?bbox=6.6546309,46.5061803,6.6666309,46.5131803&amp;layer=mapnik&amp;marker=46.5096803,6.6606309"></iframe></div></section>
+<section id="contact"><h2>Contact</h2><p class="addr"><a href="tel:+41217112390">021 711 23 90</a></p><p><a href="mailto:info@linstantgateau.com">info@linstantgateau.com</a></p>
+<p class="muted">Passer commande : un appel ou un message, directement depuis le téléphone.</p></section>
+<footer><span>© 2026 L&#x27;instant gâteau · Pully</span>
+<span class="me">Maquette par Chérif, étudiant EPFL · <a href="https://cherifbouabdallah.dev">cherifbouabdallah.dev</a> ·
+contact@cherifbouabdallah.dev · 290 CHF, puis 25 CHF/mois (hébergement et petites modifications)</span></footer>
+</body></html>
